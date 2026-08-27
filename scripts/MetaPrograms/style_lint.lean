@@ -43,7 +43,7 @@ def doubleEmptyLineLinter : PhyslibTextLinter := fun lines ↦ Id.run do
 def doubleSpaceLinter : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
-    if String.containsSubstr l.trimAsciiStart.copy "  " then
+    if String.contains l.trimAsciiStart.copy "  " then
       let k := (Substring.Raw.findAllSubstr l "  ").toList.getLast?
       let col := match k with
         | none => 1
@@ -55,7 +55,7 @@ def doubleSpaceLinter : PhyslibTextLinter := fun lines ↦ Id.run do
 def longLineLinter : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
-    if l.length > 100 ∧ ¬ String.containsSubstr l "http" then
+    if l.length > 100 ∧ ¬ String.contains l "http" then
       some (s!" Line is too long.", lno, 100)
     else none)
   errors.toArray
@@ -64,7 +64,7 @@ def longLineLinter : PhyslibTextLinter := fun lines ↦ Id.run do
 def substringLinter (s : String) : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
-    if String.containsSubstr l s then
+    if String.contains l s then
       let k := (Substring.Raw.findAllSubstr l s).toList.getLast?
       let col := match k with
         | none => 1
@@ -118,19 +118,33 @@ def physlibLintFile (path : FilePath) : IO (Array PhyslibErrorContext) := do
   let errors := allOutput.flatten
   return errors
 
-def main (_ : List String) : IO UInt32 := do
-  initSearchPath (← findSysroot)
-  let mods : Name :=  `Physlib
+/-- The file paths of the modules imported into the module `mods` (e.g. `Physlib`),
+  found by reading the module's `.olean` file. -/
+def importedFilePaths (mods : Name) : IO (Array FilePath) := do
   let imp : Import := {module := mods}
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do
         throw <| IO.userError s!"object file '{mFile}' of module {imp.module} does not exist"
-  let (physlibMod, _) ← readModuleData mFile
-  let filePaths := physlibMod.imports.filterMap (fun imp ↦
+  let (modData, _) ← readModuleData mFile
+  return modData.imports.filterMap (fun imp ↦
     if imp.module == `Init then
       none
     else
       some ((mkFilePath (imp.module.toString.splitToList (· == '.'))).addExtension "lean"))
+
+/-- The file paths of modules which should be skipped by the linters, read from
+  `scripts/LinterExemption.txt`. This is used to lint `QuantumInfo` file-by-file. -/
+def linterExemptions : IO (Array String) := do
+  let path : FilePath := mkFilePath ["scripts", "LinterExemption.txt"]
+  unless (← path.pathExists) do return #[]
+  let lines ← IO.FS.lines path
+  return lines.filterMap (fun l ↦ if l.trimAscii.copy == "" then none else some l.trimAscii.copy)
+
+def main (_ : List String) : IO UInt32 := do
+  initSearchPath (← findSysroot)
+  let filePaths := (← importedFilePaths `Physlib) ++ (← importedFilePaths `QuantumInfo)
+  let exemptions ← linterExemptions
+  let filePaths := filePaths.filter (fun p ↦ !exemptions.contains p.toString)
   let errors := (← filePaths.mapM physlibLintFile).flatten
   let errorMessagesPresent := (errors.map (fun e => e.error)).sortDedup
   for eM in errorMessagesPresent do

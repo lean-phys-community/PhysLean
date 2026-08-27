@@ -96,7 +96,8 @@ potential term via symmetry.
 
 -/
 
-/-- The charges of representations `x : Charges` allow a potential term `T : PotentialTerm`
+/-- The charge spectrum of representations `x : ChargeSpectrum 𝓩` allows a potential term
+`T : PotentialTerm`
 if the zero charge is in the set of charges associated with that potential term. -/
 def AllowsTerm (x : ChargeSpectrum 𝓩) (T : PotentialTerm) : Prop := 0 ∈ ofPotentialTerm x T
 
@@ -111,9 +112,8 @@ We define the decidability of `AllowsTerm` through `ofPotentialTerm'` rather tha
 
 lemma allowsTerm_iff_zero_mem_ofPotentialTerm' [DecidableEq 𝓩]
     {x : ChargeSpectrum 𝓩} {T : PotentialTerm} :
-    x.AllowsTerm T ↔ 0 ∈ x.ofPotentialTerm' T := by
-  rw [AllowsTerm]
-  exact mem_ofPotentialTerm_iff_mem_ofPotentialTerm
+    x.AllowsTerm T ↔ 0 ∈ x.ofPotentialTerm' T :=
+  mem_ofPotentialTerm_iff_mem_ofPotentialTerm
 
 instance [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (T : PotentialTerm) : Decidable (x.AllowsTerm T) :=
   decidable_of_iff (0 ∈ x.ofPotentialTerm' T) allowsTerm_iff_zero_mem_ofPotentialTerm'.symm
@@ -177,25 +177,14 @@ lemma allowsTermForm_allowsTerm {a b c : 𝓩} {T : PotentialTerm} :
   cases T
   all_goals
     simp [PotentialTerm.toFieldLabel, ofFieldLabel]
-  case Λ =>
-    use a, b
-    simp
+  case Λ => exact ⟨a, b, by simp⟩
+  case K1 | topYukawa => exact ⟨b, - a - b, by simp⟩
   case W3 =>
-    use b, -b - 2 • a
+    refine ⟨b, -b - 2 • a, ?_⟩
     simp only [true_or, or_true, and_self, true_and]
     abel
-  case K1 =>
-    use b, - a - b
-    simp
-  case topYukawa =>
-    use b, - a - b
-    simp
-  case W1 =>
-    use a, b, c
-    simp only [true_or, or_true, and_self, true_and]
-    abel
-  case W2 =>
-    use a, b, c
+  case W1 | W2 =>
+    refine ⟨a, b, c, ?_⟩
     simp only [true_or, or_true, and_self, true_and]
     abel
   all_goals abel
@@ -228,25 +217,17 @@ lemma allowsTermForm_eq_of_subset {a b c a' b' c' : 𝓩} {T : PotentialTerm}
   all_goals
     rw [subset_def] at h
     simp [allowsTermForm] at h ⊢
-  case' μ =>
+  case' μ | β =>
     subst h
     rfl
-  case' β =>
-    subst h
-    rfl
-  case' K2 =>
+  case' K2 | bottomYukawa =>
     obtain ⟨rfl, rfl, h2⟩ := h
     simp
   case' W4 =>
     obtain ⟨h2, rfl, rfl⟩ := h
     simp
-  case' bottomYukawa =>
-    obtain ⟨rfl, rfl, h2⟩ := h
-    simp
   case' Λ => obtain ⟨h2, h1⟩ := h
-  case' K1 => obtain ⟨rfl, h2⟩ := h
-  case' topYukawa => obtain ⟨rfl, h2⟩ := h
-  case' W3 => obtain ⟨rfl, h2⟩ := h
+  case' K1 | topYukawa | W3 => obtain ⟨rfl, h2⟩ := h
   case' topYukawa | W3 | K1 | Λ =>
     rw [Finset.insert_subset_iff] at h2
     simp at h2
@@ -273,10 +254,7 @@ lemma allowsTermForm_card_le_degree {a b c : 𝓩} {T : PotentialTerm} :
   case' W3 =>
     have h1 : Finset.card {b, -b - 2 • a} ≤ 2 := Finset.card_le_two
     omega
-  case' K1 =>
-    have h1 : Finset.card {b, -a - b} ≤ 2 := Finset.card_le_two
-    omega
-  case' topYukawa =>
+  case' K1 | topYukawa =>
     have h1 : Finset.card {b, -a - b} ≤ 2 := Finset.card_le_two
     omega
   all_goals
@@ -329,41 +307,33 @@ lemma allowsTermForm_subset_allowsTerm_of_allowsTerm {T : PotentialTerm} {x : Ch
     simp [AllowsTerm, ofPotentialTerm, PotentialTerm.toFieldLabel, ofFieldLabel]
   -- Replacements of equalities
   case' W1 | W2 =>
-    have hf2 : f2 = -f4 - f6 - f8 := by
+    obtain rfl : f2 = -f4 - f6 - f8 := by
       rw [← sub_zero f2, ← f1_add_f2_eq_zero]
       abel
-    subst hf2
     simp_all
   case β =>
-    have hf2 : f4 = - f2 := by
-      rw [← sub_zero f2, ← f1_add_f2_eq_zero]
-      abel
-    subst hf2
+    obtain rfl : f4 = - f2 := eq_neg_of_add_eq_zero_left f1_add_f2_eq_zero
     simp_all
   case K2 =>
-    have hf2 : f2 = - f4 - f6 := by
+    obtain rfl : f2 = - f4 - f6 := by
       rw [← sub_zero f2, ← f1_add_f2_eq_zero]
       abel
-    subst hf2
     simp_all
   case' Λ =>
-    have hf2 : f2 = -f4 - f6 := by
+    obtain rfl : f2 = -f4 - f6 := by
       rw [← sub_zero f2, ← f1_add_f2_eq_zero]
       abel
-    subst hf2
     simp_all
   case' W3 =>
     subst f4_mem
-    have hf8 : f8 = - f6 - 2 • f4 := by
+    obtain rfl : f8 = - f6 - 2 • f4 := by
       rw [← sub_zero f8, ← f1_add_f2_eq_zero]
       abel
-    subst hf8
     simp_all
   case' bottomYukawa =>
-    have hf6 : f6 = - f2 - f4 := by
+    obtain rfl : f6 = - f2 - f4 := by
       rw [← sub_zero f2, ← f1_add_f2_eq_zero]
       abel
-    subst hf6
     simp_all
   -- AllowsTerm
   case W3 =>
@@ -374,18 +344,16 @@ lemma allowsTermForm_subset_allowsTerm_of_allowsTerm {T : PotentialTerm} {x : Ch
     simp only [true_or, or_true, and_self, true_and]
     abel
   case K1 =>
-    have hf6 : f6 = - f2 - f4 := by
+    obtain rfl : f6 = - f2 - f4 := by
       rw [← sub_zero f2, ← f1_add_f2_eq_zero]
       abel
-    subst hf6
     simp_all
     use (-f2 - f4), f4
     simp
   case' topYukawa =>
-    have hf2 : f2 = - f4 - f6 := by
+    obtain rfl : f2 = - f4 - f6 := by
       rw [← sub_zero f2, ← f1_add_f2_eq_zero]
       abel
-    subst hf2
     simp_all
   case topYukawa | Λ =>
     use f6, f4
@@ -413,13 +381,9 @@ Given what has already been shown, this result is now trivial.
 -/
 lemma allowsTerm_iff_subset_allowsTermForm {T : PotentialTerm} {x : ChargeSpectrum 𝓩} :
     x.AllowsTerm T ↔ ∃ a b c, allowsTermForm a b c T ⊆ x := by
-  constructor
-  · intro h
-    obtain ⟨a, b, c, h1, h2⟩ := allowsTermForm_subset_allowsTerm_of_allowsTerm h
-    use a, b, c
-  · intro h
-    obtain ⟨a, b, c, h1⟩ := h
-    apply allowsTerm_mono h1 allowsTermForm_allowsTerm
+  refine ⟨fun h => ?_, fun ⟨a, b, c, h1⟩ => allowsTerm_mono h1 allowsTermForm_allowsTerm⟩
+  obtain ⟨a, b, c, h1, -⟩ := allowsTermForm_subset_allowsTerm_of_allowsTerm h
+  exact ⟨a, b, c, h1⟩
 
 /-!
 
@@ -437,9 +401,7 @@ less than or equal to the degree of `T`.
 lemma subset_card_le_degree_allowsTerm_of_allowsTerm {T : PotentialTerm} {x : ChargeSpectrum 𝓩}
     (h : x.AllowsTerm T) : ∃ y ∈ x.powerset, y.card ≤ T.degree ∧ y.AllowsTerm T := by
   obtain ⟨a, b, c, h1, h2⟩ := allowsTermForm_subset_allowsTerm_of_allowsTerm h
-  use allowsTermForm a b c T
-  simp_all
-  exact allowsTermForm_card_le_degree
+  exact ⟨_, mem_powerset_iff_subset.mpr h1, allowsTermForm_card_le_degree, h2⟩
 
 /-!
 
@@ -456,7 +418,7 @@ to `AllowsTerm` and its decidability.
 
 /-- The proposition for which says, given a charge `x` adding a charge `q5` permits the
   existence of a potential term `T` due to the addition of that charge. -/
-def AllowsTermQ5 [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (q5 : 𝓩) (T : PotentialTerm) : Prop :=
+def AllowsTermQ5 (x : ChargeSpectrum 𝓩) (q5 : 𝓩) (T : PotentialTerm) : Prop :=
   match T with
   | .μ => false
   | .β =>
@@ -493,7 +455,7 @@ We show that if the type `𝓩` has decidable equality, then the proposition
 potential term `T`.
 
 -/
-instance [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (q5 : 𝓩) (T : PotentialTerm) :
+instance (x : ChargeSpectrum 𝓩) (q5 : 𝓩) (T : PotentialTerm) :
     Decidable (AllowsTermQ5 x q5 T) :=
   match T with
   | .μ => isFalse fun h => by simp [AllowsTermQ5] at h
@@ -561,20 +523,13 @@ lemma allowsTermQ5_or_allowsTerm_of_allowsTerm_insertQ5 {qHd qHu : Option 𝓩}
   · obtain ⟨a1, a2, a3, ⟨h1, h2, h3⟩, hsum⟩ := h
     rcases h1 with h1 | h1
     · subst h1
-      left
-      rcases h2 with h2 | h2
-      · use a2, a3
-        simp_all
-      · use a2, a3
-        simp_all
-        rw [← hsum]
-        abel
+      refine .inl ⟨a2, a3, ⟨h2, h3⟩, ?_⟩
+      rw [← hsum]
+      abel
     · rcases h2 with h2 | h2
-      · left
-        use a1, a3
-        simp_all
-      · right
-        use a1, a2, a3
+      · subst h2
+        exact .inl ⟨a1, a3, ⟨.inr h1, h3⟩, hsum⟩
+      · exact .inr ⟨a1, a2, a3, ⟨h1, h2, h3⟩, hsum⟩
   · obtain ⟨a1, a2, a3, a4, ⟨h1, h2, h3, h4⟩, hsum⟩ := h
     rcases h1 with h1 | h1
     · left
@@ -733,13 +688,10 @@ lemma allowsTerm_insertQ5_iff_allowsTermQ5 {qHd qHu : Option 𝓩}
     AllowsTerm ⟨qHd, qHu, insert q5 Q5, Q10⟩ T ↔
     AllowsTermQ5 ⟨qHd, qHu, Q5, Q10⟩ q5 T ∨
     AllowsTerm ⟨qHd, qHu, Q5, Q10⟩ T := by
-  constructor
-  · exact allowsTermQ5_or_allowsTerm_of_allowsTerm_insertQ5 T
-  · intro h
-    rcases h with h | h
-    · exact allowsTerm_insertQ5_of_allowsTermQ5 T h
-    · apply allowsTerm_mono _ h
-      simp [subset_def]
+  refine ⟨allowsTermQ5_or_allowsTerm_of_allowsTerm_insertQ5 T, ?_⟩
+  rintro (h | h)
+  · exact allowsTerm_insertQ5_of_allowsTermQ5 T h
+  · exact allowsTerm_mono (by simp [subset_def]) h
 
 /-!
 
@@ -759,7 +711,7 @@ to `AllowsTerm` and its decidability.
 
 /-- The proposition for which says, given a charge `x` adding a charge `q5` permits the
   existence of a potential term `T` due to the addition of that charge. -/
-def AllowsTermQ10 [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (q10 : 𝓩) (T : PotentialTerm) : Prop :=
+def AllowsTermQ10 (x : ChargeSpectrum 𝓩) (q10 : 𝓩) (T : PotentialTerm) : Prop :=
   match T with
   | .μ => false
   | .β => false
@@ -798,7 +750,7 @@ potential term `T`.
 
 -/
 
-instance [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (q10 : 𝓩) (T : PotentialTerm) :
+instance (x : ChargeSpectrum 𝓩) (q10 : 𝓩) (T : PotentialTerm) :
     Decidable (AllowsTermQ10 x q10 T) :=
   match T with
   | .μ => isFalse fun h => by simp [AllowsTermQ10] at h
@@ -1060,13 +1012,10 @@ lemma allowsTerm_insertQ10_iff_allowsTermQ10 {qHd qHu : Option 𝓩}
     AllowsTerm ⟨qHd, qHu, Q5, insert q10 Q10⟩ T ↔
     AllowsTermQ10 ⟨qHd, qHu, Q5, Q10⟩ q10 T ∨
     AllowsTerm ⟨qHd, qHu, Q5, Q10⟩ T := by
-  constructor
-  · exact allowsTermQ10_or_allowsTerm_of_allowsTerm_insertQ10 T
-  · intro h
-    rcases h with h | h
-    · exact allowsTerm_insertQ10_of_allowsTermQ10 T h
-    · apply allowsTerm_mono _ h
-      simp [subset_def]
+  refine ⟨allowsTermQ10_or_allowsTerm_of_allowsTerm_insertQ10 T, ?_⟩
+  rintro (h | h)
+  · exact allowsTerm_insertQ10_of_allowsTermQ10 T h
+  · exact allowsTerm_mono (by simp [subset_def]) h
 
 end ChargeSpectrum
 

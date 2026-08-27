@@ -205,7 +205,6 @@ lemma insertIdx_eraseIdx {I : Type} : (n : ℕ) → (r : List I) → (hn : n < r
       List.eraseIdx_cons_succ, List.insertIdx_succ_cons, List.cons.injEq, true_and]
     exact insertIdx_eraseIdx n r _
 
-set_option backward.isDefEq.respectTransparency false in
 lemma koszulSign_eraseIdx [Std.Total le] [IsTrans 𝓕 le] (φs : List 𝓕) (n : Fin φs.length) :
     koszulSign q le (φs.eraseIdx n) = koszulSign q le φs * 𝓢(q (φs.get n), ofList q (φs.take n)) *
     𝓢(q (φs.get n), ofList q (List.take (↑(insertionSortEquiv le φs n))
@@ -255,7 +254,6 @@ lemma koszulSign_eraseIdx_insertionSortMinPos [Std.Total le] [IsTrans 𝓕 le] (
     rhs
     rhs
     lhs
-    simp [insertionSortMinPos]
   erw [Equiv.apply_symm_apply]
   simp only [List.get_eq_getElem, List.length_cons, List.insertionSort,
     List.take_zero, ofList_empty, exchangeSign_bosonic, mul_one, mul_eq_mul_left_iff]

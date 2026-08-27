@@ -16,6 +16,7 @@ We define specific instances of speed, such as miles per hour, kilometers per ho
 -/
 
 @[expose] public section
+
 open Dimension
 open NNReal
 
@@ -24,7 +25,7 @@ abbrev DimSpeed : Type := Dimensionful (WithDim (L𝓭 * T𝓭⁻¹) ℝ≥0)
 
 namespace DimSpeed
 
-open UnitChoices
+open LTMCTUnitChoices
 
 /-!
 
@@ -32,21 +33,21 @@ open UnitChoices
 
 -/
 open Dimensionful
-open UnitChoices CarriesDimension
+open LTMCTUnitChoices CarriesDimension
 /-- The dimensional speed corresponding to 1 meter per second. -/
 noncomputable def oneMeterPerSecond : DimSpeed := toDimensionful SI ⟨1⟩
 
 /-- The dimensional speed corresponding to 1 mile per hour. -/
 noncomputable def oneMilePerHour : DimSpeed := toDimensionful ({SI with
-  length := LengthUnit.miles, time := TimeUnit.hours} : UnitChoices) ⟨1⟩
+  length := LengthUnit.miles, time := TimeUnit.hours} : LTMCTUnitChoices) ⟨1⟩
 
 /-- The dimensional speed corresponding to 1 kilometer per hour. -/
 noncomputable def oneKilometerPerHour : DimSpeed := toDimensionful ({SI with
-  length := LengthUnit.kilometers, time := TimeUnit.hours} : UnitChoices) ⟨1⟩
+  length := LengthUnit.kilometers, time := TimeUnit.hours} : LTMCTUnitChoices) ⟨1⟩
 
 /-- The dimensional speed corresponding to 1 knot, aka, one nautical mile per hour. -/
 noncomputable def oneKnot : DimSpeed := toDimensionful ({SI with
-  length := LengthUnit.nauticalMiles, time := TimeUnit.hours} : UnitChoices) ⟨1⟩
+  length := LengthUnit.nauticalMiles, time := TimeUnit.hours} : LTMCTUnitChoices) ⟨1⟩
 
 /-- The dimensionful speed of light corresponding to 299792458 meters per second. -/
 noncomputable def speedOfLight : Dimensionful (WithDim (L𝓭 * T𝓭⁻¹) ℝ) :=
@@ -62,28 +63,33 @@ noncomputable def speedOfLight : Dimensionful (WithDim (L𝓭 * T𝓭⁻¹) ℝ)
 lemma oneMeterPerSecond_in_SI : oneMeterPerSecond SI = ⟨1⟩ := by
   simp [oneMeterPerSecond, toDimensionful_apply_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma oneMilePerHour_in_SI : oneMilePerHour SI = ⟨0.44704⟩ := by
   simp [oneMilePerHour, dimScale, LengthUnit.miles, TimeUnit.hours, toDimensionful_apply_apply]
   ext
-  simp only [NNReal.coe_ofScientific]
-  norm_num
+  simp [NNReal.coe_ofScientific]
+  norm_num [toReal]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma oneKilometerPerHour_in_SI :
     oneKilometerPerHour SI = ⟨5/18⟩ := by
   simp [oneKilometerPerHour, dimScale,
     LengthUnit.kilometers, TimeUnit.hours, toDimensionful_apply_apply]
   ext
-  simp only
-  norm_num
+  simp only [WithDim.smul_val, smul_eq_mul, mul_one, NNReal.coe_mul, coe_rpow, NNReal.coe_div,
+    NNReal.coe_ofNat]
+  norm_num [toReal]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma oneKnot_in_SI : oneKnot SI = ⟨463/900⟩ := by
   simp [oneKnot, dimScale, LengthUnit.nauticalMiles, TimeUnit.hours, toDimensionful_apply_apply]
   ext
-  simp only
-  norm_num
+  simp only [WithDim.smul_val, smul_eq_mul, mul_one, NNReal.coe_mul, coe_rpow, NNReal.coe_div,
+    NNReal.coe_ofNat]
+  norm_num [toReal]
 
 @[simp]
 lemma speedOfLight_in_SI : speedOfLight SI = ⟨299792458⟩ := by
@@ -95,26 +101,25 @@ lemma speedOfLight_in_SI : speedOfLight SI = ⟨299792458⟩ := by
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma oneKnot_eq_mul_oneKilometerPerHour :
     oneKnot = (1.852 : ℝ≥0) • oneKilometerPerHour := by
   apply (toDimensionful SI).symm.injective
-  simp [toDimensionful]
   ext
-  norm_num
+  norm_num [toDimensionful]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma oneKilometerPerHour_eq_mul_oneKnot:
     oneKilometerPerHour = (250/463 : ℝ≥0) • oneKnot := by
   apply (toDimensionful SI).symm.injective
-  simp [toDimensionful]
   ext
-  norm_num
+  norm_num [toDimensionful]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma oneMeterPerSecond_eq_mul_oneMilePerHour :
     oneMeterPerSecond = (3125/1397 : ℝ≥0) • oneMilePerHour := by
   apply (toDimensionful SI).symm.injective
-  simp [toDimensionful]
   ext
-  norm_num
+  norm_num [toDimensionful]
 
 end DimSpeed

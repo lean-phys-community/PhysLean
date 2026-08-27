@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Units.WithDim.Speed
+public import Physlib.Units.FDeriv
 /-!
 
 # Examples of units in Physlib
@@ -19,7 +20,7 @@ should not be used in the proofs of any other results other then those in this f
 @[expose] public section
 
 namespace UnitExamples
-open Dimension CarriesDimension UnitChoices UnitDependent HasDim
+open Dimension CarriesDimension LTMCTUnitChoices UnitDependent HasDim
 /-!
 
 ## Defining a length dependent on units
@@ -29,14 +30,13 @@ open Dimension CarriesDimension UnitChoices UnitDependent HasDim
 /-- The length corresponding to 400 meters. -/
 noncomputable def meters400 : Dimensionful (WithDim L𝓭 ℝ) := toDimensionful SI ⟨400⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Changing that length to miles.
   400 meters is very almost a quarter of a mile. -/
 example : meters400 {SI with length := LengthUnit.miles} = ⟨1/4 - 73/50292⟩ := by
   simp [meters400, toDimensionful_apply_apply, dimScale, LengthUnit.miles]
   ext
-  simp only [WithDim.smul_val]
-  trans 1609.344⁻¹ * 400
-  · rfl
+  show (1609.344 : ℝ)⁻¹ * 400 = _
   norm_num
 
 /-!
@@ -111,7 +111,6 @@ def EnergyMassWithDimNot (m : WithDim M𝓭 ℝ) (E : WithDim (M𝓭 * L𝓭 * L
     (c : WithDim (L𝓭 * T𝓭⁻¹) ℝ) : Prop :=
   E.1 = m.1 * c.1
 
-set_option backward.isDefEq.respectTransparency false in
 lemma energyMassWithDimNot_not_isDimensionallyCorrect :
     ¬ IsDimensionallyCorrect EnergyMassWithDimNot := by
   simp only [isDimensionallyCorrect_fun_iff, not_forall, funext_iff, scaleUnit_apply_fun]
@@ -119,8 +118,7 @@ lemma energyMassWithDimNot_not_isDimensionallyCorrect :
     changing from `SI` to `SIPrimed` with values of `E`, `m` and `c` all equal to `1`. -/
   use SI, SIPrimed, ⟨1⟩, ⟨1⟩, ⟨1⟩
   unfold EnergyMassWithDimNot
-  simp [WithDim.scaleUnit_val, M𝓭, NNReal.smul_def]
-  norm_num
+  norm_num [WithDim.scaleUnit_val, M𝓭, NNReal.smul_def]
 
 /-!
 
@@ -132,14 +130,14 @@ open DimSpeed
 /-- The equation `E = m c^2`, in this equation we `E` and `m` are implicitly in the
   units `u`, while the speed of light is explicitly written in those units. -/
 def EnergyMass (m : WithDim M𝓭 ℝ) (E : WithDim (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹) ℝ)
-    (u : UnitChoices) : Prop :=
+    (u : LTMCTUnitChoices) : Prop :=
     E.1 = m.1 * (speedOfLight u).1 ^ 2
 
 /-- The equation `E = m c^2`, in this version everything is written explicitly in
   terms of a choice of units. -/
 def EnergyMass' (m : Dimensionful (WithDim M𝓭 ℝ))
     (E : Dimensionful (WithDim (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹) ℝ))
-    (u : UnitChoices) : Prop :=
+    (u : LTMCTUnitChoices) : Prop :=
     (E.1 u).1 = (m.1 u).1 * (speedOfLight u).1 ^ 2
 
 /-- The lemma that the proposition `EnergyMass` is dimensionally correct-/
@@ -149,36 +147,13 @@ lemma energyMass_isDimensionallyCorrect :
   intro u1 u2
   /- Let `m` be the mass, `E` be the energy and `u` be the actual units we start with. -/
   funext m E u
-  calc _
-    _ = ((scaleUnit u2 u1 E).1 =
-        (scaleUnit u2 u1 m).1 * (speedOfLight.1 (scaleUnit u2 u1 u)).1 ^ 2) := by
-      rfl
-    _ = ((u2.dimScale u1 (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹)).1 • E.1 =
-        (u2.dimScale u1 M𝓭).1 * m.1 * ((u2.dimScale u1 (L𝓭 * T𝓭⁻¹)).1 *
-          (speedOfLight.1 u).1) ^ 2) := by
-      conv_lhs => rw [scaleUnit_apply, scaleUnit_apply, Dimensionful.of_scaleUnit]
-      rfl
-    _ = ((u2.dimScale u1 (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹)).1 • E.1 =
-        ((u2.dimScale u1 M𝓭 * u2.dimScale u1 (L𝓭 * T𝓭⁻¹) * u2.dimScale u1 (L𝓭 * T𝓭⁻¹)).1) *
-          (m.1 * ((speedOfLight.1 u).1) ^ 2)) := by
-        simp only [map_mul, NNReal.val_eq_coe, NNReal.coe_mul, smul_eq_mul, eq_iff_iff]
-        ring_nf
-    _ = ((u2.dimScale u1 (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹)).1 • E.1 =
-        ((u2.dimScale u1 (M𝓭 * (L𝓭 * T𝓭⁻¹) * (L𝓭 * T𝓭⁻¹))).1) *
-          (m.1 * ((speedOfLight.1 u).1) ^ 2)) := by
-        simp
-    _ = ((u2.dimScale u1 (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹)).1 • E.1 =
-        ((u2.dimScale u1 (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹)).1) *
-          (m.1 * ((speedOfLight.1 u).1) ^ 2)) := by
-      congr 4
-      ext <;> simp; try module
-    _ = ((u2.dimScale u1 (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹)).1 • E.1 =
-        ((u2.dimScale u1 (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹)).1) •
-          (m.1 * ((speedOfLight.1 u).1) ^ 2)) := by
-      rfl
-  simp only [map_mul, NNReal.val_eq_coe, NNReal.coe_mul, smul_eq_mul, mul_eq_mul_left_iff,
-    mul_eq_zero, NNReal.coe_eq_zero, dimScale_ne_zero, or_self, or_false, eq_iff_iff]
-  rfl
+  unfold EnergyMass
+  simp only [eq_iff_iff, UnitDependent.scaleUnit_apply_fun_left,
+    UnitDependent.scaleUnit_apply_fun, Dimensionful.of_scaleUnit, dim_apply,
+    WithDim.scaleUnit_val, WithDim.smul_val, map_mul, mul_pow, NNReal.smul_def, smul_eq_mul,
+    NNReal.coe_mul]
+  ring_nf
+  simp [mul_assoc, mul_eq_mul_left_iff, dimScale_ne_zero]
 
 /-!
 
@@ -189,20 +164,15 @@ We now explore the consequences of `energyMass_isDimensionallyCorrect` and how w
 -/
 
 lemma example1_energyMass : EnergyMass ⟨2⟩ ⟨2 * 299792458 ^ 2⟩ SI := by
-  simp only [EnergyMass, mul_eq_mul_left_iff, OfNat.ofNat_ne_zero,
-    or_false]
-  simp [speedOfLight, toDimensionful_apply_apply, dimScale, SI]
+  simp [EnergyMass, speedOfLight, toDimensionful_apply_apply, dimScale, SI]
 
 /- The lemma `energyMass_isDimensionallyCorrect` allows us to scale the units
   of `example1_energyMass`, that is - we proved it in one set of units, but we get the result
   in any set of units. -/
-lemma example2_energyMass (u : UnitChoices) :
+lemma example2_energyMass (u : LTMCTUnitChoices) :
     EnergyMass (scaleUnit SI u ⟨2⟩) (scaleUnit SI u ⟨2 * 299792458 ^ 2⟩) u := by
-  conv_rhs => rw [← UnitChoices.scaleUnit_apply_fst SI u]
-  have h1 := congrFun (congrFun (congrFun (energyMass_isDimensionallyCorrect SI u)
-    (scaleUnit SI u ⟨2⟩))
-    (scaleUnit SI u ⟨2 * 299792458 ^ 2⟩)) (scaleUnit SI u SI)
-  rw [← h1]
+  conv_rhs => rw [← LTMCTUnitChoices.scaleUnit_apply_fst SI u]
+  rw [← energyMass_isDimensionallyCorrect SI u]
   simp only [scaleUnit_apply_fst, scaleUnit_apply_fun, scaleUnit_symm_apply,
     scaleUnit_apply_fun_left]
   exact example1_energyMass
@@ -225,5 +195,20 @@ lemma cosDim_isDimensionallyCorrect : IsDimensionallyCorrect CosDim := by
 
 -/
 
-TODO "LCR7N" "Add an example involving derivatives."
+example {M1 M2 : Type} [NormedAddCommGroup M1] [NormedSpace ℝ M1]
+    [ContinuousConstSMul ℝ M1] [HasDim M1]
+    [NormedAddCommGroup M2] [NormedSpace ℝ M2] [SMulCommClass ℝ ℝ M2]
+    [ContinuousConstSMul ℝ M2] [HasDim M2] (f : M1 → M2)
+    (hf : IsDimensionallyCorrect f) (f_diff : Differentiable ℝ f) :
+    IsDimensionallyCorrect (fderiv ℝ f) :=
+  fderiv_isDimensionallyCorrect f hf f_diff
+
+example {M1 M2 : Type} [NormedAddCommGroup M1] [NormedSpace ℝ M1]
+    [ContinuousConstSMul ℝ M1] [HasDim M1]
+    [NormedAddCommGroup M2] [NormedSpace ℝ M2] [SMulCommClass ℝ ℝ M2]
+    [ContinuousConstSMul ℝ M2] [HasDim M2] (dm : M1) (f : M1 → M2)
+    (hf : IsDimensionallyCorrect f) (f_diff : Differentiable ℝ f) :
+    IsDimensionallyCorrect (fun x (v : WithDim (dim M2 * (dim M1)⁻¹) M2) =>
+      fderiv ℝ f x dm = v.1) :=
+  fderiv_dimension_const_direction dm f hf f_diff
 end UnitExamples

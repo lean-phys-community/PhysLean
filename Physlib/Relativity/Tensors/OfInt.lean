@@ -14,14 +14,15 @@ public import Physlib.Relativity.Tensors.Basic
 
 @[expose] public section
 
-open Module IndexNotation
-open CategoryTheory
-open MonoidalCategory
+open Module
 
 namespace TensorSpecies
-open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G] (S : TensorSpecies k C G)
+variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Basis (basisIdx c) k (V c)}
+    (S : TensorSpecies k C G V basisIdx rep b)
 
 namespace Tensor
 
@@ -30,12 +31,12 @@ abbrev TensorInt {n : ℕ} (c : Fin n → C) := (ComponentIdx (S := S) c) → �
 
 namespace TensorInt
 
-variable {k : Type} [CommRing k] {G : Type} [Group G] {S : TensorSpecies k C G}
+variable {S : TensorSpecies k C G V basisIdx rep b}
 
 /-- The element of `S.Tensor c` created from a tensor `TensorInt S c`. -/
 noncomputable def toTensor {n : ℕ} {c : Fin n → C} (f : TensorInt S c) :
     S.Tensor c := (Tensor.basis c).repr.symm <|
-  (Finsupp.linearEquivFunOnFinite k k ((j : Fin n) → Fin (S.repDim (c j)))).symm <|
+  (Finsupp.linearEquivFunOnFinite k k ((j : Fin n) → basisIdx (c j))).symm <|
   (fun j => Int.cast (f j))
 
 lemma basis_repr_apply {n : ℕ} {c : Fin n → C}

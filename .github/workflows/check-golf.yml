@@ -1,0 +1,115 @@
+# Reacts to a `/check-golf` comment on a pull request. It verifies that the PR
+# only golfs proofs -- i.e. that no declaration *statement* (signature/type)
+# changed, only proofs and bodies -- and reports the compile-cost of the golf
+# (heartbeats and time, base vs head). The findings are posted as a single PR
+# comment, edited in place on subsequent runs.
+#
+# The check runs on `issue_comment`, so it uses the workflow file from the
+# default branch. Measuring compile cost needs oleans, so this workflow builds
+# the head revision before measuring.
+
+name: Check golf
+
+on:
+  issue_comment:
+    types: [created]
+
+# Only the permissions needed to read the repo and upsert a PR comment.
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-golf:
+    name: Verify only proofs changed
+    # Run only for `/check-golf` comments posted on a pull request.
+    if: >-
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/check-golf')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acknowledge the command
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+        run: |
+          gh api --method POST \
+            "repos/${{ github.repository }}/issues/comments/${COMMENT_ID}/reactions" \
+            -f content=eyes || true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve base and head revisions
+        id: refs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.issue.number }}
+        run: |
+          base_branch=$(gh pr view "$PR" --json baseRefName -q .baseRefName)
+          head_sha=$(gh pr view "$PR" --json headRefOid -q .headRefOid)
+          git fetch --no-tags origin "$base_branch"
+          git fetch --no-tags origin "pull/$PR/head:check-golf-head"
+          merge_base=$(git merge-base "origin/$base_branch" "$head_sha")
+          echo "base=$merge_base" >> "$GITHUB_OUTPUT"
+          echo "head=$head_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Check out the head revision (to build it)
+        run: git checkout --detach "${{ steps.refs.outputs.head }}"
+
+      - name: Install elan
+        run: |
+          set -o pipefail
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      # Reuse this repo's compiled oleans across check-golf runs. The key is
+      # per-head so every run saves a fresh entry; restore-keys fall back to
+      # the most recent build with the same toolchain/deps, making rebuilds
+      # incremental (typically seconds-to-minutes instead of a full build).
+      - name: Restore Lake build cache
+        uses: actions/cache@v4
+        with:
+          path: .lake/build
+          key: check-golf-lake-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}-${{ steps.refs.outputs.head }}
+          restore-keys: |
+            check-golf-lake-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}-
+
+      # Measurement only needs the *measured files'* imports built, not the
+      # whole library: build just the changed modules (their dependency cones
+      # come from the mathlib cache plus the restored build cache above).
+      - name: Build the changed modules
+        run: |
+          lake exe cache get
+          mods=$(git diff --name-only --diff-filter=d \
+              "${{ steps.refs.outputs.base }}" "${{ steps.refs.outputs.head }}" -- '*.lean' \
+            | grep -vE '^(scripts|docs)/' \
+            | sed -e 's/\.lean$//' -e 's#/#.#g')
+          if [ -n "$mods" ]; then
+            # shellcheck disable=SC2086
+            lake build $mods
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Run the checker from the default branch, not the PR head: the head may
+      # predate flags this workflow passes (workflow file and script must not
+      # skew apart).
+      - name: Run check-golf (with compile-cost measurement) and upsert comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git show "origin/${{ github.event.repository.default_branch }}:scripts/check_golf.py" > /tmp/check_golf.py
+          python /tmp/check_golf.py \
+            --base "${{ steps.refs.outputs.base }}" \
+            --head "${{ steps.refs.outputs.head }}" \
+            --repo "${{ github.repository }}" \
+            --pr "${{ github.event.issue.number }}" \
+            --measure \
+            --measure-jobs "$(nproc)" \
+            --post

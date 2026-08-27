@@ -41,6 +41,7 @@ def chargeMap (f : PermGroup n) : (SMνCharges n).Charges →ₗ[ℚ] (SMνCharg
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The representation of `(permGroup n)` acting on the vector space of charges. -/
 @[simp]
 def repCharges {n : ℕ} : Representation ℚ (PermGroup n) (SMνCharges n).Charges where
@@ -52,39 +53,40 @@ def repCharges {n : ℕ} : Representation ℚ (PermGroup n) (SMνCharges n).Char
     rw [charges_eq_toSpecies_eq]
     intro i
     simp only [chargeMap_apply, Pi.inv_apply, Module.End.mul_apply]
-    repeat erw [toSMSpecies_toSpecies_inv]
+    repeat rw [toSMSpecies_toSpecies_inv]
     rfl
   map_one' := by
     refine LinearMap.ext fun S => ?_
     rw [charges_eq_toSpecies_eq]
     intro i
-    erw [toSMSpecies_toSpecies_inv]
-    rfl
+    exact toSMSpecies_toSpecies_inv _ _
 
 lemma repCharges_toSpecies (f : PermGroup n) (S : (SMνCharges n).Charges) (j : Fin 6) :
-    toSpecies j (repCharges f S) = toSpecies j S ∘ f⁻¹ j := by
-  erw [toSMSpecies_toSpecies_inv]
+    toSpecies j (repCharges f S) = toSpecies j S ∘ f⁻¹ j :=
+  toSMSpecies_toSpecies_inv _ _
 
 lemma toSpecies_sum_invariant (m : ℕ) (f : PermGroup n) (S : (SMνCharges n).Charges) (j : Fin 6) :
     ∑ i, ((fun a => a ^ m) ∘ toSpecies j (repCharges f S)) i =
     ∑ i, ((fun a => a ^ m) ∘ toSpecies j S) i := by
-  erw [repCharges_toSpecies]
-  change ∑ i : Fin n, ((fun a => a ^ m) ∘ _) (⇑(f⁻¹ _) i) = ∑ i : Fin n, ((fun a => a ^ m) ∘ _) i
-  refine Equiv.Perm.sum_comp _ _ _ ?_
-  simp only [PermGroup, Pi.inv_apply, ne_eq, coe_univ, Set.subset_univ]
+  rw [repCharges_toSpecies]
+  exact Equiv.sum_comp (f⁻¹ j) ((fun a => a ^ m) ∘ toSpecies j S)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accGrav_invariant (f : PermGroup n) (S : (SMνCharges n).Charges) :
     accGrav (repCharges f S) = accGrav S :=
   accGrav_ext (by simpa using toSpecies_sum_invariant 1 f S)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accSU2_invariant (f : PermGroup n) (S : (SMνCharges n).Charges) :
     accSU2 (repCharges f S) = accSU2 S :=
   accSU2_ext (by simpa using toSpecies_sum_invariant 1 f S)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accSU3_invariant (f : PermGroup n) (S : (SMνCharges n).Charges) :
     accSU3 (repCharges f S) = accSU3 S :=
   accSU3_ext (by simpa using toSpecies_sum_invariant 1 f S)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accYY_invariant (f : PermGroup n) (S : (SMνCharges n).Charges) :
     accYY (repCharges f S) = accYY S :=
   accYY_ext (by simpa using toSpecies_sum_invariant 1 f S)

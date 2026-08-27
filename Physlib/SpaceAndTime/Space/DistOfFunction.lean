@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.Space.IsDistBounded
+public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 public import Mathlib.MeasureTheory.SpecificCodomains.WithLp
 public import Physlib.Mathematics.Distribution.Basic
 /-!
@@ -30,13 +31,15 @@ to reference the underlying Schwartz maps.
 - A. Definition of a distribution from a function
 - B. Linarity properties of getting distributions from functions
 - C. Properties related to inner products
-- D. Components
+- D. Derivatives
+- E. Components
 
 ## iv. References
 
 -/
 
 @[expose] public section
+
 open SchwartzMap NNReal
 noncomputable section
 
@@ -60,14 +63,14 @@ def distOfFunction {d : ℕ} (f : Space d → F) (hf : IsDistBounded f) :
   refine mkCLMtoNormedSpace (fun η => ∫ x, η x • f x) ?_ ?_ hf.integral_mul_schwartzMap_bounded
   · /- Addition -/
     intro η κ
-    simp only [SchwartzMap.add_apply]
+    simp only [_root_.add_apply]
     conv_lhs =>
       enter [2, a]
       rw [add_smul]
     rw [integral_add (by fun_prop) (by fun_prop)]
   · /- SMul-/
     intro a η
-    simp only [SchwartzMap.smul_apply, smul_eq_mul, RingHom.id_apply]
+    simp only [_root_.smul_apply, smul_eq_mul, RingHom.id_apply]
     conv_lhs =>
       enter [2, a]
       rw [← smul_smul]
@@ -144,12 +147,34 @@ lemma distOfFunction_inner {d n : ℕ} (f : Space d → EuclideanSpace ℝ (Fin 
   rw [integral_inner, real_inner_comm]
   fun_prop
 
-TODO "LV5RM" "Add a general lemma specifying the derivative of
-  functions from distributions."
+/-!
+
+## D. Derivatives
+
+-/
+
+/-- The distributional spatial derivative of the distribution associated to a differentiable
+function is the distribution associated to the corresponding pointwise spatial derivative. -/
+lemma distDeriv_distOfFunction {d : ℕ} (μ : Fin d) (f : Space d → F)
+    (hf : IsDistBounded f) (hf_deriv : IsDistBounded (∂[μ] f))
+    (hf_diff : Differentiable ℝ f) :
+    ∂ᵈ[μ] (distOfFunction f hf) = distOfFunction (∂[μ] f) hf_deriv := by
+  ext η
+  rw [distDeriv_apply, Physlib.Distribution.fderivD_apply, distOfFunction_apply,
+    distOfFunction_apply]
+  change -∫ (x : Space d), fderiv ℝ η x (basis μ) • f x =
+    ∫ (x : Space d), η x • fderiv ℝ f x (basis μ)
+  rw [integral_smul_fderiv_eq_neg_fderiv_smul_of_integrable]
+  · exact hf.integrable_space_fderiv η (basis μ)
+  · exact hf_deriv.integrable_space η
+  · exact hf.integrable_space η
+  · fun_prop
+  · intro x _
+    exact hf_diff.differentiableAt
 
 /-!
 
-## D. Components
+## E. Components
 
 -/
 

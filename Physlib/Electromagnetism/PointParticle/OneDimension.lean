@@ -5,10 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Electromagnetism.Dynamics.IsExtrema
-public import Physlib.SpaceAndTime.Space.Norm
+public import Physlib.Electromagnetism.Distributional.Dynamics.IsExtrema
+public import Physlib.SpaceAndTime.Space.Norm.Basic
 public import Physlib.SpaceAndTime.Space.Translations
-public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
 /-!
 
 # The electrostatics of a stationary point particle in 1d
@@ -44,8 +43,10 @@ sitting at the origin in 1d space.
 @[expose] public section
 
 namespace Electromagnetism
+open Physlib
 open Distribution SchwartzMap
 open Space MeasureTheory
+
 namespace DistElectromagneticPotential
 
 /-!
@@ -70,7 +71,6 @@ lemma oneDimPointParticleCurrentDensity_eq_distTranslate (c : SpeedOfLight) (q :
   ext η
   simp [distTranslate_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma oneDimPointParticleCurrentDensity_currentDensity (c : SpeedOfLight) (q : ℝ) (r₀ : Space 1) :
     (oneDimPointParticleCurrentDensity c q r₀).currentDensity c = 0 := by
@@ -78,7 +78,6 @@ lemma oneDimPointParticleCurrentDensity_currentDensity (c : SpeedOfLight) (q : �
   simp [oneDimPointParticleCurrentDensity, DistLorentzCurrentDensity.currentDensity,
     Lorentz.Vector.spatialCLM, constantTime_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma oneDimPointParticleCurrentDensity_chargeDensity (c : SpeedOfLight) (q : ℝ) (r₀ : Space 1) :
     (oneDimPointParticleCurrentDensity c q r₀).chargeDensity c =
@@ -86,8 +85,8 @@ lemma oneDimPointParticleCurrentDensity_chargeDensity (c : SpeedOfLight) (q : �
   ext ε
   simp only [DistLorentzCurrentDensity.chargeDensity, one_div, Lorentz.Vector.temporalCLM,
     Fin.isValue, oneDimPointParticleCurrentDensity, map_smul, LinearMap.coe_mk, AddHom.coe_mk,
-    ContinuousLinearEquiv.apply_symm_apply, ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
+    ContinuousLinearEquiv.apply_symm_apply, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
     Function.comp_apply, constantTime_apply, diracDelta'_apply, Lorentz.Vector.apply_smul,
     Lorentz.Vector.basis_apply, ↓reduceIte, mul_one, smul_eq_mul, diracDelta_apply]
   field_simp
@@ -128,7 +127,6 @@ lemma oneDimPointParticle_eq_distTranslate (𝓕 : FreeSpace) (q : ℝ) (r₀ : 
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma oneDimPointParticle_vectorPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 1) :
     (oneDimPointParticle 𝓕 q r₀).vectorPotential 𝓕.c = 0 := by
@@ -142,7 +140,6 @@ lemma oneDimPointParticle_vectorPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : S
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma oneDimPointParticle_scalarPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 1) :
     (oneDimPointParticle 𝓕 q r₀).scalarPotential 𝓕.c =
     Space.constantTime (distOfFunction (fun x =>
@@ -150,14 +147,14 @@ lemma oneDimPointParticle_scalarPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : S
   ext ε
   simp only [scalarPotential, Lorentz.Vector.temporalCLM, Fin.isValue, map_smul,
     ContinuousLinearMap.comp_smulₛₗ, Real.ringHom_apply, oneDimPointParticle, LinearMap.coe_mk,
-    AddHom.coe_mk, ContinuousLinearEquiv.apply_symm_apply, ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
+    AddHom.coe_mk, ContinuousLinearEquiv.apply_symm_apply, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
     Function.comp_apply, constantTime_apply, distOfFunction_vector_eval, Lorentz.Vector.apply_smul,
     Lorentz.Vector.basis_apply, ↓reduceIte, mul_one, smul_eq_mul, neg_mul]
   rw [distOfFunction_mul_fun _ (by fun_prop), distOfFunction_neg,
     distOfFunction_mul_fun _ (by fun_prop)]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul,
-    ContinuousLinearMap.neg_apply]
+  simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul,
+    _root_.neg_apply]
   ring
 
 /-!
@@ -171,7 +168,7 @@ lemma oneDimPointParticle_electricField (𝓕 : FreeSpace) (q : ℝ) (r₀ : Spa
     ((q * 𝓕.μ₀ * 𝓕.c ^ 2) / 2) • constantTime (distOfFunction (fun x : Space 1 =>
       ‖x - r₀‖ ^ (- 1 : ℤ) • basis.repr (x - r₀))
       ((IsDistBounded.zpow_smul_repr_self (- 1 : ℤ) (by omega)).comp_sub_right r₀)) := by
-  have h1 := Space.distGrad_distOfFunction_norm_zpow (d := 0) 1 (by grind)
+  have h1 := Space.distGrad_distOfFunction_norm_zpow (d := 1) 1 (by grind)
   simp at h1
   simp only [electricField, LinearMap.coe_mk, AddHom.coe_mk, oneDimPointParticle_scalarPotential,
     smul_eq_mul, neg_mul, oneDimPointParticle_vectorPotential, map_zero, sub_zero, Int.reduceNeg,
@@ -218,7 +215,7 @@ lemma oneDimPointParticle_div_electricField {𝓕} (q : ℝ) (r₀ : Space 1) :
     (𝓕.μ₀ * 𝓕.c ^ 2) • constantTime (q • diracDelta ℝ r₀) := by
   rw [oneDimPointParticle_electricField]
   simp only [Int.reduceNeg, zpow_neg, zpow_one, map_smul, smul_smul]
-  have h1 := Space.distDiv_inv_pow_eq_dim (d := 0)
+  have h1 := Space.distDiv_inv_pow_eq_dim (d := 1)
   simp at h1
   trans (q * 𝓕.μ₀ * 𝓕.c.val ^ 2 / 2) •
     distSpaceDiv (constantTime <|
@@ -242,7 +239,6 @@ lemma oneDimPointParticle_div_electricField {𝓕} (q : ℝ) (r₀ : Space 1) :
   · simp
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma oneDimPointParticle_isExterma (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 1) :
     (oneDimPointParticle 𝓕 q r₀).IsExtrema 𝓕 (oneDimPointParticleCurrentDensity 𝓕.c q r₀) := by
   rw [isExtrema_iff_components]
@@ -250,9 +246,9 @@ lemma oneDimPointParticle_isExterma (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 1
   · intro ε
     rw [gradLagrangian_sum_inl_0]
     simp only [one_div, mul_inv_rev, oneDimPointParticleCurrentDensity_chargeDensity, map_smul,
-      ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+      FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
     rw [oneDimPointParticle_div_electricField]
-    simp only [map_smul, ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+    simp only [map_smul, FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
     field_simp
     ring
   · intro ε i

@@ -48,6 +48,7 @@ lemma uncontractedCongr_some {c c': WickContraction n} (h : c = c') (i : c.uncon
     (uncontractedCongr h) (some i) = some (Equiv.subtypeEquivRight (by rw [h]; simp) i) := by
   simp [uncontractedCongr]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma mem_uncontracted_iff_not_contracted (i : Fin n) :
     i ∈ c.uncontracted ↔ ∀ p ∈ c.1, i ∉ p := by
   simp only [uncontracted, getDual?, Finset.mem_filter, Finset.mem_univ, true_and]

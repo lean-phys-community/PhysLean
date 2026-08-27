@@ -70,8 +70,8 @@ This is slow to compute in practice.
 
 -/
 
-/-- Given a charges `x : Charges` associated to the representations, and a potential
-  term `T`, the charges associated with instances of that potential term. -/
+/-- Given a charge spectrum `x : ChargeSpectrum 𝓩` associated to the representations, and a
+  potential term `T`, the charges associated with instances of that potential term. -/
 def ofPotentialTerm (x : ChargeSpectrum 𝓩) (T : PotentialTerm) : Multiset 𝓩 :=
   let add : Multiset 𝓩 → Multiset 𝓩 → Multiset 𝓩 := fun a b => (a ×ˢ b).map
       fun (x, y) => x + y
@@ -189,85 +189,47 @@ For each potential term, we give an explicit form of the multiset `ofPotentialTe
 lemma ofPotentialTerm'_μ_finset {x : ChargeSpectrum 𝓩} :
     x.ofPotentialTerm' μ =
     (x.qHd.toFinset.product <| x.qHu.toFinset).val.map (fun x => x.1 - x.2) := by
-  match x with
-  | ⟨none, qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨some qHd, none, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨some qHd, some qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
+  rcases x with ⟨_ | qHd, _ | qHu, Q5, Q10⟩ <;> simp [ofPotentialTerm']
 
 lemma ofPotentialTerm'_β_finset {x : ChargeSpectrum 𝓩} :
     x.ofPotentialTerm' β =
     (x.qHu.toFinset.product <| x.Q5).val.map (fun x => - x.1 + x.2) := by
-  match x with
-  | ⟨qHd, none, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨qHd, some qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
+  rcases x with ⟨_ | qHd, _ | qHu, Q5, Q10⟩ <;> simp [ofPotentialTerm']
 
 lemma ofPotentialTerm'_W2_finset {x : ChargeSpectrum 𝓩} :
     x.ofPotentialTerm' W2 = (x.qHd.toFinset.product <|
       x.Q10.product <| x.Q10.product <| x.Q10).val.map
     (fun x => x.1 + x.2.1 + x.2.2.1 + x.2.2.2) := by
-  match x with
-  | ⟨none, qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨some qHd, qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
+  rcases x with ⟨_ | qHd, _ | qHu, Q5, Q10⟩ <;> simp [ofPotentialTerm']
 
 lemma ofPotentialTerm'_W3_finset {x : ChargeSpectrum 𝓩} :
     x.ofPotentialTerm' W3 = (x.qHu.toFinset.product <| x.Q5.product <| x.Q5).val.map
     (fun x => -x.1 - x.1 + x.2.1 + x.2.2) := by
-  match x with
-  | ⟨qHd, none, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨qHd, some qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
+  rcases x with ⟨_ | qHd, _ | qHu, Q5, Q10⟩ <;> simp [ofPotentialTerm']
 
 lemma ofPotentialTerm'_W4_finset {x : ChargeSpectrum 𝓩} :
     x.ofPotentialTerm' W4 = (x.qHd.toFinset.product <|
       x.qHu.toFinset.product <| x.Q5).val.map
     (fun x => x.1 - x.2.1 - x.2.1 + x.2.2) := by
-  match x with
-  | ⟨none, qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨some qHd, none, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨some qHd, some qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
+  rcases x with ⟨_ | qHd, _ | qHu, Q5, Q10⟩ <;> simp [ofPotentialTerm']
 
 lemma ofPotentialTerm'_K2_finset {x : ChargeSpectrum 𝓩} :
     x.ofPotentialTerm' K2 = (x.qHd.toFinset.product <|
       x.qHu.toFinset.product <| x.Q10).val.map
     (fun x => x.1 + x.2.1 + x.2.2) := by
-  match x with
-  | ⟨none, qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨some qHd, none, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨some qHd, some qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
+  rcases x with ⟨_ | qHd, _ | qHu, Q5, Q10⟩ <;> simp [ofPotentialTerm']
 
 lemma ofPotentialTerm'_topYukawa_finset {x : ChargeSpectrum 𝓩} :
     x.ofPotentialTerm' topYukawa = (x.qHu.toFinset.product <|
       x.Q10.product <| x.Q10).val.map
     (fun x => -x.1 + x.2.1 + x.2.2) := by
-  match x with
-  | ⟨qHd, none, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨qHd, some qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
+  rcases x with ⟨_ | qHd, _ | qHu, Q5, Q10⟩ <;> simp [ofPotentialTerm']
 
 lemma ofPotentialTerm'_bottomYukawa_finset {x : ChargeSpectrum 𝓩} :
     x.ofPotentialTerm' bottomYukawa = (x.1.toFinset.product <|
       x.Q5.product <| x.Q10).val.map
     (fun x => x.1 + x.2.1 + x.2.2) := by
-  match x with
-  | ⟨none, qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
-  | ⟨some qHd, qHu, Q5, Q10⟩ =>
-    simp [ofPotentialTerm']
+  rcases x with ⟨_ | qHd, _ | qHu, Q5, Q10⟩ <;> simp [ofPotentialTerm']
 
 /-!
 

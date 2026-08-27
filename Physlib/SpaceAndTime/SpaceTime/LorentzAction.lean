@@ -48,7 +48,7 @@ open Matrix
 open Complex
 open ComplexConjugate
 open TensorSpecies
-open SchwartzMap
+open SchwartzMap Physlib
 attribute [-simp] Fintype.sum_sum_type
 
 /-!
@@ -63,7 +63,6 @@ attribute [-simp] Fintype.sum_sum_type
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The Lorentz group action on Schwartz functions taking the Lorentz group to
   continuous linear maps. -/
 def schwartzAction {d} : LorentzGroup d →* 𝓢(SpaceTime d, ℝ) →L[ℝ] 𝓢(SpaceTime d, ℝ) where
@@ -160,6 +159,7 @@ lemma lorentzGroup_smul_dist_apply (Λ : LorentzGroup d) (f : (SpaceTime d) →d
 
 -/
 
+set_option synthInstance.maxHeartbeats 40000
 instance : DistribMulAction (LorentzGroup d) ((SpaceTime d) →d[ℝ] M) where
   one_smul f := by
     ext η
@@ -174,7 +174,7 @@ instance : DistribMulAction (LorentzGroup d) ((SpaceTime d) →d[ℝ] M) where
   smul_add Λ f1 f2 := by
     ext η
     rw [lorentzGroup_smul_dist_apply]
-    simp only [ContinuousLinearMap.add_apply, smul_add, lorentzGroup_smul_dist_apply]
+    simp only [_root_.add_apply, smul_add, lorentzGroup_smul_dist_apply]
 
 /-!
 
@@ -201,7 +201,7 @@ def distActionLinearMap {d} {M : Type} [NormedAddCommGroup M]
   toFun f := Λ • f
   map_add' f1 f2 := by
     ext η
-    simp [lorentzGroup_smul_dist_apply, ContinuousLinearMap.add_apply, smul_add]
+    simp [lorentzGroup_smul_dist_apply, _root_.add_apply, smul_add]
   map_smul' a f := by
     ext η
     simp [lorentzGroup_smul_dist_apply]

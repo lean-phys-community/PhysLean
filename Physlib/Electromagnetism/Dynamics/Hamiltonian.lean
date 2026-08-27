@@ -46,7 +46,6 @@ in the case of three spatial dimensions.
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff
 
@@ -104,22 +103,18 @@ lemma canonicalMomentum_eq_gradient_kineticTerm {d}
     enter [2]
     simp [lagrangian_add_const]
   have hx : DifferentiableAt ℝ (fun v => kineticTerm 𝓕 ⟨fun x => A x + x (Sum.inl 0) • v⟩ x) 0 := by
-    apply Differentiable.differentiableAt _
-    conv =>
-      enter [2, v]
-      rw [kineticTerm_add_time_mul_const _ (hA.differentiable (by simp))]
+    simp only [kineticTerm_add_time_mul_const _ (hA.differentiable (by simp))]
     fun_prop
-
   conv_lhs =>
     enter [1]
     simp only [lagrangian, Fin.isValue, map_add, map_smul,
       LinearMap.smul_apply, smul_eq_mul]
     rw [fderiv_fun_sub hx (by simp [freeCurrentPotential]; fun_prop)]
-    simp only [Fin.isValue, freeCurrentPotential, map_add, map_smul, ContinuousLinearMap.add_apply,
-      ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul, fderiv_const_add,
-      ContinuousLinearMap.coe_sub', Pi.sub_apply]
+    simp only [Fin.isValue, freeCurrentPotential, map_add, map_smul, _root_.add_apply,
+      FunLike.coe_smul, Pi.smul_apply, smul_eq_mul, fderiv_const_add,
+      FunLike.coe_sub, Pi.sub_apply]
     rw [fderiv_const_mul (by fun_prop)]
-  simp only [Fin.isValue, ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+  simp only [Fin.isValue, FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   rw [fderiv_fun_sub (by fun_prop) (by fun_prop)]
   simp
 
@@ -142,35 +137,14 @@ lemma canonicalMomentum_eq {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
   conv_lhs =>
     enter [1, 2, v]
     rw [kineticTerm_add_time_mul_const _ (hA.differentiable (by simp))]
-  simp only [Fin.isValue, Finset.sum_sub_distrib, one_div, fderiv_const_add]
-  rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
-  rw [fderiv_const_mul (by fun_prop)]
-  rw [fderiv_const_mul (by fun_prop)]
-  rw [fderiv_fun_sub (by fun_prop) (by fun_prop)]
-  rw [fderiv_fun_sum (by fun_prop)]
-  rw [fderiv_fun_sum (by fun_prop)]
-  conv_lhs =>
-    enter [1, 1, 2, 1, 2, i]
-    rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
-    rw [fderiv_mul_const (by fun_prop)]
-    rw [fderiv_mul_const (by fun_prop)]
-    rw [fderiv_const_mul (by fun_prop)]
-    rw [fderiv_const_mul (by fun_prop)]
-    rw [fderiv_pow _ (by fun_prop)]
-    simp
-  conv_lhs =>
-    enter [1, 1, 2, 2, 2, i]
-    rw [fderiv_mul_const (by fun_prop)]
-    rw [fderiv_const_mul (by fun_prop)]
-    simp
-  rw [fderiv_pow _ (by fun_prop)]
+  simp (disch := fun_prop) only [Fin.isValue, Finset.sum_sub_distrib, one_div,
+    fderiv_const_add, fderiv_fun_add, fderiv_const_mul, fderiv_fun_sub, fderiv_fun_sum,
+    fderiv_mul_const, fderiv_fun_pow]
   simp [Lorentz.Vector.coordCLM]
-  rw [← Finset.sum_sub_distrib]
-  rw [Finset.mul_sum]
+  rw [← Finset.sum_sub_distrib, Finset.mul_sum]
   congr
   ext μ
-  simp only [Fin.isValue, RCLike.inner_apply, conj_trivial]
-  simp only [Fin.isValue, equivEuclid_apply]
+  simp only [Fin.isValue, RCLike.inner_apply, conj_trivial, equivEuclid_apply]
   rw [fieldStrengthMatrix, toFieldStrength_basis_repr_apply_eq_single]
   simp only [Fin.isValue, inl_0_inl_0, one_mul]
   ring_nf
@@ -195,11 +169,10 @@ lemma canonicalMomentum_eq_electricField {d} {𝓕 : FreeSpace} (A : Electromagn
   | Sum.inr i =>
   simp only [one_div, inr_i_inr_i, Fin.isValue, smul_eq_mul, neg_mul, one_mul, mul_neg, mul_inv_rev,
     neg_inj]
-  rw [electricField_eq_fieldStrengthMatrix]
+  rw [electricField_eq_fieldStrengthMatrix (hA := hA.differentiable (by simp))]
   simp only [Fin.isValue, toTimeAndSpace_symm_apply_time_space, neg_mul, mul_neg]
   field_simp
   exact fieldStrengthMatrix_antisymm A x (Sum.inr i) (Sum.inl 0)
-  exact hA.differentiable (by simp)
 /-!
 
 ## B. The Hamiltonian
@@ -238,16 +211,10 @@ lemma hamiltonian_eq_electricField_vectorPotential {d} {𝓕 : FreeSpace}
   congr
   rw [← Time.deriv_lorentzVector]
   rfl
-  · change Differentiable ℝ (A ∘ fun t =>((toTimeAndSpace 𝓕.c).symm
-      (t, ((toTimeAndSpace 𝓕.c) x).2)))
-    apply Differentiable.comp
-    · exact hA.differentiable (by simp)
-    · fun_prop
-  · apply vectorPotential_differentiable_time
-    exact hA.differentiable (by simp)
+  · exact (hA.differentiable (by simp)).comp (by fun_prop)
+  · exact vectorPotential_differentiable_time A (hA.differentiable (by simp)) x.space
   · exact hA.differentiable (by simp)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma hamiltonian_eq_electricField_scalarPotential {d} {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d) (hA : ContDiff ℝ 2 A)
     (J : LorentzCurrentDensity d) (x : SpaceTime d) :

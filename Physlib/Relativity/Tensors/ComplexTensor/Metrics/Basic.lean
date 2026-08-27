@@ -13,16 +13,11 @@ public import Physlib.Relativity.Tensors.ComplexTensor.OfRat
 -/
 
 @[expose] public section
-open IndexNotation
-open CategoryTheory
-open MonoidalCategory
+
 open Matrix
 open MatrixGroups
 open Complex
 open TensorProduct
-open IndexNotation
-open CategoryTheory
-open OverColor.Discrete
 noncomputable section
 
 namespace complexLorentzTensor
@@ -47,10 +42,10 @@ abbrev leftMetric : ℂT[.upL, .upL] := complexLorentzTensor.metricTensor Color.
 abbrev rightMetric : ℂT[.upR, .upR] := complexLorentzTensor.metricTensor Color.upR
 
 /-- The metric `εₐₐ` as a complex Lorentz tensor. -/
-abbrev altLeftMetric : ℂT[.downL, .downL] := complexLorentzTensor.metricTensor Color.downL
+abbrev dualLeftMetric : ℂT[.downL, .downL] := complexLorentzTensor.metricTensor Color.downL
 
 /-- The metric `ε_{dot a}_{dot a}` as a complex Lorentz tensor. -/
-abbrev altRightMetric : ℂT[.downR, .downR] := complexLorentzTensor.metricTensor Color.downR
+abbrev dualRightMetric : ℂT[.downR, .downR] := complexLorentzTensor.metricTensor Color.downR
 
 /-!
 
@@ -71,10 +66,10 @@ scoped[complexLorentzTensor] notation "εL" => leftMetric
 scoped[complexLorentzTensor] notation "εR" => rightMetric
 
 /-- The metric `εₐₐ` as a complex Lorentz tensors. -/
-scoped[complexLorentzTensor] notation "εL'" => altLeftMetric
+scoped[complexLorentzTensor] notation "εL'" => dualLeftMetric
 
 /-- The metric `ε_{dot a}_{dot a}` as a complex Lorentz tensors. -/
-scoped[complexLorentzTensor] notation "εR'" => altRightMetric
+scoped[complexLorentzTensor] notation "εR'" => dualRightMetric
 
 /-!
 
@@ -89,11 +84,13 @@ open Tensor
 
 -/
 
-lemma coMetric_eq_fromConstPair : η' = fromConstPair Lorentz.coMetric := by
+lemma coMetric_eq_fromConstPair : η' = fromConstPair (S := complexLorentzTensor)
+    (c1 := .down) (c2 := .down) Lorentz.coMetric := by
   rw [Lorentz.coMetric]
   rfl
 
-lemma contrMetric_eq_fromConstPair : η = fromConstPair Lorentz.contrMetric := by
+lemma contrMetric_eq_fromConstPair : η = fromConstPair (S := complexLorentzTensor)
+    (c1 := .up) (c2 := .up) Lorentz.contrMetric := by
   rw [Lorentz.contrMetric]
   rfl
 
@@ -101,9 +98,9 @@ lemma leftMetric_eq_fromConstPair : εL = fromConstPair Fermion.leftMetric := rf
 
 lemma rightMetric_eq_fromConstPair : εR = fromConstPair Fermion.rightMetric := rfl
 
-lemma altLeftMetric_eq_fromConstPair : εL' = fromConstPair Fermion.altLeftMetric := rfl
+lemma dualLeftMetric_eq_fromConstPair : εL' = fromConstPair Fermion.dualLeftMetric := rfl
 
-lemma altRightMetric_eq_fromConstPair : εR' = fromConstPair Fermion.altRightMetric := rfl
+lemma dualRightMetric_eq_fromConstPair : εR' = fromConstPair Fermion.dualRightMetric := rfl
 
 /-!
 
@@ -131,15 +128,15 @@ lemma rightMetric_eq_fromPairT : εR = fromPairT (Fermion.rightMetricVal) := by
   congr 1
   exact Fermion.rightMetric_apply_one
 
-lemma altLeftMetric_eq_fromPairT : εL' = fromPairT (Fermion.altLeftMetricVal) := by
-  rw [altLeftMetric_eq_fromConstPair, fromConstPair]
+lemma dualLeftMetric_eq_fromPairT : εL' = fromPairT (Fermion.dualLeftMetricVal) := by
+  rw [dualLeftMetric_eq_fromConstPair, fromConstPair]
   congr 1
-  exact Fermion.altLeftMetric_apply_one
+  exact Fermion.dualLeftMetric_apply_one
 
-lemma altRightMetric_eq_fromPairT : εR' = fromPairT (Fermion.altRightMetricVal) := by
-  rw [altRightMetric_eq_fromConstPair, fromConstPair]
+lemma dualRightMetric_eq_fromPairT : εR' = fromPairT (Fermion.dualRightMetricVal) := by
+  rw [dualRightMetric_eq_fromConstPair, fromConstPair]
   congr 1
-  exact Fermion.altRightMetric_apply_one
+  exact Fermion.dualRightMetric_apply_one
 
 /-!
 
@@ -148,7 +145,6 @@ lemma altRightMetric_eq_fromPairT : εR' = fromPairT (Fermion.altRightMetricVal)
 -/
 
 open Lorentz in
-set_option backward.isDefEq.respectTransparency false in
 lemma coMetric_eq_complexCoBasis : η' =
     fromPairT (complexCoBasis (Sum.inl 0) ⊗ₜ[ℂ] complexCoBasis (Sum.inl 0))
     - fromPairT (complexCoBasis (Sum.inr 0) ⊗ₜ[ℂ] complexCoBasis (Sum.inr 0))
@@ -168,7 +164,6 @@ lemma coMetric_eq_complexCoBasisFin4 : η' =
   rfl
 
 open Lorentz in
-set_option backward.isDefEq.respectTransparency false in
 lemma contrMetric_eq_complexContrBasis : η =
     fromPairT (complexContrBasis (Sum.inl 0) ⊗ₜ[ℂ] complexContrBasis (Sum.inl 0))
     - fromPairT (complexContrBasis (Sum.inr 0) ⊗ₜ[ℂ] complexContrBasis (Sum.inr 0))
@@ -188,35 +183,31 @@ lemma contrMetric_eq_complexContrBasisFin4 : η =
   rfl
 
 open Fermion in
-set_option backward.isDefEq.respectTransparency false in
-lemma leftMetric_eq_leftBasis : εL =
-    - fromPairT (leftBasis 0 ⊗ₜ[ℂ] leftBasis 1)
-    + fromPairT (leftBasis 1 ⊗ₜ[ℂ] leftBasis 0) := by
+lemma leftMetric_eq_leftHandedWeyl_basis : εL =
+    - fromPairT (LeftHandedWeyl.basis 0 ⊗ₜ[ℂ] LeftHandedWeyl.basis 1)
+    + fromPairT (LeftHandedWeyl.basis 1 ⊗ₜ[ℂ] LeftHandedWeyl.basis 0) := by
   rw [leftMetric_eq_fromPairT, leftMetricVal_expand_tmul]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 open Fermion in
-lemma altLeftMetric_eq_altLeftBasis : εL' =
-    fromPairT (altLeftBasis 0 ⊗ₜ[ℂ] altLeftBasis 1)
-    - fromPairT (altLeftBasis 1 ⊗ₜ[ℂ] altLeftBasis 0) := by
-  rw [altLeftMetric_eq_fromPairT, altLeftMetricVal_expand_tmul]
+lemma dualLeftMetric_eq_dualLeftHandedWeyl_basis : εL' =
+    fromPairT (DualLeftHandedWeyl.basis 0 ⊗ₜ[ℂ] DualLeftHandedWeyl.basis 1)
+    - fromPairT (DualLeftHandedWeyl.basis 1 ⊗ₜ[ℂ] DualLeftHandedWeyl.basis 0) := by
+  rw [dualLeftMetric_eq_fromPairT, dualLeftMetricVal_expand_tmul]
   simp
 
 open Fermion in
-set_option backward.isDefEq.respectTransparency false in
-lemma rightMetric_eq_rightBasis : εR =
-    - fromPairT (rightBasis 0 ⊗ₜ[ℂ] rightBasis 1)
-    + fromPairT (rightBasis 1 ⊗ₜ[ℂ] rightBasis 0) := by
+lemma rightMetric_eq_rightHandedWeyl_basis : εR =
+    - fromPairT (RightHandedWeyl.basis 0 ⊗ₜ[ℂ] RightHandedWeyl.basis 1)
+    + fromPairT (RightHandedWeyl.basis 1 ⊗ₜ[ℂ] RightHandedWeyl.basis 0) := by
   rw [rightMetric_eq_fromPairT, rightMetricVal_expand_tmul]
   simp
 
 open Fermion in
-set_option backward.isDefEq.respectTransparency false in
-lemma altRightMetric_eq_altRightBasis : εR' =
-    fromPairT (altRightBasis 0 ⊗ₜ[ℂ] altRightBasis 1)
-    - fromPairT (altRightBasis 1 ⊗ₜ[ℂ] altRightBasis 0) := by
-  rw [altRightMetric_eq_fromPairT, altRightMetricVal_expand_tmul]
+lemma dualRightMetric_eq_dualRightHandedWeyl_basis : εR' =
+    fromPairT (DualRightHandedWeyl.basis 0 ⊗ₜ[ℂ] DualRightHandedWeyl.basis 1)
+    - fromPairT (DualRightHandedWeyl.basis 1 ⊗ₜ[ℂ] DualRightHandedWeyl.basis 0) := by
+  rw [dualRightMetric_eq_fromPairT, dualRightMetricVal_expand_tmul]
   simp
 
 /-!
@@ -227,109 +218,144 @@ lemma altRightMetric_eq_altRightBasis : εR' =
 
 open Lorentz in
 lemma coMetric_eq_basis : η' =
-    (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down] (fun | 0 => 0 | 1 => 0))
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down] (fun | 0 => 1 | 1 => 1))
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down] (fun | 0 => 2 | 1 => 2))
+    (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down]
+      (fun | 0 => (0 : Fin 4) | 1 => (0 : Fin 4)))
     - (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down]
-      (fun | 0 => 3 | 1 => 3)) := by
+      (fun | 0 => (1 : Fin 4) | 1 => (1 : Fin 4)))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down]
+      (fun | 0 => (2 : Fin 4) | 1 => (2 : Fin 4)))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down]
+      (fun | 0 => (3 : Fin 4) | 1 => (3 : Fin 4))) := by
   rw [coMetric_eq_complexCoBasisFin4]
-  rw [show complexCoBasisFin4 = complexLorentzTensor.basis .down by rfl]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .down _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .down _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .down _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .down _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1, 2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .down _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .down _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1, 1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .down _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .down _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 open Lorentz in
 lemma contrMetric_eq_basis : η =
-    (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up] (fun | 0 => 0 | 1 => 0))
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up] (fun | 0 => 1 | 1 => 1))
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up] (fun | 0 => 2 | 1 => 2))
+    (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up]
+      (fun | 0 => (0 : Fin 4) | 1 => (0 : Fin 4)))
     - (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up]
-      (fun | 0 => 3 | 1 => 3)) := by
+      (fun | 0 => (1 : Fin 4) | 1 => (1 : Fin 4)))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up]
+      (fun | 0 => (2 : Fin 4) | 1 => (2 : Fin 4)))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up]
+      (fun | 0 => (3 : Fin 4) | 1 => (3 : Fin 4))) := by
   rw [contrMetric_eq_complexContrBasisFin4]
-  rw [show complexContrBasisFin4 = complexLorentzTensor.basis .up by rfl]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .up _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .up _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .up _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .up _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1, 2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .up _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .up _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1, 1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .up _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .up _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 open Fermion in
 lemma leftMetric_eq_basis : εL =
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.upL, Color.upL] (fun | 0 => 0 | 1 => 1))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.upL, Color.upL]
+      (fun | 0 => (0 : Fin 2) | 1 => (1 : Fin 2)))
     + (Tensor.basis (S := complexLorentzTensor)
-      ![Color.upL, Color.upL] (fun | 0 => 1 | 1 => 0)) := by
-  rw [leftMetric_eq_leftBasis]
-  rw [show leftBasis = complexLorentzTensor.basis .upL by rfl]
+      ![Color.upL, Color.upL] (fun | 0 => (1 : Fin 2) | 1 => (0 : Fin 2))) := by
+  rw [leftMetric_eq_leftHandedWeyl_basis]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .upL _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .upL _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .upL _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .upL _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 open Fermion in
-lemma altLeftMetric_eq_basis : εL' =
-    (Tensor.basis (S := complexLorentzTensor) ![Color.downL, Color.downL] (fun | 0 => 0 | 1 => 1))
+lemma dualLeftMetric_eq_basis : εL' =
+    (Tensor.basis (S := complexLorentzTensor) ![Color.downL, Color.downL]
+      (fun | 0 => (0 : Fin 2) | 1 => (1 : Fin 2)))
     - (Tensor.basis (S := complexLorentzTensor)
-      ![Color.downL, Color.downL] (fun | 0 => 1 | 1 => 0)) := by
-  rw [altLeftMetric_eq_altLeftBasis]
-  rw [show altLeftBasis = complexLorentzTensor.basis .downL by rfl]
+      ![Color.downL, Color.downL] (fun | 0 => (1 : Fin 2) | 1 => (0 : Fin 2))) := by
+  rw [dualLeftMetric_eq_dualLeftHandedWeyl_basis]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .downL _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .downL _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .downL _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .downL _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 open Fermion in
 lemma rightMetric_eq_basis : εR =
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.upR, Color.upR] (fun | 0 => 0 | 1 => 1))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.upR, Color.upR]
+      (fun | 0 => (0 : Fin 2) | 1 => (1 : Fin 2)))
     + (Tensor.basis (S := complexLorentzTensor)
-      ![Color.upR, Color.upR] (fun | 0 => 1 | 1 => 0)) := by
-  rw [rightMetric_eq_rightBasis]
-  rw [show rightBasis = complexLorentzTensor.basis .upR by rfl]
+      ![Color.upR, Color.upR] (fun | 0 => (1 : Fin 2) | 1 => (0 : Fin 2))) := by
+  rw [rightMetric_eq_rightHandedWeyl_basis]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .upR _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .upR _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .upR _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .upR _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 open Fermion in
-lemma altRightMetric_eq_basis : εR' =
+lemma dualRightMetric_eq_basis : εR' =
     (Tensor.basis (S := complexLorentzTensor)
-      ![Color.downR, Color.downR] (fun | 0 => 0 | 1 => 1))
+      ![Color.downR, Color.downR] (fun | 0 => (0 : Fin 2) | 1 => (1 : Fin 2)))
     - (Tensor.basis (S := complexLorentzTensor)
-      ![Color.downR, Color.downR] (fun | 0 => 1 | 1 => 0)) := by
-  rw [altRightMetric_eq_altRightBasis]
-  rw [show altRightBasis = complexLorentzTensor.basis .downR by rfl]
+      ![Color.downR, Color.downR] (fun | 0 => (1 : Fin 2) | 1 => (0 : Fin 2))) := by
+  rw [dualRightMetric_eq_dualRightHandedWeyl_basis]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .downR _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .downR _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .downR _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .downR _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 /-!
@@ -338,8 +364,9 @@ lemma altRightMetric_eq_basis : εR' =
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma coMetric_eq_ofRat : η' = ofRat fun f =>
-    if f 0 = 0 ∧ f 1 = 0 then 1 else
+    if f 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ f 1 = Fin.cast (by rfl) (0 : Fin 4) then 1 else
     if f 0 = f 1 then - 1 else 0 := by
   rw [coMetric_eq_basis]
   conv_lhs =>
@@ -348,8 +375,9 @@ lemma coMetric_eq_ofRat : η' = ofRat fun f =>
   congr
   with_unfolding_all decide
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contrMetric_eq_ofRat : η = ofRat fun f =>
-    if f 0 = 0 ∧ f 1 = 0 then 1 else
+    if f 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ f 1 = Fin.cast (by rfl) (0 : Fin 4) then 1 else
     if f 0 = f 1 then - 1 else 0 := by
   rw [contrMetric_eq_basis]
   conv_lhs =>
@@ -359,8 +387,9 @@ lemma contrMetric_eq_ofRat : η = ofRat fun f =>
   with_unfolding_all decide
 
 lemma leftMetric_eq_ofRat : εL = ofRat fun f =>
-    if f 0 = 0 ∧ f 1 = 1 then - 1 else
-    if f 1 = 0 ∧ f 0 = 1 then 1 else 0 := by
+    if f 0 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 1 = Fin.cast (by rfl) (1 : Fin 2) then - 1 else
+    if f 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 0 = Fin.cast (by rfl) (1 : Fin 2) then
+      1 else 0 := by
   rw [leftMetric_eq_basis]
   conv_lhs =>
     rw [basis_eq_ofRat, basis_eq_ofRat]
@@ -368,10 +397,11 @@ lemma leftMetric_eq_ofRat : εL = ofRat fun f =>
   congr
   with_unfolding_all decide
 
-lemma altLeftMetric_eq_ofRat : εL' = ofRat fun f =>
-    if f 0 = 0 ∧ f 1 = 1 then 1 else
-    if f 1 = 0 ∧ f 0 = 1 then - 1 else 0 := by
-  rw [altLeftMetric_eq_basis]
+lemma dualLeftMetric_eq_ofRat : εL' = ofRat fun f =>
+    if f 0 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 1 = Fin.cast (by rfl) (1 : Fin 2) then 1 else
+    if f 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 0 = Fin.cast (by rfl) (1 : Fin 2) then
+      - 1 else 0 := by
+  rw [dualLeftMetric_eq_basis]
   conv_lhs =>
     rw [basis_eq_ofRat, basis_eq_ofRat]
   rw [← map_sub]
@@ -379,8 +409,8 @@ lemma altLeftMetric_eq_ofRat : εL' = ofRat fun f =>
   with_unfolding_all decide
 
 lemma rightMetric_eq_ofRat : εR = ofRat fun f =>
-    if f 0 = 0 ∧ f 1 = 1 then - 1 else
-    if f 1 = 0 ∧ f 0 = 1 then 1 else 0 := by
+    if f 0 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 1 = Fin.cast (by rfl) (1 : Fin 2) then - 1 else
+    if f 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 0 = Fin.cast (by rfl) (1 : Fin 2) then 1 else 0 := by
   rw [rightMetric_eq_basis]
   conv_lhs =>
     rw [basis_eq_ofRat, basis_eq_ofRat]
@@ -388,10 +418,11 @@ lemma rightMetric_eq_ofRat : εR = ofRat fun f =>
   congr
   with_unfolding_all decide
 
-lemma altRightMetric_eq_ofRat : εR' = ofRat fun f =>
-    if f 0 = 0 ∧ f 1 = 1 then 1 else
-    if f 1 = 0 ∧ f 0 = 1 then - 1 else 0 := by
-  rw [altRightMetric_eq_basis]
+lemma dualRightMetric_eq_ofRat : εR' = ofRat fun f =>
+    if f 0 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 1 = Fin.cast (by rfl) (1 : Fin 2) then 1 else
+    if f 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 0 = Fin.cast (by rfl) (1 : Fin 2) then
+      - 1 else 0 := by
+  rw [dualRightMetric_eq_basis]
   conv_lhs =>
     rw [basis_eq_ofRat, basis_eq_ofRat]
   rw [← map_sub]
@@ -427,13 +458,13 @@ lemma actionT_rightMetric (g : SL(2,ℂ)) : g • εR = εR := by
   rw [metricTensor_invariant]
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The tensor `altLeftMetric` is invariant under the action of `SL(2,ℂ)`. -/
-lemma actionT_altLeftMetric (g : SL(2,ℂ)) : g • εL' = εL' := by
+/-- The tensor `dualLeftMetric` is invariant under the action of `SL(2,ℂ)`. -/
+lemma actionT_dualLeftMetric (g : SL(2,ℂ)) : g • εL' = εL' := by
   rw [metricTensor_invariant]
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The tensor `altRightMetric` is invariant under the action of `SL(2,ℂ)`. -/
-lemma actionT_altRightMetric (g : SL(2,ℂ)) : g • εR' = εR' := by
+/-- The tensor `dualRightMetric` is invariant under the action of `SL(2,ℂ)`. -/
+lemma actionT_dualRightMetric (g : SL(2,ℂ)) : g • εR' = εR' := by
   rw [metricTensor_invariant]
 
 end complexLorentzTensor

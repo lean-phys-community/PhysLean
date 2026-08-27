@@ -49,6 +49,8 @@ inductive PhyslibCategory
   | StringTheory
   | StatisticalMechanics
   | Thermodynamics
+  | QuantumInfo
+  | PhyslibAlpha
   | Other
 deriving BEq, DecidableEq
 
@@ -67,6 +69,8 @@ def PhyslibCategory.string :  PhyslibCategory → String
   | StringTheory => "String Theory"
   | StatisticalMechanics => "Statistical Mechanics"
   | Thermodynamics => "Thermodynamics"
+  | QuantumInfo => "Quantum Information"
+  | PhyslibAlpha => "Physlib Alpha"
   | Other => "Other"
 
 def PhyslibCategory.emoji : PhyslibCategory → String
@@ -84,6 +88,8 @@ def PhyslibCategory.emoji : PhyslibCategory → String
   | StringTheory => "🧵"
   | StatisticalMechanics => "🎲"
   | Thermodynamics => "🔥"
+  | QuantumInfo => "💻"
+  | PhyslibAlpha => "🧪"
   | Other => "❓"
 
 def PhyslibCategory.List :  List PhyslibCategory :=
@@ -101,38 +107,45 @@ def PhyslibCategory.List :  List PhyslibCategory :=
     PhyslibCategory.StringTheory,
     PhyslibCategory.StatisticalMechanics,
     PhyslibCategory.Thermodynamics,
+    PhyslibCategory.QuantumInfo,
+    PhyslibCategory.PhyslibAlpha,
     PhyslibCategory.Other]
 
 instance : ToString PhyslibCategory where
   toString := PhyslibCategory.string
 
 def PhyslibCategory.ofFileName (n : Name) : PhyslibCategory :=
-  if n.toString.startsWith "Physlib.ClassicalMechanics"  then
+  let s : String := n.toString
+  if s.startsWith "Physlib.ClassicalMechanics"  then
     PhyslibCategory.ClassicalMechanics
-  else if n.toString.startsWith "Physlib.CondensedMatter" then
+  else if s.startsWith "Physlib.CondensedMatter" then
     PhyslibCategory.CondensedMatter
-  else if n.toString.startsWith "Physlib.Cosmology" then
+  else if s.startsWith "Physlib.Cosmology" then
     PhyslibCategory.Cosmology
-  else if n.toString.startsWith "Physlib.Electromagnetism" then
+  else if s.startsWith "Physlib.Electromagnetism" then
     PhyslibCategory.Elctromagnetism
-  else if n.toString.startsWith "Physlib.Mathematics" then
+  else if s.startsWith "Physlib.Mathematics" then
     PhyslibCategory.Mathematics
-  else if n.toString.startsWith "Physlib.Meta" then
+  else if s.startsWith "Physlib.Meta" then
     PhyslibCategory.Meta
-  else if n.toString.startsWith "Physlib.Optics" then
+  else if s.startsWith "Physlib.Optics" then
     PhyslibCategory.Optics
-  else if n.toString.startsWith "Physlib.Particles" then
+  else if s.startsWith "Physlib.Particles" then
     PhyslibCategory.Particles
-  else if n.toString.startsWith "Physlib.QFT" then
+  else if s.startsWith "Physlib.QFT" then
     PhyslibCategory.QFT
-  else if n.toString.startsWith "Physlib.QuantumMechanics" then
+  else if s.startsWith "Physlib.QuantumMechanics" then
     PhyslibCategory.QuantumMechanics
-  else if n.toString.startsWith "Physlib.Relativity" then
+  else if s.startsWith "Physlib.Relativity" then
     PhyslibCategory.Relativity
-  else if n.toString.startsWith "Physlib.StatisticalMechanics" then
+  else if s.startsWith "Physlib.StatisticalMechanics" then
     PhyslibCategory.StatisticalMechanics
-  else if n.toString.startsWith "Physlib.Thermodynamics" then
+  else if s.startsWith "Physlib.Thermodynamics" then
     PhyslibCategory.Thermodynamics
+  else if s.startsWith "Physlib.QuantumInfo" then
+    PhyslibCategory.QuantumInfo
+  else if s.startsWith "PhyslibAlpha" then
+    PhyslibCategory.PhyslibAlpha
   else
     PhyslibCategory.Other
 
@@ -315,8 +328,9 @@ unsafe def fullTODOYML : MetaM String := do
 
 unsafe def main (args : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   println! "Generating TODO list."
-  let env ← importModules (loadExts := true) #[`Physlib] {} 0
+  let env ← importModules (loadExts := true) #[`Physlib, `QuantumInfo, `PhyslibAlpha] {} 0
   let fileName := ""
   let options : Options := {}
   let ctx : Core.Context := {fileName, options, fileMap := default }
@@ -327,5 +341,9 @@ unsafe def main (args : List String) : IO UInt32 := do
   let fileOut : System.FilePath := {toString := "./docs/_data/TODO.yml"}
   if "mkFile" ∈ args then
     IO.println (s!"TODOList file made.")
+    -- Create directory if it doesn't exist
+    let dir : System.FilePath := {toString := "./docs/_data"}
+    if !(← System.FilePath.pathExists dir) then
+      IO.FS.createDirAll dir
     IO.FS.writeFile fileOut ymlString
   pure 0

@@ -49,6 +49,7 @@ def getStats (dir : String ) : MetaM String := do
 
 unsafe def main (args  : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   match args with
   | [dir] => do
   let files ← allFilePaths.go (#[] : Array FilePath) dir (dir : FilePath)

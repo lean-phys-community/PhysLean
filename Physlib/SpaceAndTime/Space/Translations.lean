@@ -17,6 +17,7 @@ Translations for part of the Poincaré group.
 
 @[expose] public section
 
+open Physlib
 section
 
 variable
@@ -48,7 +49,7 @@ noncomputable def translateSchwartz {d : ℕ} (a : EuclideanSpace ℝ (Fin d)) :
               fun _ => ContinuousLinearMap.id ℝ (Space d) := by
             funext x
             erw [fderiv_sub]
-            simp only [fderiv_id', fderiv_fun_const, Pi.zero_apply, sub_zero]
+            simp only [fderiv_fun_id, fderiv_fun_const, Pi.zero_apply, sub_zero]
             fun_prop
             fun_prop
           rw [hx]
@@ -69,7 +70,6 @@ noncomputable def translateSchwartz {d : ℕ} (a : EuclideanSpace ℝ (Fin d)) :
             positivity
           ring_nf
           rfl) (by
-          simp only
           use 1, (1 + ‖a‖)
           intro x
           simp only [pow_one]
@@ -127,18 +127,19 @@ lemma distTranslate_distGrad {d : ℕ} (a : EuclideanSpace ℝ (Fin d))
   rw [fderiv_comp_add_right]
 
 open MeasureTheory
-lemma distTranslate_ofFunction {d : ℕ} (a : EuclideanSpace ℝ (Fin d.succ))
-    (f : Space d.succ → X) (hf : IsDistBounded f) :
+set_option backward.isDefEq.respectTransparency false in
+lemma distTranslate_ofFunction {d : ℕ} (a : EuclideanSpace ℝ (Fin d))
+    (f : Space d → X) (hf : IsDistBounded f) :
     distTranslate a (distOfFunction f hf) =
     distOfFunction (fun x => f (x - basis.repr.symm a))
     (IsDistBounded.comp_add_right hf (- basis.repr.symm a)) := by
   ext η
   rw [distTranslate_apply, distOfFunction_apply, distOfFunction_apply]
-  trans ∫ (x : Space d.succ), η ((x - basis.repr.symm a) + basis.repr.symm a) •
+  trans ∫ (x : Space d), η ((x - basis.repr.symm a) + basis.repr.symm a) •
     f (x - basis.repr.symm a); swap
   · simp
-  let f' := fun x : Space d.succ => η (x + basis.repr.symm a) • f (x)
-  change _ = ∫ (x : Space d.succ), f' (x - basis.repr.symm a)
+  let f' := fun x : Space d => η (x + basis.repr.symm a) • f (x)
+  change _ = ∫ (x : Space d), f' (x - basis.repr.symm a)
   rw [MeasureTheory.integral_sub_right_eq_self]
   congr
   funext x

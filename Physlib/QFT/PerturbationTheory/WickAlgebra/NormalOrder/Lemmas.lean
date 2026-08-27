@@ -184,6 +184,7 @@ lemma normalOrder_ofCrAnOp_ofFieldOpList_swap (φ : 𝓕.CrAnFieldOp) (φ' : Lis
   rw [← ofCrAnList_singleton, ofCrAnList_mul_ofFieldOpList_eq_superCommute]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma normalOrder_anPart_ofFieldOpList_swap (φ : 𝓕.FieldOp) (φ' : List 𝓕.FieldOp) :
     𝓝(anPart φ * ofFieldOpList φ') = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • 𝓝(ofFieldOpList φ' * anPart φ) := by
   match φ with
@@ -288,6 +289,7 @@ lemma ofCrAnOp_superCommute_normalOrder_ofFieldOpList_sum (φ : 𝓕.CrAnFieldOp
     rw [← Finset.mul_sum]
   rw [← Finset.sum_mul, ← map_sum, ← map_sum, ← ofFieldOp_eq_sum, ← ofFieldOpList_eq_sum]
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The commutator of the annihilation part of a field operator with a normal ordered list of field
 operators can be decomposed into the sum of the commutators of the annihilation part with each

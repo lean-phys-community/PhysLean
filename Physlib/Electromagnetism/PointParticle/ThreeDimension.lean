@@ -5,10 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Electromagnetism.Dynamics.IsExtrema
-public import Physlib.SpaceAndTime.Space.Norm
+public import Physlib.Electromagnetism.Distributional.Dynamics.IsExtrema
+public import Physlib.SpaceAndTime.Space.Norm.Basic
 public import Physlib.SpaceAndTime.Space.Translations
-public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
 /-!
 
 # Electrostatics of a stationary point particle in 3d
@@ -46,8 +45,10 @@ sitting at the origin in 3d space.
 @[expose] public section
 
 namespace Electromagnetism
+open Physlib
 open Distribution SchwartzMap
 open Space MeasureTheory
+
 namespace DistElectromagneticPotential
 
 /-!
@@ -91,7 +92,6 @@ where $q$ is the charge of the particle and $r₀$ is the position of the partic
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma threeDimPointParticleCurrentDensity_chargeDensity (c : SpeedOfLight) (q : ℝ) (r₀ : Space 3) :
     (threeDimPointParticleCurrentDensity c q r₀).chargeDensity c =
@@ -99,8 +99,8 @@ lemma threeDimPointParticleCurrentDensity_chargeDensity (c : SpeedOfLight) (q : 
   ext ε
   simp only [DistLorentzCurrentDensity.chargeDensity, one_div, Lorentz.Vector.temporalCLM,
     Fin.isValue, threeDimPointParticleCurrentDensity, map_smul, LinearMap.coe_mk, AddHom.coe_mk,
-    ContinuousLinearEquiv.apply_symm_apply, ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
+    ContinuousLinearEquiv.apply_symm_apply, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
     Function.comp_apply, constantTime_apply, diracDelta'_apply, Lorentz.Vector.apply_smul,
     Lorentz.Vector.basis_apply, ↓reduceIte, mul_one, smul_eq_mul, diracDelta_apply]
   field_simp
@@ -116,7 +116,6 @@ In other words, there is no current flow for a point particle at rest.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma threeDimPointParticleCurrentDensity_currentDensity (c : SpeedOfLight) (q : ℝ) (r₀ : Space 3) :
     (threeDimPointParticleCurrentDensity c q r₀).currentDensity c = 0 := by
@@ -158,7 +157,7 @@ lemma threeDimPointParticle_eq_distTranslate (𝓕 : FreeSpace) (q : ℝ) (r₀ 
     distTranslate (basis.repr r₀) <|
     distOfFunction (fun x => (((q * 𝓕.μ₀ * 𝓕.c)/ (4 * π))* ‖x‖⁻¹) •
       Lorentz.Vector.basis (Sum.inl 0))
-      ((IsDistBounded.inv.const_mul_fun _).smul_const _)) := by
+      (((IsDistBounded.inv (by norm_num)).const_mul_fun _).smul_const _)) := by
   rw [threeDimPointParticle]
   congr
   ext η
@@ -175,7 +174,6 @@ $$V(r) = \frac{q}{4 π \epsilon_0 |r - r_0|}.$$
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma threeDimPointParticle_scalarPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 3) :
     (threeDimPointParticle 𝓕 q r₀).scalarPotential 𝓕.c =
     Space.constantTime (distOfFunction (fun x => (q/ (4 * π * 𝓕.ε₀))• ‖x - r₀‖⁻¹)
@@ -183,14 +181,13 @@ lemma threeDimPointParticle_scalarPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ :
   ext ε
   simp only [scalarPotential, Lorentz.Vector.temporalCLM, Fin.isValue, map_smul,
     ContinuousLinearMap.comp_smulₛₗ, ringHom_apply, threeDimPointParticle, LinearMap.coe_mk,
-    AddHom.coe_mk, ContinuousLinearEquiv.apply_symm_apply, ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
+    AddHom.coe_mk, ContinuousLinearEquiv.apply_symm_apply, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
     Function.comp_apply, constantTime_apply, distOfFunction_vector_eval, Lorentz.Vector.apply_smul,
     Lorentz.Vector.basis_apply, ↓reduceIte, mul_one, smul_eq_mul]
   rw [distOfFunction_mul_fun _ (IsDistBounded.inv_shift _),
     distOfFunction_mul_fun _ (IsDistBounded.inv_shift _)]
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, ContinuousLinearMap.coe_smul', Pi.smul_apply,
-    smul_eq_mul]
+  simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   ring_nf
   simp only [𝓕.c_sq, one_div, mul_inv_rev, mul_eq_mul_right_iff, inv_eq_zero, OfNat.ofNat_ne_zero,
     or_false]
@@ -207,7 +204,6 @@ $$\vec A(r) = 0.$$
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma threeDimPointParticle_vectorPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 3) :
     (threeDimPointParticle 𝓕 q r₀).vectorPotential 𝓕.c = 0 := by
@@ -238,7 +234,7 @@ lemma threeDimPointParticle_electricField (𝓕 : FreeSpace) (q : ℝ) (r₀ : S
     (distOfFunction (fun x => ‖x‖⁻¹) (IsDistBounded.inv)))
   · simp [distTranslate_ofFunction]
   rw [Space.distTranslate_distGrad]
-  have := Space.distGrad_distOfFunction_norm_zpow (d := 2) (-1) (by grind)
+  have := Space.distGrad_distOfFunction_norm_zpow (d := 3) (-1) (by grind)
   simp_all [distOfFunction_neg, distTranslate_ofFunction]
 
 /-!
@@ -279,13 +275,12 @@ satisfies Maxwell's equations for a point particle at rest.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma threeDimPointParticle_div_electricField {𝓕} (q : ℝ) (r₀ : Space 3) :
     distSpaceDiv ((threeDimPointParticle 𝓕 q r₀).electricField 𝓕.c) =
     (1/𝓕.ε₀) • constantTime (q • diracDelta ℝ r₀) := by
   rw [threeDimPointParticle_electricField]
   simp only [Int.reduceNeg, zpow_neg, map_smul, smul_smul]
-  have h1 := Space.distDiv_inv_pow_eq_dim (d := 2)
+  have h1 := Space.distDiv_inv_pow_eq_dim (d := 3)
   simp at h1
   trans (q / (4 * π * 𝓕.ε₀)) •
     distSpaceDiv (constantTime <|
@@ -294,7 +289,7 @@ lemma threeDimPointParticle_div_electricField {𝓕} (q : ℝ) (r₀ : Space 3) 
       (IsDistBounded.zpow_smul_repr_self (- 3 : ℤ) (by omega))))
   · ext η
     simp [distTranslate_ofFunction]
-  simp only [Int.reduceNeg, zpow_neg, one_div]
+  simp only [Int.reduceNeg, zpow_neg, zpow_ofNat, one_div]
   rw [constantTime_distSpaceDiv, distDiv_distTranslate, h1]
   simp only [map_smul, smul_smul]
   ext η
@@ -303,7 +298,6 @@ lemma threeDimPointParticle_div_electricField {𝓕} (q : ℝ) (r₀ : Space 3) 
   ring_nf
   field_simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma threeDimPointParticle_isExterma (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 3) :
     (threeDimPointParticle 𝓕 q r₀).IsExtrema 𝓕 (threeDimPointParticleCurrentDensity 𝓕.c q r₀) := by
   rw [isExtrema_iff_components]
@@ -311,9 +305,9 @@ lemma threeDimPointParticle_isExterma (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space
   · intro ε
     rw [gradLagrangian_sum_inl_0]
     simp only [one_div, mul_inv_rev, threeDimPointParticleCurrentDensity_chargeDensity, map_smul,
-      ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+      FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
     rw [threeDimPointParticle_div_electricField]
-    simp only [one_div, map_smul, ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+    simp only [one_div, map_smul, FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
     field_simp
     simp [𝓕.c_sq]
     right

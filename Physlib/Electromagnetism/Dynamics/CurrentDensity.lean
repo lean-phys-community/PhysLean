@@ -26,8 +26,6 @@ The current density is given in terms of the charge density `ρ` and the current
   Lorentz current density.
 - `LorentzCurrentDensity.currentDensity` : The current density associated with a
   Lorentz current density.
-- `DistLorentzCurrentDensity` : The type of Lorentz current densities
-  as distributions.
 
 ## iii. Table of contents
 
@@ -40,9 +38,6 @@ The current density is given in terms of the charge density `ρ` and the current
   - C.1. current density of zero Lorentz current density
   - C.2. Differentiability of the current density
   - C.3. Smoothness of the current density
-- D. The Lorentz current density as a distribution
-  - D.1. The underlying charge density
-  - D.2. The underlying current density
 
 ## iv. References
 
@@ -241,49 +236,5 @@ lemma currentDensity_ContDiff {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDe
   exact contDiff_euclidean.mpr fun i => h1 (Sum.inr i)
 
 end LorentzCurrentDensity
-/-!
 
-## D. The Lorentz current density as a distribution
-
--/
-/-- The Lorentz current density, also called four-current as a distribution. -/
-abbrev DistLorentzCurrentDensity (d : ℕ := 3) := (SpaceTime d) →d[ℝ] Lorentz.Vector d
-
-namespace DistLorentzCurrentDensity
-
-/-!
-
-### D.1. The underlying charge density
-
--/
-
-set_option backward.isDefEq.respectTransparency false in
-/-- The charge density underlying a Lorentz current density which is a distribution. -/
-noncomputable def chargeDensity {d : ℕ} (c : SpeedOfLight) :
-    (DistLorentzCurrentDensity d) →ₗ[ℝ] (Time × Space d) →d[ℝ] ℝ where
-  toFun J := (1 / (c : ℝ)) • (Lorentz.Vector.temporalCLM d ∘L distTimeSlice c J)
-  map_add' J1 J2 := by
-    simp
-  map_smul' r J := by
-    simp only [one_div, map_smul, ContinuousLinearMap.comp_smulₛₗ, RingHom.id_apply]
-    rw [smul_comm]
-
-/-!
-
-### D.2. The underlying current density
-
--/
-
-set_option backward.isDefEq.respectTransparency false in
-/-- The underlying (non-Lorentz) current density associated with a distributive
-  Lorentz current density. -/
-noncomputable def currentDensity (c : SpeedOfLight) :
-    DistLorentzCurrentDensity d →ₗ[ℝ] (Time × Space d) →d[ℝ] EuclideanSpace ℝ (Fin d) where
-  toFun J := Lorentz.Vector.spatialCLM d ∘L distTimeSlice c J
-  map_add' J1 J2 := by
-    simp
-  map_smul' r J := by
-    simp
-
-end DistLorentzCurrentDensity
 end Electromagnetism

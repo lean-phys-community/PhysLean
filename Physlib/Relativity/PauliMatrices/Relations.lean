@@ -20,12 +20,9 @@ There is likely a more direct path to this result.
 -/
 
 @[expose] public section
-open IndexNotation
-open CategoryTheory
-open MonoidalCategory
+
 open Matrix
 open TensorProduct
-open CategoryTheory
 
 namespace PauliMatrix
 open Fermion
@@ -33,19 +30,16 @@ open complexLorentzTensor
 open TensorSpecies
 open Tensor
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The statement that ` σᵥᵃᵇ σᵛᵃ'ᵇ' = 2 εᵃᵃ' εᵇᵇ'`. -/
 lemma pauliCo_contr_pauliContr :
     {σ_^^ | ν α β ⊗ σ^^^ | ν α' β' = (2 : ℂ) •ₜ εL | α α' ⊗ εR | β β'}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [Tensorial.self_toTensor_apply]
   conv_rhs =>
     rw [permT_basis_repr_symm_apply]
     rw [_root_.map_smul]
     simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, Fin.succAbove_zero,
-      Function.comp_apply, OverColor.mk_hom, OverColor.equivToHomEq_toEquiv, Finsupp.coe_smul,
-      Pi.smul_apply, smul_eq_mul]
+      Function.comp_apply, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul]
     rw (transparency := .instances) [prodT_basis_repr_apply]
     simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, Fin.succAbove_zero,
       Function.comp_apply]
@@ -60,10 +54,7 @@ lemma pauliCo_contr_pauliContr :
     enter [2, x]
     rw [prodT_basis_repr_apply]
     simp only [pauliCo_eq_ofRat, toTensor_eq_ofRat]
-    simp only [Fin.isValue, ofRat_basis_repr_apply, Function.comp_apply, Monoidal.tensorUnit_obj,
-      Equivalence.symm_inverse, Action.functorCategoryEquivalence_functor,
-      Action.FunctorCategoryEquivalence.functor_obj_obj, Functor.comp_obj,
-      Discrete.functor_obj_eq_as, Fin.cast_eq_self]
+    simp only [Fin.isValue, Fin.cast_eq_self, ofRat_basis_repr_apply]
     left
     rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
   conv_lhs =>
@@ -79,7 +70,6 @@ lemma pauliCo_contr_pauliContr :
   decide +kernel
 
 lemma pauliCoDown_trace_pauliCo : {(σ___ | μ β α ⊗ σ_^^ | ν α β) = (2 •ₜ η' | μ ν)}ᵀ := by
-  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     rw [pauliCoDown_eq_ofRat, pauliCo_eq_ofRat, prodT_ofRat_ofRat,
       contrT_ofRat, contrT_ofRat]
@@ -95,7 +85,6 @@ lemma pauliCoDown_trace_pauliCo : {(σ___ | μ β α ⊗ σ_^^ | ν α β) = (2 
   decide +kernel
 
 lemma pauliCo_trace_pauliCoDown: {σ_^^ | μ α β ⊗ σ___ | ν β α = 2 •ₜ η' | μ ν}ᵀ := by
-  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     rw [pauliCoDown_eq_ofRat, pauliCo_eq_ofRat]
     rw [prodT_ofRat_ofRat,
@@ -113,12 +102,11 @@ lemma pauliCo_trace_pauliCoDown: {σ_^^ | μ α β ⊗ σ___ | ν β α = 2 •�
 lemma pauliContr_mul_pauliContrDown_add :
     {((σ^^^ | μ α β ⊗ σ^__ | ν β α') + (σ^^^ | ν α β ⊗ σ^__ | μ β α')) =
     2 •ₜ η | μ ν ⊗ δL | α α'}ᵀ := by
-  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     rw [pauliContrDown_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat,
       contrT_ofRat, permT_ofRat, ← map_add]
   conv_rhs =>
-    rw [leftAltLeftUnit_eq_ofRat, contrMetric_eq_ofRat, prodT_ofRat_ofRat, ← map_nsmul,
+    rw [leftDualLeftUnit_eq_ofRat, contrMetric_eq_ofRat, prodT_ofRat_ofRat, ← map_nsmul,
       permT_ofRat]
   apply (Tensor.basis _).repr.injective
   ext b
@@ -129,12 +117,11 @@ lemma pauliContr_mul_pauliContrDown_add :
 lemma auliContrDown_pauliContr_mul_add :
     {((σ^__ | μ β α ⊗ σ^^^ | ν α β') + (σ^__ | ν β α ⊗ σ^^^ | μ α β')) =
     2 •ₜ η | μ ν ⊗ δR' | β β'}ᵀ := by
-  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     rw [pauliContrDown_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat,
       contrT_ofRat, permT_ofRat, ← map_add]
   conv_rhs =>
-    rw [altRightRightUnit_eq_ofRat, contrMetric_eq_ofRat, prodT_ofRat_ofRat, ← map_nsmul,
+    rw [dualRightRightUnit_eq_ofRat, contrMetric_eq_ofRat, prodT_ofRat_ofRat, ← map_nsmul,
       permT_ofRat]
   apply (Tensor.basis _).repr.injective
   ext b

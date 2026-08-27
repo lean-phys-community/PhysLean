@@ -43,6 +43,7 @@ copyright (c) 2020 Microsoft Corporation. Authored by Leonardo de Moura.
 
 @[expose] public meta section
 open Lean
+
 namespace Physlib
 
 /-!

@@ -154,10 +154,8 @@ def card {α1 α2 α3 α4 : Type} (T : FourTree α1 α2 α3 α4) : Nat :=
 
 lemma card_eq_toMultiset_card (T : FourTree α1 α2 α3 α4s) :
     T.card = T.toMultiset.card := by
-  match T with
-  | .root trunks =>
-    simp only [card, toMultiset, Multiset.card_bind, Function.comp_apply, Multiset.card_map]
-    rfl
+  simp only [card, toMultiset, Multiset.card_bind, Function.comp_apply, Multiset.card_map]
+  rfl
 
 /-!
 
@@ -237,51 +235,26 @@ instance [DecidableEq α1] [DecidableEq α2] [DecidableEq α3] [DecidableEq α4]
 
 lemma mem_iff_mem_toMultiset (T : FourTree α1 α2 α3 α4) (x : α1 × α2 × α3 × α4) :
     x ∈ T ↔ x ∈ T.toMultiset := by
-  match T with
-  | .root trunks =>
-  conv_lhs => simp [Membership.mem, mem]
-  simp [toMultiset]
-  constructor
-  · intro h
-    obtain ⟨trunk, hTrunkMem, hbranch⟩ := h
-    refine ⟨trunk, hTrunkMem, ?_⟩
-    match trunk with
-    | .trunk qHd branches =>
-    simp [Trunk.mem] at hbranch
-    obtain ⟨hqHu, branch, hBranchMem, htwig⟩ := hbranch
-    simp only
-    refine ⟨branch, hBranchMem, ?_⟩
-    match branch with
-    | .branch qHu twigs =>
-    simp [Branch.mem] at htwig
-    obtain ⟨hqHu, twig, hTwigMem, hleaf⟩ := htwig
-    simp only
-    refine ⟨twig, hTwigMem, ?_⟩
-    match twig with
-    | .twig Q5 leafs =>
-    simp [Twig.mem] at hleaf
-    obtain ⟨hqHu, leaf, hLeafMem, hxs⟩ := hleaf
-    simp only
-    refine ⟨leaf, hLeafMem, ?_⟩
-    match leaf with
-    | .leaf Q10 =>
-    simp [Leaf.mem] at hxs
-    simp_all
-  · intro h
-    obtain ⟨trunk, hTrunkMem, ⟨branch, hbranchMem, ⟨twig, htwigMem, ⟨leaf, hleafMem, heq⟩⟩⟩⟩ := h
-    use trunk
-    subst heq
-    refine ⟨hTrunkMem, ?_⟩
-    simp [Trunk.mem]
-    use branch
-    refine ⟨hbranchMem, ?_⟩
-    simp [Branch.mem]
-    use twig
-    refine ⟨htwigMem, ?_⟩
-    simp [Twig.mem]
-    use leaf
-    refine ⟨hleafMem, ?_⟩
-    simp [Leaf.mem]
+  have leaf_iff : ∀ (l : Leaf α4) (y : α4), l.mem y ↔ l.1 = y := by
+    rintro ⟨_⟩ _
+    rfl
+  have twig_iff : ∀ (t : Twig α3 α4) (y : α3 × α4),
+      t.mem y ↔ t.1 = y.1 ∧ ∃ l ∈ t.2, l.mem y.2 := by
+    rintro ⟨_, _⟩ _
+    rfl
+  have branch_iff : ∀ (b : Branch α2 α3 α4) (y : α2 × α3 × α4),
+      b.mem y ↔ b.1 = y.1 ∧ ∃ t ∈ b.2, t.mem y.2 := by
+    rintro ⟨_, _⟩ _
+    rfl
+  have trunk_iff : ∀ (k : Trunk α1 α2 α3 α4) (y : α1 × α2 × α3 × α4),
+      k.mem y ↔ k.1 = y.1 ∧ ∃ b ∈ k.2, b.mem y.2 := by
+    rintro ⟨_, _⟩ _
+    rfl
+  obtain ⟨trunks⟩ := T
+  show (∃ trunk ∈ trunks, trunk.mem x) ↔ x ∈ (root trunks).toMultiset
+  simp only [toMultiset, Multiset.mem_bind, Multiset.mem_map,
+    trunk_iff, branch_iff, twig_iff, leaf_iff, Prod.ext_iff]
+  tauto
 
 lemma mem_of_parts {T : FourTree α1 α2 α3 α4} {C : α1 × α2 × α3 × α4}
     (trunk : Trunk α1 α2 α3 α4)
@@ -292,14 +265,8 @@ lemma mem_of_parts {T : FourTree α1 α2 α3 α4} {C : α1 × α2 × α3 × α4}
     (heq : C = (trunk.1, branch.1, twig.1, leaf.1)) :
     C ∈ T := by
   rw [mem_iff_mem_toMultiset]
-  simp [toMultiset]
-  use trunk
-  simp_all
-  use branch
-  simp_all
-  use twig
-  simp_all
-  use leaf
+  simp only [toMultiset, Multiset.mem_bind, Multiset.mem_map]
+  exact ⟨trunk, trunk_mem, branch, branch_mem, twig, twig_mem, leaf, leaf_mem, heq.symm⟩
 
 end FourTree
 

@@ -15,6 +15,7 @@ In this module we define the Planck's constant `ℏ` as a positive real number.
 -/
 
 @[expose] public section
+
 open NNReal
 
 namespace Constants
@@ -23,12 +24,15 @@ namespace Constants
 def ℏ : Subtype fun x : ℝ => 0 < x := ⟨1.054571817e-34, by norm_num⟩
 
 /-- Planck's constant is positive. -/
+@[simp]
 lemma ℏ_pos : 0 < (ℏ : ℝ) := ℏ.2
 
 /-- Planck's constant is non-negative. -/
+@[simp]
 lemma ℏ_nonneg : 0 ≤ (ℏ : ℝ) := le_of_lt ℏ.2
 
 /-- Planck's constant is not equal to zero. -/
+@[simp]
 lemma ℏ_ne_zero : (ℏ : ℝ) ≠ 0 := ne_of_gt ℏ.2
 
 end Constants

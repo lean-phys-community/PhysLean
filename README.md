@@ -1,8 +1,3 @@
-> [!NOTE]
-> Things look different? We've recently undergone a name change and move from /lean-phys-community/PhysLean
-> to /leanprover-community/physlib. Same repo, different location and name. This shouldn't affect
-> the average user, but please be patient as we update things.
-
 
 <div align="center">
 <img src="./docs/Physlib-logo.jpeg" alt="Physlib logo" width="500">
@@ -23,7 +18,7 @@
 
 
 [![](https://img.shields.io/badge/View_The-Stats-blue)](https://physlib.io/Stats)
-[![](https://img.shields.io/badge/Lean-v4.29.1-blue)](https://github.com/leanprover/lean4/releases/tag/v4.29.1)
+[![](https://img.shields.io/badge/Lean-v4.33.0-blue)](https://github.com/leanprover/lean4/releases/tag/v4.33.0)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/leanprover-community/physlib)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/leanprover-community/physlib)
 [![api_docs](https://img.shields.io/badge/doc-API_docs-blue)](https://physlib.io/docs/)
@@ -54,6 +49,12 @@
 
 🎯 The project shall be for **mainstream** physics only.
 
+
+## PhyslibAlpha
+
+PhyslibAlpha sits downstream of `./Physlib` (within the same repository). The core idea is that PhyslibAlpha has a lower review-standards then Physlib making it easier to contribute large PRs, AI-generated content, or formalizations which are not-quite-perfect. PRs for PhyslibAlpha must pass basic linter checks, described [here](https://github.com/leanprover-community/physlib/blob/master/scripts/PhyslibAlpha/README.md). PRs must also undergo a light 'one-look' review checking 1) Whether the content is main-stream physics, 2) Whether it looks reasonable (no axioms, easy to read etc.), 3) Whether it is within the right place within PhyslibAlpha (mirroring its place in Physlib).
+
+Because of the lower-review bar for PhyslibAlpha we cannot promise to maintain contributions when they break — we will simply record when this happens.
 
 ## Contributing to Physlib
 

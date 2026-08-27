@@ -194,7 +194,7 @@ lemma ι_normalOrderF_zero_of_mem_ideal (a : 𝓕.FieldOpFreeAlgebra)
     obtain ⟨a, ha, b, hb, rfl⟩ := Set.mem_mul.mp hx
     obtain ⟨a, ha, c, hc, rfl⟩ := ha
     simp only [p]
-    simp only [fieldOpIdealSet, exists_prop, exists_and_left, Set.mem_setOf_eq] at hc
+    simp only [fieldOpIdealSet, exists_prop, exists_and_left, Set.mem_ofPred_eq] at hc
     match hc with
     | Or.inl hc =>
       obtain ⟨φa, φa', hφa, hφa', rfl⟩ := hc
@@ -222,6 +222,7 @@ lemma ι_normalOrderF_eq_of_equiv (a b : 𝓕.FieldOpFreeAlgebra) (h : a ≈ b) 
   rw [← sub_eq_zero, ← map_sub, ← LinearMap.map_sub]
   exact ι_normalOrderF_zero_of_mem_ideal (a - b) h
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a field specification `𝓕`, `normalOrder` is the linear map
 
   `WickAlgebra 𝓕 →ₗ[ℂ] WickAlgebra 𝓕`

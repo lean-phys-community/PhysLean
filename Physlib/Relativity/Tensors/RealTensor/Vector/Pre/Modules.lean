@@ -50,10 +50,6 @@ def toFin1dℝFun : ContrMod d ≃ (Fin 1 ⊕ Fin d → ℝ) where
   left_inv _ := rfl
   right_inv _ := rfl
 
-/-- The instance of `AddCommMonoid` on `ContrℝModule` defined via its equivalence
-  with `Fin 1 ⊕ Fin d → ℝ`. -/
-instance : AddCommMonoid (ContrMod d) := Equiv.addCommMonoid toFin1dℝFun
-
 /-- The instance of `AddCommGroup` on `ContrℝModule` defined via its equivalence
   with `Fin 1 ⊕ Fin d → ℝ`. -/
 instance : AddCommGroup (ContrMod d) := Equiv.addCommGroup toFin1dℝFun
@@ -84,7 +80,6 @@ lemma toFin1dℝ_eq_val (ψ : ContrMod d) : ψ.toFin1dℝ = ψ.val := by rfl
 -/
 
 /-- The standard basis of `ContrℝModule` indexed by `Fin 1 ⊕ Fin d`. -/
-@[simps!]
 def stdBasis : Basis (Fin 1 ⊕ Fin d) ℝ (ContrMod d) := Basis.ofEquivFun toFin1dℝEquiv
 
 @[simp]
@@ -225,7 +220,6 @@ def toSelfAdjoint : ContrMod 3 ≃ₗ[ℝ] selfAdjoint (Matrix (Fin 2) (Fin 2) �
   PauliMatrix.pauliBasis'.repr.symm
 
 open PauliMatrix in
-set_option backward.isDefEq.respectTransparency false in
 lemma toSelfAdjoint_apply (x : ContrMod 3) : toSelfAdjoint x =
     x.toFin1dℝ (Sum.inl 0) • ⟨pauliMatrix (Sum.inl 0), pauliMatrix_selfAdjoint _⟩
     - x.toFin1dℝ (Sum.inr 0) • ⟨pauliMatrix (Sum.inr 0), pauliMatrix_selfAdjoint _⟩
@@ -251,7 +245,6 @@ lemma toSelfAdjoint_apply_coe (x : ContrMod 3) : (toSelfAdjoint x).1 =
   rw [toSelfAdjoint_apply]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma toSelfAdjoint_stdBasis (i : Fin 1 ⊕ Fin 3) :
     toSelfAdjoint (stdBasis i) = PauliMatrix.pauliBasis' i := by
   rw [toSelfAdjoint_apply]
@@ -330,10 +323,6 @@ def toFin1dℝFun : CoMod d ≃ (Fin 1 ⊕ Fin d → ℝ) where
   left_inv _ := rfl
   right_inv _ := rfl
 
-/-- The instance of `AddCommMonoid` on `CoℂModule` defined via its equivalence
-  with `Fin 1 ⊕ Fin d → ℝ`. -/
-instance : AddCommMonoid (CoMod d) := Equiv.addCommMonoid toFin1dℝFun
-
 /-- The instance of `AddCommGroup` on `CoℝModule` defined via its equivalence
   with `Fin 1 ⊕ Fin d → ℝ`. -/
 instance : AddCommGroup (CoMod d) := Equiv.addCommGroup toFin1dℝFun
@@ -357,7 +346,6 @@ abbrev toFin1dℝ (ψ : CoMod d) := toFin1dℝEquiv ψ
 -/
 
 /-- The standard basis of `CoℝModule` indexed by `Fin 1 ⊕ Fin d`. -/
-@[simps!]
 def stdBasis : Basis (Fin 1 ⊕ Fin d) ℝ (CoMod d) := Basis.ofEquivFun toFin1dℝEquiv
 
 @[simp]

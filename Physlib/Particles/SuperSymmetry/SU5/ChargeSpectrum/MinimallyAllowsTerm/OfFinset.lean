@@ -98,11 +98,7 @@ def toMultisetsOne (s : Finset 𝓩) : Multiset (Multiset 𝓩) :=
 @[simp]
 lemma mem_toMultisetsOne_iff [DecidableEq 𝓩] {s : Finset 𝓩} (X : Multiset 𝓩) :
     X ∈ toMultisetsOne s ↔ X.toFinset ⊆ s ∧ X.card = 1 := by
-  simp [toMultisetsOne]
-  intro h
-  rw [Multiset.card_eq_one] at h
-  obtain ⟨x, h1, h2⟩ := h
-  simp
+  simp +contextual [toMultisetsOne, Multiset.card_eq_one]
 
 /-!
 
@@ -123,19 +119,13 @@ lemma mem_toMultisetsTwo_iff [DecidableEq 𝓩] {s : Finset 𝓩} (X : Multiset 
   constructor
   · intro h
     rcases h with ⟨a, ⟨hasub, hacard⟩, hbind⟩ | ⟨h1, hcard⟩
-    · rw [Finset.card_eq_one] at hacard
-      obtain ⟨a, rfl⟩ := hacard
-      simp at hbind
+    · obtain ⟨a, rfl⟩ := Finset.card_eq_one.mp hacard
       subst hbind
       simpa using hasub
-    · simp_all only [and_true]
-      refine Finset.subset_def.mpr ?_
-      simp only [Multiset.toFinset_val, Multiset.dedup_subset']
-      exact Multiset.subset_of_le h1
+    · exact ⟨fun a ha => Multiset.mem_of_le h1 (Multiset.mem_toFinset.mp ha), hcard⟩
   · intro ⟨hsub, hcard⟩
     simp_all
-    rw [Multiset.card_eq_two] at hcard
-    obtain ⟨a, b, rfl⟩ := hcard
+    obtain ⟨a, b, rfl⟩ := Multiset.card_eq_two.mp hcard
     by_cases hab : a = b
     · subst hab
       left
@@ -165,29 +155,16 @@ lemma mem_toMultisetsThree_iff [DecidableEq 𝓩] {s : Finset 𝓩} (X : Multise
   simp [toMultisetsThree]
   constructor
   · intro h
-    rw [or_assoc] at h
-    rcases h with ⟨a, ⟨hasub, hacard⟩, hbind⟩ | ⟨a, ha, ⟨b, hb, rfl⟩⟩ | ⟨h1, hcard⟩
-    · rw [Finset.card_eq_one] at hacard
-      obtain ⟨a, rfl⟩ := hacard
-      simp at hbind
+    rcases h with (⟨a, ⟨hasub, hacard⟩, hbind⟩ | ⟨a, ha, ⟨b, hb, rfl⟩⟩) | ⟨h1, hcard⟩
+    · obtain ⟨a, rfl⟩ := Finset.card_eq_one.mp hacard
       subst hbind
       simpa using hasub
-    · simp only [Multiset.toFinset_cons, Multiset.toFinset_singleton, Finset.mem_insert,
-      Finset.mem_singleton, or_true, Finset.insert_eq_of_mem, Multiset.card_cons,
-      Multiset.card_singleton, Nat.reduceAdd, and_true]
-      refine Finset.insert_subset ha ?_
-      rw [← @Multiset.mem_toFinset] at hb
-      simp at hb
-      simp only [Finset.singleton_subset_iff]
-      exact Finset.mem_of_mem_erase hb
-    · simp_all only [and_true]
-      refine Finset.subset_def.mpr ?_
-      simp only [Multiset.toFinset_val, Multiset.dedup_subset']
-      exact Multiset.subset_of_le h1
+    · have := Multiset.mem_of_mem_erase hb
+      simp_all [Finset.insert_subset_iff]
+    · exact ⟨fun a ha => Multiset.mem_of_le h1 (Multiset.mem_toFinset.mp ha), hcard⟩
   · intro ⟨hsub, hcard⟩
     simp_all
-    rw [Multiset.card_eq_three] at hcard
-    obtain ⟨a, b, c, rfl⟩ := hcard
+    obtain ⟨a, b, c, rfl⟩ := Multiset.card_eq_three.mp hcard
     by_cases hab : a = b
     · subst hab
       left
@@ -198,37 +175,20 @@ lemma mem_toMultisetsThree_iff [DecidableEq 𝓩] {s : Finset 𝓩} (X : Multise
         simpa using hsub
       · right
         simp [@Finset.insert_subset_iff] at hsub
-        use c
-        simp_all
-        use a
-        apply And.intro
-        · refine (Multiset.mem_erase_of_ne hac).mpr ?_
-          simp_all
-        · simp
-          rw [← Multiset.insert_eq_cons, Multiset.pair_comm c a]
-          simp
+        refine ⟨c, hsub.2, a, (Multiset.mem_erase_of_ne hac).mpr hsub.1, ?_⟩
+        exact congrArg (a ::ₘ ·) (Multiset.pair_comm c a)
     · rw [or_assoc]
       right
       by_cases hac : a = c
       · subst hac
         simp [@Finset.insert_subset_iff] at hsub
         left
-        use b
-        simp_all
-        use a
-        simp only [and_true]
-        refine (Multiset.mem_erase_of_ne (by omega)).mpr ?_
-        simp_all
+        exact ⟨b, hsub.1, a, (Multiset.mem_erase_of_ne hab).mpr hsub.2, rfl⟩
       · by_cases hbc : b = c
         · subst hbc
           left
           simp [@Finset.insert_subset_iff] at hsub
-          use a
-          simp_all
-          use b
-          apply And.intro
-          · refine (Multiset.mem_erase_of_ne (fun h => hac h.symm)).mpr ?_
-            simp_all
+          refine ⟨a, hsub.1, b, (Multiset.mem_erase_of_ne (Ne.symm hac)).mpr hsub.2, ?_⟩
           exact Multiset.cons_swap b a {b}
         · right
           refine (Multiset.le_iff_subset ?_).mpr ?_
@@ -377,10 +337,8 @@ lemma mem_ofFinset_of_mem_minimallyAllowsTermOfFinset {S5 S10 : Finset 𝓩} {T 
     simp_all
 
 lemma minimallyAllowsTermOfFinset_subset_ofFinset {S5 S10 : Finset 𝓩} {T : PotentialTerm} :
-    minimallyAllowsTermsOfFinset S5 S10 T ⊆ (ofFinset S5 S10).val := by
-  refine Multiset.subset_iff.mpr (fun x hx => ?_)
-  rw [Finset.mem_val]
-  exact mem_ofFinset_of_mem_minimallyAllowsTermOfFinset hx
+    minimallyAllowsTermsOfFinset S5 S10 T ⊆ (ofFinset S5 S10).val :=
+  fun _ hx => Finset.mem_val.mpr (mem_ofFinset_of_mem_minimallyAllowsTermOfFinset hx)
 
 /-!
 
@@ -421,53 +379,34 @@ lemma eq_allowsTermForm_of_mem_minimallyAllowsTermOfFinset {S5 S10 : Finset 𝓩
     obtain ⟨c, rfl⟩ := Multiset.card_eq_one.mp hacard
     obtain ⟨d, e, rfl⟩ := Multiset.card_eq_two.mp hbcard
     simp_all [allowsTermForm]
-    use -c
-    simp only [neg_neg, true_and] at ⊢ hsum
-    use d
-    congr
-    grind
+    refine ⟨-c, ?_, d, ?_⟩ <;> grind
   case Λ =>
     obtain ⟨a, b, ⟨⟨⟨ha, hacard⟩, ⟨hb, hbcard⟩⟩, hsum⟩, rfl⟩ := hx
     obtain ⟨c, d, rfl⟩ := Multiset.card_eq_two.mp hacard
     obtain ⟨e, rfl⟩ := Multiset.card_eq_one.mp hbcard
     simp_all [allowsTermForm]
-    use c, d
-    simp_all
     grind
   case W1 =>
     obtain ⟨⟨a, b, ⟨⟨⟨ha, hacard⟩, ⟨hb, hbcard⟩⟩, hsum⟩, rfl⟩, _⟩ := hx
     obtain ⟨c, rfl⟩ := Multiset.card_eq_one.mp hacard
     obtain ⟨e, d, f, rfl⟩ := Multiset.card_eq_three.mp hbcard
     simp_all [allowsTermForm]
-    use e, d, f
-    simp_all
     grind
   case W2 =>
     obtain ⟨⟨a, b, ⟨⟨ha, ⟨hb, hbcard⟩⟩, hsum⟩, rfl⟩, _⟩ := hx
     obtain ⟨e, d, f, rfl⟩ := Multiset.card_eq_three.mp hbcard
     simp_all [allowsTermForm]
-    use e, d, f
-    simp_all
     grind
   case W3 =>
     obtain ⟨a, b, ⟨⟨ha, ⟨hb, hbcard⟩⟩, hsum⟩, rfl⟩ := hx
     obtain ⟨c, d, rfl⟩ := Multiset.card_eq_two.mp hbcard
     simp_all [allowsTermForm]
-    use -a
-    simp_all
-    use c
-    congr
-    trans d - 0
-    · simp
-    rw [← hsum]
-    abel
+    refine ⟨-a, ?_, c, ?_⟩ <;> grind
   case W4 =>
     obtain ⟨a, b, c, ⟨⟨ha, ⟨hb, hc, hcard⟩⟩, hsum⟩, rfl⟩ := hx
     obtain ⟨d, rfl⟩ := Multiset.card_eq_one.mp hcard
     simp_all [allowsTermForm]
-    use -b
-    simp_all
-    grind
+    exact ⟨-b, by grind⟩
   case K2 =>
     obtain ⟨a, b, c, ⟨⟨ha, ⟨hb, hc, hcard⟩⟩, hsum⟩, rfl⟩ := hx
     obtain ⟨d, rfl⟩ := Multiset.card_eq_one.mp hcard
@@ -477,11 +416,7 @@ lemma eq_allowsTermForm_of_mem_minimallyAllowsTermOfFinset {S5 S10 : Finset 𝓩
     obtain ⟨a, b, ⟨⟨ha, ⟨hb, hbcard⟩⟩, hsum⟩, rfl⟩ := hx
     obtain ⟨c, d, rfl⟩ := Multiset.card_eq_two.mp hbcard
     simp_all [allowsTermForm]
-    use -a
-    simp_all
-    use c
-    congr
-    grind
+    refine ⟨-a, ?_, c, ?_⟩ <;> grind
   case bottomYukawa =>
     obtain ⟨a, b, c, ⟨⟨ha, ⟨⟨hb, hbcard⟩, hc, hcard⟩⟩, hsum⟩, rfl⟩ := hx
     obtain ⟨e, rfl⟩ := Multiset.card_eq_one.mp hcard
@@ -519,13 +454,8 @@ lemma minimallyAllowsTerm_of_mem_minimallyAllowsTermOfFinset {S5 S10 : Finset �
   by_cases hT : T ≠ W1 ∧ T ≠ W2
   · obtain ⟨a, b, c, rfl⟩ := eq_allowsTermForm_of_mem_minimallyAllowsTermOfFinset hx
     exact allowsTermForm_minimallyAllowsTerm hT
-  · simp at hT
-    by_cases h : T = W1
-    · subst h
-      simp [minimallyAllowsTermsOfFinset] at hx
-      exact hx.2
-    · simp_all
-      subst hT
+  · obtain rfl | rfl : T = W1 ∨ T = W2 := by tauto
+    all_goals
       simp [minimallyAllowsTermsOfFinset] at hx
       exact hx.2
 
@@ -549,42 +479,31 @@ lemma mem_minimallyAllowsTermOfFinset_of_minimallyAllowsTerm {S5 S10 : Finset �
   case μ =>
     simp_all [allowsTermForm]
   case β =>
-    use {a}
-    simp_all [allowsTermForm]
+    exact ⟨{a}, by simp_all [allowsTermForm]⟩
   case Λ =>
-    use {a, b}, {- a - b}
-    simp_all [allowsTermForm]
+    exact ⟨{a, b}, {- a - b}, by simp_all [allowsTermForm]⟩
   case W1 =>
-    apply And.intro
-    · use {- a - b - c}, {a, b, c}
-      simp_all [allowsTermForm]
-      abel
-    · exact h
+    refine ⟨⟨{- a - b - c}, {a, b, c}, ?_⟩, h⟩
+    simp_all [allowsTermForm]
+    abel
   case W2 =>
-    apply And.intro
-    · use {a, b, c}
-      simp_all [allowsTermForm]
-      abel
-    · exact h
+    refine ⟨⟨{a, b, c}, ?_⟩, h⟩
+    simp_all [allowsTermForm]
+    abel
   case W3 =>
     use {b, - b - 2 • a}
     simp_all [allowsTermForm]
     abel
   case W4 =>
-    use {c}
-    simp_all [allowsTermForm]
+    exact ⟨{c}, by simp_all [allowsTermForm]⟩
   case K1 =>
-    use {-a}, {b, - a - b}
-    simp_all [allowsTermForm]
+    exact ⟨{-a}, {b, - a - b}, by simp_all [allowsTermForm]⟩
   case K2 =>
-    use {- a - b}
-    simp_all [allowsTermForm]
+    exact ⟨{- a - b}, by simp_all [allowsTermForm]⟩
   case topYukawa =>
-    use {b, - a - b}
-    simp_all [allowsTermForm]
+    exact ⟨{b, - a - b}, by simp_all [allowsTermForm]⟩
   case bottomYukawa =>
-    use {b}, {- a - b}
-    simp_all [allowsTermForm]
+    exact ⟨{b}, {- a - b}, by simp_all [allowsTermForm]⟩
 
 /-!
 
@@ -599,12 +518,9 @@ it minimally allows the term `T`, provided it is in `ofFinset S5 S10`.
 lemma minimallyAllowsTerm_iff_mem_minimallyAllowsTermOfFinset
     {S5 S10 : Finset 𝓩} {T : PotentialTerm}
     {x : ChargeSpectrum 𝓩} (hx : x ∈ ofFinset S5 S10) :
-    x.MinimallyAllowsTerm T ↔ x ∈ minimallyAllowsTermsOfFinset S5 S10 T := by
-  constructor
-  · intro h
-    exact mem_minimallyAllowsTermOfFinset_of_minimallyAllowsTerm x h hx
-  · intro h
-    exact minimallyAllowsTerm_of_mem_minimallyAllowsTermOfFinset h
+    x.MinimallyAllowsTerm T ↔ x ∈ minimallyAllowsTermsOfFinset S5 S10 T :=
+  ⟨fun h => mem_minimallyAllowsTermOfFinset_of_minimallyAllowsTerm x h hx,
+    minimallyAllowsTerm_of_mem_minimallyAllowsTermOfFinset⟩
 
 /-!
 

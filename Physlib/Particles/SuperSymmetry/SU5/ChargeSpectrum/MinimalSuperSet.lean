@@ -255,42 +255,23 @@ lemma exists_minimalSuperSet (S5 S10 : Finset 𝓩) {x y : ChargeSpectrum 𝓩}
   match x, y with
   | ⟨x1, x2, x3, x4⟩, ⟨y1, y2, y3, y4⟩ =>
   simp at hxneqy
+  simp [mem_ofFinset_iff] at hy
   by_cases h3 : x3 ≠ y3
-  · have h3Strict : x3 ⊂ y3 := by
-      refine Finset.ssubset_iff_subset_ne.mpr ?_
-      simp_all
-    rw [Finset.ssubset_iff_of_subset (by simp_all)] at h3Strict
-    obtain ⟨z3, hz3, h3⟩ := h3Strict
-    use ⟨x1, x2, insert z3 x3, x4⟩
-    constructor
-    · apply insert_Q5_mem_minimalSuperSet
-      · simp [mem_ofFinset_iff] at hy
-        apply hy.2.2.1 hz3
-      · exact h3
-    · rw [Subset]
-      dsimp [hasSubset]
-      simp_all
-      rw [@Finset.insert_subset_iff]
-      simp_all
+  · obtain ⟨z3, hz3, hz3not⟩ :=
+      Finset.exists_of_ssubset (ssubset_of_subset_of_ne hsubset.2.2.1 h3)
+    refine ⟨⟨x1, x2, insert z3 x3, x4⟩, insert_Q5_mem_minimalSuperSet z3 (hy.2.2.1 hz3) hz3not, ?_⟩
+    rw [Subset]
+    dsimp [hasSubset]
+    simp_all [Finset.insert_subset_iff]
   simp at h3
   subst h3
   by_cases h4 : x4 ≠ y4
-  · have h4Strict : x4 ⊂ y4 := by
-      refine Finset.ssubset_iff_subset_ne.mpr ?_
-      simp_all
-    rw [Finset.ssubset_iff_of_subset (by simp_all)] at h4Strict
-    obtain ⟨z4, hz4, h4⟩ := h4Strict
-    use ⟨x1, x2, x3, insert z4 x4⟩
-    constructor
-    · apply insert_Q10_mem_minimalSuperSet
-      · simp [mem_ofFinset_iff] at hy
-        apply hy.2.2.2 hz4
-      · exact h4
-    · rw [Subset]
-      dsimp [hasSubset]
-      simp_all
-      rw [@Finset.insert_subset_iff]
-      simp_all
+  · obtain ⟨z4, hz4, hz4not⟩ :=
+      Finset.exists_of_ssubset (ssubset_of_subset_of_ne hsubset.2.2.2 h4)
+    refine ⟨⟨x1, x2, x3, insert z4 x4⟩, insert_Q10_mem_minimalSuperSet z4 (hy.2.2.2 hz4) hz4not, ?_⟩
+    rw [Subset]
+    dsimp [hasSubset]
+    simp_all [Finset.insert_subset_iff]
   simp at h4
   subst h4
   simp_all
@@ -302,7 +283,7 @@ lemma exists_minimalSuperSet (S5 S10 : Finset 𝓩) {x y : ChargeSpectrum 𝓩}
     use ⟨some y1, x2, x3, x4⟩
     constructor
     · have h0 := (some_qHd_mem_minimalSuperSet_of_none (S5 := S5) (S10 := S10) y1
-        (by simp_all [mem_ofFinset_iff]) (x2 := (x2, x3, x4)))
+        (by simp_all) (x2 := (x2, x3, x4)))
       simpa using h0
     · simp_all [subset_def]
   | x1, y1, some x2, none =>
@@ -312,7 +293,7 @@ lemma exists_minimalSuperSet (S5 S10 : Finset 𝓩) {x y : ChargeSpectrum 𝓩}
     use ⟨x1, some y2, x3, x4⟩
     constructor
     · have h0 := (some_qHu_mem_minimalSuperSet_of_none (x1 := x1) (S5 := S5) (S10 := S10) y2
-        (by simp_all [mem_ofFinset_iff]) (x2 := (x3, x4)))
+        (by simp_all) (x2 := (x3, x4)))
       simpa using h0
     · simp_all [subset_def]
   | none, none, none, none =>

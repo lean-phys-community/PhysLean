@@ -30,7 +30,7 @@ open Lean
 
 -/
 
-/-- Gets all imports within Physlib. -/
+/-- Gets all imports within Physlib and QuantumInfo.. -/
 def Physlib.allImports : IO (Array Import) := do
   initSearchPath (← findSysroot)
   let mods := `Physlib
@@ -38,7 +38,15 @@ def Physlib.allImports : IO (Array Import) := do
   unless ← mFile.pathExists do
     throw <| IO.userError s!"object file '{mFile}' of module {mods} does not exist"
   let (physlibMod, _) ← readModuleData mFile
-  physlibMod.imports.filterM fun c => return c.module != `Init
+  let PhysLibImports := physlibMod.imports.filter (fun c => c.module != `Init)
+
+  let mods := `QuantumInfo
+  let mFile ← findOLean mods
+  unless ← mFile.pathExists do
+    throw <| IO.userError s!"object file '{mFile}' of module {mods} does not exist"
+  let (QIMod, _) ← readModuleData mFile
+  let QIImports := QIMod.imports.filter (fun c => c.module != `Init)
+  return (PhysLibImports ++ QIImports)
 
 /-- Number of files within Physlib. -/
 def Physlib.noImports : IO Nat := do

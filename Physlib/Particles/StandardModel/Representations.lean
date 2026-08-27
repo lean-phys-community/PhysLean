@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Analysis.Complex.Basic
 public import Mathlib.LinearAlgebra.UnitaryGroup
+public import Physlib.Meta.TODO.Basic
 /-!
 # Representations appearing in the Standard Model
 
@@ -30,7 +31,7 @@ noncomputable def repU1Map (g : unitary ℂ) : unitaryGroup (Fin 2) ℂ :=
     simp only [SubmonoidClass.mk_pow, Submonoid.mk_smul, star_smul, star_pow, RCLike.star_def,
       star_one]
     rw [smul_smul, ← mul_pow]
-    erw [(Unitary.mem_iff.mp g.prop).2]
+    rw [← star_def, (Unitary.mem_iff.mp g.prop).2]
     simp only [one_pow, one_smul]⟩
 
 /-- The 2d representation of U(1) with charge 3 as a homomorphism
@@ -54,5 +55,11 @@ lemma repU1_fundamentalSU2_commute (u1 : unitary ℂ) (g : specialUnitaryGroup (
     repU1 u1 * fundamentalSU2 g = fundamentalSU2 g * repU1 u1 := by
   apply Subtype.ext
   simp
+
+TODO "Define a structure capturing the fermionic content of the Standard Model, with all fermions
+  expressed as left-handed Weyl fermions (`Fermion.LeftHandedWeyl`) and including all three
+  families. The structure should carry a `Module ℂ` instance together with a representation of the
+  Lorentz group and a representation of the global gauge group `GaugeGroupI` (built from `repU1`
+  and `fundamentalSU2`)."
 
 end StandardModel

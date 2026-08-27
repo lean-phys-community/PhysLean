@@ -88,7 +88,6 @@ instance [inst : InnerProductSpace' 𝕜 E] : InnerProductSpace.Core 𝕜 E := i
 
 instance [inst : InnerProductSpace' 𝕜 E] : Inner 𝕜 E := inst.core.toInner
 
-set_option backward.isDefEq.respectTransparency false in
 instance {𝕜 : Type*} {E : Type*} [RCLike 𝕜] [NormedAddCommGroup E] [inst : InnerProductSpace 𝕜 E] :
     InnerProductSpace' 𝕜 E where
   norm₂ x := ‖x‖
@@ -146,11 +145,8 @@ scoped instance toNormedAddCommGroupWitL2 : NormedAddCommGroup (WithLp 2 E) :=
 
 lemma norm_withLp2_eq_norm2 (x : WithLp 2 E) :
     ‖x‖ = |norm₂ (WithLp.equiv 2 E x)| := by
-  trans √ (RCLike.re ⟪WithLp.equiv 2 E x, WithLp.equiv 2 E x⟫)
-  · rfl
-  have h1 := norm₂_sq_eq_re_inner (𝕜 := 𝕜) ((WithLp.equiv 2 E) x)
-  rw [← h1]
-  exact Real.sqrt_sq_eq_abs ‖(WithLp.equiv 2 E) x‖₂
+  rw [show ‖x‖ = √ (RCLike.re ⟪WithLp.equiv 2 E x, WithLp.equiv 2 E x⟫) from rfl,
+    ← norm₂_sq_eq_re_inner (𝕜 := 𝕜) (WithLp.equiv 2 E x), Real.sqrt_sq_eq_abs]
 
 /-- Attach normed space structure to `WithLp 2 E` with L₂ norm. -/
 noncomputable
@@ -213,19 +209,21 @@ def fromL2 : WithLp 2 E →L[𝕜] E where
         have h := Real.sqrt_le_sqrt (h ((WithLp.equiv 2 E) x)).1
         simp [smul_eq_mul] at h
         apply (le_inv_mul_iff₀' hc).2
-        convert h using 1
-        simp only [WithLp.equiv_apply]
-        ring
+        apply le_of_eq_of_le (b :=  √c * ‖x.ofLp‖ )
+        · simp [WithLp.equiv_apply]
+          ring
+        · apply h.trans
+          rfl
 
 lemma fromL2_inner_left (x : WithLp 2 E) (y : E) : ⟪fromL2 𝕜 x, y⟫ = ⟪x, toL2 𝕜 y⟫ := rfl
 
-lemma ofLp_inner_left (x : E) (y : WithLp 2 E) : ⟪WithLp.ofLp y, x⟫ = ⟪y, WithLp.toLp 2 x⟫ := by
-  exact fromL2_inner_left y x
+lemma ofLp_inner_left (x : E) (y : WithLp 2 E) : ⟪WithLp.ofLp y, x⟫ = ⟪y, WithLp.toLp 2 x⟫ :=
+  fromL2_inner_left y x
 
 lemma toL2_inner_left (x : E) (y : WithLp 2 E) : ⟪toL2 𝕜 x, y⟫ = ⟪x, fromL2 𝕜 y⟫ := rfl
 
-lemma toLp_inner_left (x : WithLp 2 E) (y : E) : ⟪WithLp.toLp 2 y, x⟫ = ⟪y, WithLp.ofLp x⟫ := by
-  exact toL2_inner_left y x
+lemma toLp_inner_left (x : WithLp 2 E) (y : E) : ⟪WithLp.toLp 2 y, x⟫ = ⟪y, WithLp.ofLp x⟫ :=
+  toL2_inner_left y x
 
 @[simp]
 lemma toL2_fromL2 (x : WithLp 2 E) : toL2 𝕜 (fromL2 𝕜 x) = x := rfl
@@ -269,8 +267,8 @@ lemma ext_inner_left' {x y : E} (h : ∀ v, ⟪v, x⟫ = ⟪v, y⟫) : x = y :=
 
 variable (𝕜) in
 lemma ext_inner_right' {x y : E} (h : ∀ v, ⟪x, v⟫ = ⟪y, v⟫) : x = y :=
-  (WithLp.equiv 2 E).symm.injective <| ext_inner_right (E := WithLp 2 E) 𝕜 <| by
-  simpa [← ofLp_inner_left] using fun v => h (WithLp.ofLp v)
+  (WithLp.equiv 2 E).symm.injective <| ext_inner_right (E := WithLp 2 E) 𝕜 <|
+    fun v => h (WithLp.ofLp v)
 
 @[simp]
 lemma inner_conj_symm' (x y : E) : ⟪y, x⟫† = ⟪x, y⟫ :=
@@ -312,27 +310,19 @@ lemma inner_neg_right' (x y : E) : ⟪x, -y⟫ = -⟪x, y⟫ :=
 
 @[simp]
 lemma inner_self_eq_zero' {x : E} : ⟪x, x⟫ = 0 ↔ x = 0 := by
-  erw [inner_self_eq_zero (E:=WithLp 2 E)]
-  simp
+  rw [show (⟪x, x⟫ : 𝕜) = inner 𝕜 (toL2 𝕜 x) (toL2 𝕜 x) from rfl, inner_self_eq_zero,
+      map_eq_zero_iff _ (Function.LeftInverse.injective fromL2_toL2)]
 
 @[simp]
 lemma inner_sum'{ι : Type*} [Fintype ι] (x : E) (g : ι → E) :
-    ⟪x, ∑ i, g i⟫ = ∑ i, ⟪x, g i⟫ := by
-  have h1 := inner_sum (𝕜 := 𝕜) (E:=WithLp 2 E) (x := WithLp.toLp 2 x)
-    (f := fun i => WithLp.toLp 2 (g i))
-  convert h1 (Finset.univ)
-  rw [← ofLp_inner_left]
-  simp only
-  congr
-  change _ = (WithLp.linearEquiv 2 𝕜 E) _
-  simp
+    ⟪x, ∑ i, g i⟫ = ∑ i, ⟪x, g i⟫ :=
+  map_sum (AddMonoidHom.mk' (fun y => ⟪x, y⟫) (inner_add_right' x)) g Finset.univ
 
 @[fun_prop]
 lemma Continuous.inner' {α} [TopologicalSpace α] (f g : α → E)
     (hf : Continuous f) (hg : Continuous g) : Continuous (fun a => ⟪f a, g a⟫) :=
-  have hf : Continuous (fun x => toL2 𝕜 (f x)) := by fun_prop
-  have hg : Continuous (fun x => toL2 𝕜 (g x)) := by fun_prop
-  Continuous.inner (𝕜:=𝕜) (E:=WithLp 2 E) hf hg
+  Continuous.inner (𝕜 := 𝕜) (E := WithLp 2 E) (f := fun x => toL2 𝕜 (f x))
+    (g := fun x => toL2 𝕜 (g x)) (by fun_prop) (by fun_prop)
 
 section Real
 
@@ -352,17 +342,15 @@ lemma real_inner_comm' (x y : F) : ⟪y, x⟫ = ⟪x, y⟫ :=
 lemma ContDiffAt.inner' {f g : E → F} {x : E}
     (hf : ContDiffAt ℝ n f x) (hg : ContDiffAt ℝ n g x) :
     ContDiffAt ℝ n (fun x => ⟪f x, g x⟫) x :=
-  have hf : ContDiffAt ℝ n (fun x => toL2 ℝ (f x)) x := by fun_prop
-  have hg : ContDiffAt ℝ n (fun x => toL2 ℝ (g x)) x := by fun_prop
-  hf.inner ℝ hg
+  ContDiffAt.inner ℝ (f := fun x => toL2 ℝ (f x)) (g := fun x => toL2 ℝ (g x))
+    (by fun_prop) (by fun_prop)
 
 @[fun_prop]
 lemma ContDiff.inner' {f g : E → F}
     (hf : ContDiff ℝ n f) (hg : ContDiff ℝ n g) :
     ContDiff ℝ n (fun x => ⟪f x, g x⟫) :=
-  have hf : ContDiff ℝ n (fun x => toL2 ℝ (f x)) := by fun_prop
-  have hg : ContDiff ℝ n (fun x => toL2 ℝ (g x)) := by fun_prop
-  hf.inner ℝ hg
+  ContDiff.inner ℝ (f := fun x => toL2 ℝ (f x)) (g := fun x => toL2 ℝ (g x))
+    (by fun_prop) (by fun_prop)
 
 end Real
 
@@ -440,26 +428,19 @@ instance : InnerProductSpace' 𝕜 (E × F) where
       have : 0 ≤ re ⟪y, y⟫ := by apply PreInnerProductSpace.Core.re_inner_nonneg
       have : 0 ≤ re ⟪x, x⟫ := by apply PreInnerProductSpace.Core.re_inner_nonneg
       simp only [Prod.norm_mk, smul_eq_mul, prod_inner_apply', map_add]
-      constructor
-      · by_cases h : ‖x‖ ≤ ‖y‖
-        · have : max ‖x‖ ‖y‖ ≤ ‖y‖ := by simp[h]
-          calc _ ≤ c₂ * ‖y‖ ^ 2 := by gcongr; simp
-              _ ≤ re ⟪y,y⟫ := h₂₁ y
-              _ ≤ _ := by simpa
-        · have : max ‖x‖ ‖y‖ ≤ ‖x‖ := by simp at h; simp; linarith
-          calc _ ≤ c₁ * ‖x‖ ^ 2 := by gcongr; simp
-              _ ≤ re ⟪x,x⟫ := h₁₁ x
-              _ ≤ _ := by simpa
-      · by_cases h : re ⟪x,x⟫ ≤ re ⟪y,y⟫
-        · calc _ ≤ re ⟪y,y⟫ + re ⟪y,y⟫ := by simp [h]
-              _ ≤ d₂ * ‖y‖ ^ 2 + d₂ * ‖y‖ ^ 2 := by gcongr <;> exact h₂₂ y
-              _ ≤ _ := by ring_nf; gcongr <;> simp
-        · have h : re ⟪y,y⟫ ≤ re ⟪x,x⟫ := by linarith
-          calc _ ≤ re ⟪x,x⟫ + re ⟪x,x⟫ := by simp [h]
-              _ ≤ d₁ * ‖x‖ ^ 2 + d₁ * ‖x‖ ^ 2 := by gcongr <;> exact h₁₂ x
-              _ ≤ _ := by ring_nf; gcongr <;> simp
+      simp only [smul_eq_mul] at h₁₁ h₁₂ h₂₁ h₂₂
+      refine ⟨?_, ?_⟩
+      · rcases le_total ‖x‖ ‖y‖ with h | h
+        · rw [max_eq_right h]
+          nlinarith [h₂₁ y, min_le_right c₁ c₂, sq_nonneg ‖y‖]
+        · rw [max_eq_left h]
+          nlinarith [h₁₁ x, min_le_left c₁ c₂, sq_nonneg ‖x‖]
+      · rcases le_total (re ⟪x,x⟫) (re ⟪y,y⟫) with h | h
+        · nlinarith [h₂₂ y, le_max_right d₁ d₂, sq_nonneg ‖y‖, norm_nonneg y,
+            pow_le_pow_left₀ (norm_nonneg y) (le_max_right ‖x‖ ‖y‖) 2]
+        · nlinarith [h₁₂ x, le_max_left d₁ d₂, sq_nonneg ‖x‖, norm_nonneg x,
+            pow_le_pow_left₀ (norm_nonneg x) (le_max_left ‖x‖ ‖y‖) 2]
 
-set_option backward.isDefEq.respectTransparency false in
 open InnerProductSpace' in
 noncomputable
 instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
@@ -496,9 +477,7 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
       re_ofReal_pow]
     rw [← Real.rpow_two, ← Real.rpow_mul]
     swap
-    · apply Finset.sum_nonneg
-      intro i hi
-      exact sq_nonneg √(re ⟪ (x i),(x i)⟫)
+    · exact Finset.sum_nonneg fun i _ => sq_nonneg _
     simp only [isUnit_iff_ne_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
       IsUnit.inv_mul_cancel, Real.rpow_one]
     rfl
@@ -527,17 +506,10 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
         have h1 := Finset.sum_le_univ_sum_of_nonneg
           (f := fun i => re (@inner 𝕜 (WithLp 2 E) toInnerProductSpaceWithL2.2
             (WithLp.toLp 2 (x i)) (WithLp.toLp 2 (x i))))
-          (s := {i}) (by
-            intro i
-            simp only
-            exact InnerProductSpace.Core.inner_self_nonneg)
-
+          (s := {i}) (fun _ => InnerProductSpace.Core.inner_self_nonneg)
         apply le_trans _ (le_trans h1 _)
         · simp [norm]
-          apply le_of_eq
-          symm
-          refine Real.sq_sqrt ?_
-          exact InnerProductSpace.Core.inner_self_nonneg
+          exact le_of_eq (Real.sq_sqrt InnerProductSpace.Core.inner_self_nonneg).symm
         · apply le_of_eq
           conv_rhs => rw [inner]
           simp [PiLp.inner_apply]
@@ -548,8 +520,7 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
           simp only [PiLp.inner_apply, inner_self_eq_norm_sq_to_K, map_sum, re_ofReal_pow]
           congr
           funext j
-          refine Real.sq_sqrt ?_
-          exact InnerProductSpace.Core.inner_self_nonneg
+          exact Real.sq_sqrt InnerProductSpace.Core.inner_self_nonneg
         trans ∑ j, d * ‖x j‖ ^ 2
         · refine Finset.sum_le_sum ?_
           intro j _
@@ -561,24 +532,11 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
         apply Finset.sum_le_card_nsmul
         intro j _
         refine mul_le_mul_of_nonneg (by simp) ?_ (by positivity) (by positivity)
-        refine (sq_le_sq₀ ?_ ?_).mpr (hj j)
-        · exact norm_nonneg (x j)
-        · exact norm_nonneg (x i)
-    · simp at hnEmpty
-      use 1, 1
-      simp only [zero_lt_one, smul_eq_mul, one_mul, true_and]
-      intro x
-      refine le_antisymm_iff.mp ?_
-      have h1 : x = fun _ => 0 := by
-        funext i
-        have hn : ¬ IsEmpty ι := by
-          simp only [not_isEmpty_iff]
-          use i
-        exact False.elim (hn hnEmpty)
-      subst h1
-      simp [norm]
-      conv_rhs => rw [inner]
-      simp [PiLp.inner_apply]
+        exact (sq_le_sq₀ (norm_nonneg (x j)) (norm_nonneg (x i))).mpr (hj j)
+    · rw [not_nonempty_iff] at hnEmpty
+      refine ⟨1, 1, zero_lt_one, zero_lt_one, fun x => ?_⟩
+      rw [Subsingleton.elim x 0]
+      simp [norm, inner]
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [hE : InnerProductSpace' ℝ E]
 local notation "⟪" x ", " y "⟫" => inner ℝ x y
@@ -597,56 +555,23 @@ lemma _root_.isBoundedBilinearMap_inner' :
     simp_all
     intro x y
     trans |‖x‖₂| * |‖y‖₂|
-    change |@inner ℝ (WithLp 2 E) _ _ _| ≤ _
-    have h1 := norm_inner_le_norm (𝕜 := ℝ) (E := WithLp 2 E) (WithLp.toLp 2 x) (WithLp.toLp 2 y)
-    simp at h1
-    apply h1.trans
-    apply le_of_eq
-    congr
-    rw [norm_withLp2_eq_norm2]
-    rfl
-    rw [norm_withLp2_eq_norm2]
-    rfl
-    have h1 : |‖x‖₂| ≤ √ d * ‖x‖ := by
-      apply le_of_sq_le_sq
-      simp [@mul_pow]
-      rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
-      simp only [re_to_real]
-      apply (h x).2.trans
-      apply le_of_eq
-      simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-        pow_eq_zero_iff, norm_eq_zero]
-      left
-      refine Eq.symm (Real.sq_sqrt ?_)
-      linarith
-      apply mul_nonneg
-      exact Real.sqrt_nonneg d
-      exact norm_nonneg x
-    have h2 : |‖y‖₂| ≤ √ d * ‖y‖ := by
-      apply le_of_sq_le_sq
-      simp [@mul_pow]
-      rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
-      simp only [re_to_real]
-      apply (h y).2.trans
-      apply le_of_eq
-      simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-        pow_eq_zero_iff, norm_eq_zero]
-      left
-      refine Eq.symm (Real.sq_sqrt ?_)
-      linarith
-      apply mul_nonneg
-      exact Real.sqrt_nonneg d
-      exact norm_nonneg y
-    trans (√ d * ‖x‖) * (√ d * ‖y‖)
-    refine mul_le_mul_of_nonneg h1 h2 ?_ ?_
-    exact abs_nonneg ‖x‖₂
-    apply mul_nonneg
-    exact Real.sqrt_nonneg d
-    exact norm_nonneg y
-    apply le_of_eq
-    ring_nf
-    rw [Real.sq_sqrt]
-    ring
-    linarith
+    · refine (norm_inner_le_norm (𝕜 := ℝ) (E := WithLp 2 E) (WithLp.toLp 2 x)
+        (WithLp.toLp 2 y)).trans ?_
+      simp [norm_withLp2_eq_norm2]
+    · have key (z : E) : |‖z‖₂| ≤ √ d * ‖z‖ := by
+        apply le_of_sq_le_sq
+        · simp [@mul_pow]
+          rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
+          simp only [re_to_real]
+          rw [Real.sq_sqrt (by linarith : (0:ℝ) ≤ d)]
+          exact (h z).2
+        · positivity
+      have h1 := key x
+      have h2 := key y
+      trans (√ d * ‖x‖) * (√ d * ‖y‖)
+      · exact mul_le_mul_of_nonneg h1 h2 (by positivity) (by positivity)
+      · apply le_of_eq
+        rw [mul_mul_mul_comm, Real.mul_self_sqrt (by linarith : (0:ℝ) ≤ d)]
+        ring
 
 end Constructions

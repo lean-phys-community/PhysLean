@@ -174,16 +174,12 @@ lemma mem_liftCharge_iff [DecidableEq 𝓩] {c : ChargeSpectrum 𝓩}
     {x : Quanta 𝓩} :
     x ∈ liftCharge c ↔ x.qHd = c.qHd ∧ x.qHu = c.qHu ∧
     x.F ∈ FiveQuanta.liftCharge c.Q5 ∧ x.T ∈ TenQuanta.liftCharge c.Q10:= by
-  simp [liftCharge, Multiset.mem_bind, Multiset.mem_map]
+  simp only [liftCharge, Multiset.mem_bind, Multiset.mem_map]
   constructor
   · rintro ⟨Q5, h1, Q10, h2, rfl⟩
-    simp_all
-  · intro h
-    use x.F
-    simp_all
-    use x.T
-    simp_all
-    rw [← h.1, ← h.2.1]
+    exact ⟨rfl, rfl, h1, h2⟩
+  · rintro ⟨h1, h2, h3, h4⟩
+    exact ⟨x.F, h3, x.T, h4, by rw [← h1, ← h2]⟩
 
 /-!
 
@@ -195,15 +191,10 @@ lemma toCharges_of_mem_liftCharge [DecidableEq 𝓩] {c : ChargeSpectrum 𝓩}
     {x : Quanta 𝓩} (h : x ∈ liftCharge c) :
     x.toCharges = c := by
   rw [mem_liftCharge_iff] at h
-  apply ChargeSpectrum.eq_of_parts
-  · simp_all [toCharges_qHd]
-  · simp_all [toCharges_qHu]
-  · have h1 := h.2.2.1
-    rw [FiveQuanta.mem_liftCharge_iff] at h1
-    simpa [toCharges] using h1.2.1
-  · have h2 := h.2.2.2
-    rw [TenQuanta.mem_liftCharge_iff] at h2
-    simpa [toCharges] using h2.2.1
+  obtain ⟨h1, h2, h3, h4⟩ := h
+  rw [FiveQuanta.mem_liftCharge_iff] at h3
+  rw [TenQuanta.mem_liftCharge_iff] at h4
+  exact ChargeSpectrum.eq_of_parts h1 h2 h3.2.1 h4.2.1
 
 /-!
 
@@ -238,9 +229,7 @@ def HdAnomalyCoefficient [CommRing 𝓩] (qHd : Option 𝓩) : 𝓩 × 𝓩 :=
 lemma HdAnomalyCoefficient_map {𝓩 𝓩1 : Type} [CommRing 𝓩] [CommRing 𝓩1]
     (f : 𝓩 →+* 𝓩1) (qHd : Option 𝓩) :
     HdAnomalyCoefficient (qHd.map f) = (f.prodMap f) (HdAnomalyCoefficient qHd) := by
-  match qHd with
-  | none => simp [HdAnomalyCoefficient]
-  | some qHd => simp [HdAnomalyCoefficient]
+  cases qHd <;> simp [HdAnomalyCoefficient]
 
 /-!
 
@@ -258,9 +247,7 @@ def HuAnomalyCoefficient [CommRing 𝓩] (qHu : Option 𝓩) : 𝓩 × 𝓩 :=
 lemma HuAnomalyCoefficient_map {𝓩 𝓩1 : Type} [CommRing 𝓩] [CommRing 𝓩1]
     (f : 𝓩 →+* 𝓩1) (qHu : Option 𝓩) :
     HuAnomalyCoefficient (qHu.map f) = (f.prodMap f) (HuAnomalyCoefficient qHu) := by
-  match qHu with
-  | none => simp [HuAnomalyCoefficient]
-  | some qHu => simp [HuAnomalyCoefficient]
+  cases qHu <;> simp [HuAnomalyCoefficient]
 
 /-!
 

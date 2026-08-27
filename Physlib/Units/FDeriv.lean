@@ -34,7 +34,7 @@ variable {M1 M2 : Type} [NormedAddCommGroup M1] [NormedSpace ℝ M1]
     [SMulCommClass ℝ ℝ M2] [ContinuousConstSMul ℝ M2]
     [HasDim M2]
 
-lemma fderiv_apply_scaleUnit (u1 u2 : UnitChoices) (x dm : M1)
+lemma fderiv_apply_scaleUnit (u1 u2 : LTMCTUnitChoices) (x dm : M1)
     (f : M1 → M2) (hf : IsDimensionallyCorrect f) (f_diff : Differentiable ℝ f) :
     fderiv ℝ f (scaleUnit u2 u1 x) dm =
     u2.dimScale u1 (dim M2) • u1.dimScale u2 (dim M1) • fderiv ℝ f x dm := by
@@ -57,7 +57,6 @@ lemma fderiv_isDimensionallyCorrect (f : M1 → M2) (hf : IsDimensionallyCorrect
   rw [fderiv_apply_scaleUnit u1 u2 m (scaleUnit u2 u1 m') f hf f_diff]
   simp [HasDim.scaleUnit_apply, smul_smul]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The expression `fderiv ℝ f x dm = v.1` for a fixed `dm` and for
   `v` with dimension `d M2 * (d M1)⁻¹` is dimensionally correct. This is the
   ordinary manifestation of dimensions of a derivative, usually `dm` is taken as e.g. `1`.
@@ -70,4 +69,4 @@ lemma fderiv_dimension_const_direction (dm : M1) (f : M1 → M2) (hf : IsDimensi
       fderiv ℝ f x dm = v.1) := by
   simp [isDimensionallyCorrect_fun_iff, funext_iff, WithDim.scaleUnit_val,
     fderiv_apply_scaleUnit _ _ _ dm f hf f_diff,
-    ← smul_smul, ← UnitChoices.dimScale_symm]
+    ← smul_smul, ← LTMCTUnitChoices.dimScale_symm]

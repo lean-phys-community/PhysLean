@@ -32,6 +32,8 @@ We show that the derivatives of this constant distribution are zero.
 
 @[expose] public section
 
+open Physlib
+
 namespace Space
 open Distribution
 
@@ -56,25 +58,21 @@ noncomputable def distConst {M } [NormedAddCommGroup M] [NormedSpace ℝ M] (d :
 lemma distDeriv_distConst {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ : Fin d) (m : M) :
     distDeriv μ (distConst d m) = 0 := by
-  ext η
   simp [distDeriv, distConst]
 
 @[simp]
 lemma distGrad_distConst {d} (m : ℝ) :
     distGrad (distConst d m) = 0 := by
-  ext η
-  simp [distGrad, distConst]
+  simp [distConst]
 
 @[simp]
 lemma distDiv_distConst {d} (m : EuclideanSpace ℝ (Fin d)) :
     distDiv (distConst d m) = 0 := by
-  ext η
   simp [distDiv, distConst]
 
 @[simp]
 lemma distCurl_distConst (m : EuclideanSpace ℝ (Fin 3)) :
     distCurl (distConst 3 m) = 0 := by
-  ext η
   simp [distCurl, distConst]
 
 end Space

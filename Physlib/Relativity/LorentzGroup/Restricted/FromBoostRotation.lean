@@ -102,6 +102,14 @@ def toBoostRotation {d} : LorentzGroup.restricted d ≃ₜ Lorentz.Velocity d ×
   continuous_toFun := by fun_prop
   continuous_invFun := by fun_prop
 
+/-- Every element of the restricted Lorentz group can be written as a product of a
+  generalized boost and a rotation. -/
+theorem exists_boost_mul_rotation {d} (Λ : LorentzGroup.restricted d) :
+    ∃ (v : Lorentz.Velocity d) (R : Rotations d),
+      (Λ : LorentzGroup d) = generalizedBoost 0 v * (R : LorentzGroup d) := by
+  have h : toRotation Λ = (generalizedBoost 0 (toVelocity Λ))⁻¹ * Λ := rfl
+  exact ⟨toVelocity Λ, toRotation Λ, by rw [h, mul_inv_cancel_left]⟩
+
 end LorentzGroup
 
 end

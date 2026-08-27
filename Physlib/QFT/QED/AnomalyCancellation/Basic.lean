@@ -31,16 +31,17 @@ open Finset
 namespace PureU1
 open BigOperators
 
-TODO "K3HYF" "The implementation of pure U(1) anomaly cancellation conditions is done
+TODO "The implementation of pure U(1) anomaly cancellation conditions is done
   currently through the type `ACCSystemCharges`. This whole directory could be
   simplified by refactoring to remove `ACCSystemCharges` defining `PureU1Charges` as
   `Fin n → ℚ` directly, or this space quotiented by permutations and overall factors."
 
 /-- The vector space of charges. -/
 @[simps!]
-def PureU1Charges (n : ℕ) : ACCSystemCharges := ACCSystemChargesMk n
+def PureU1Charges (n : ℕ) : ACCSystemCharges := ⟨n⟩
 
 open BigOperators in
+set_option backward.isDefEq.respectTransparency false in
 /-- The gravitational anomaly. -/
 def accGrav (n : ℕ) : ((PureU1Charges n).Charges →ₗ[ℚ] ℚ) where
   toFun S := ∑ i : Fin n, S i
@@ -49,33 +50,32 @@ def accGrav (n : ℕ) : ((PureU1Charges n).Charges →ₗ[ℚ] ℚ) where
     simp only [HSMul.hSMul, SMul.smul, eq_ratCast, Rat.cast_eq_id, id_eq]
     rw [← Finset.mul_sum]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The symmetric trilinear form used to define the cubic anomaly. -/
 @[simps!]
 def accCubeTriLinSymm {n : ℕ} : TriLinearSymm (PureU1Charges n).Charges := TriLinearSymm.mk₃
   (fun S => ∑ i, S.1 i * S.2.1 i * S.2.2 i)
   (by
     intro a S L T
-    simp only [PureU1Charges_numberCharges, HSMul.hSMul, ACCSystemCharges.chargesModule_smul]
+    simp only [HSMul.hSMul, ACCSystemCharges.chargesModule_smul]
     rw [Finset.mul_sum]
     apply Fintype.sum_congr
     intro i
     ring)
   (by
     intro S L T R
-    simp only [PureU1Charges_numberCharges, ACCSystemCharges.chargesAddCommMonoid_add]
+    simp only [ACCSystemCharges.chargesAddCommMonoid_add]
     rw [← Finset.sum_add_distrib]
     apply Fintype.sum_congr
     intro i
     ring)
   (by
     intro S L T
-    simp only [PureU1Charges_numberCharges]
     apply Fintype.sum_congr
     intro i
     ring)
   (by
     intro S L T
-    simp only [PureU1Charges_numberCharges]
     apply Fintype.sum_congr
     intro i
     ring)
@@ -92,7 +92,7 @@ lemma accCube_explicit (n : ℕ) (S : (PureU1Charges n).Charges) :
   rw [accCube, TriLinearSymm.toCubic]
   change accCubeTriLinSymm S S S = _
   rw [accCubeTriLinSymm]
-  simp only [PureU1Charges_numberCharges, TriLinearSymm.mk₃_toFun_apply_apply]
+  simp only [TriLinearSymm.mk₃_toFun_apply_apply]
   exact Finset.sum_congr rfl fun x _ => Eq.symm (pow_three' (S x))
 
 end PureU1
@@ -121,19 +121,22 @@ def pureU1EqCharges {n m : ℕ} (h : n = m) :
 
 open BigOperators
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A solution to the pure U(1) accs satisfies the linear ACCs. -/
 lemma pureU1_linear {n : ℕ} (S : (PureU1 n).LinSols) :
     ∑ (i : Fin n), S.val i = 0 := by
   have hS := S.linearSol
-  simp only [PureU1_numberLinear, PureU1_linearACCs] at hS
-  exact hS 0
+  simp only [PureU1_linearACCs] at hS
+  exact hS ⟨0, by simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A solution to the pure U(1) accs satisfies the cubic ACCs. -/
 lemma pureU1_cube {n : ℕ} (S : (PureU1 n).Sols) :
     ∑ i, (S.val i) ^ 3 = 0 := by
   rw [← PureU1.accCube_explicit]
   exact S.cubicSol
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The last charge of a solution to the linear ACCs is equal to the negation of the sum
   of the other charges. -/
 lemma pureU1_last {n : ℕ} (S : (PureU1 n.succ).LinSols) :
@@ -166,8 +169,10 @@ lemma sum_of_charges {n : ℕ} (f : Fin k → (PureU1 n).Charges) (j : Fin n) :
   · rfl
   · rename_i k hl
     rw [Fin.sum_univ_castSucc, Fin.sum_univ_castSucc]
-    erw [← hl (f ∘ Fin.castSucc)]
-    rfl
+    change ((∑ i : Fin k, f i.castSucc) j) + f (Fin.last k) j =
+      (∑ i : Fin k, f i.castSucc j) + f (Fin.last k) j
+    have h := hl (fun i : Fin k => f i.castSucc)
+    exact congrArg (fun x => x + f (Fin.last k) j) h
 
 /-- The `j`th charge of a sum of solutions to the linear ACC is equal to the sum of
   their `j`th charges. -/
@@ -177,7 +182,9 @@ lemma sum_of_anomaly_free_linear {n : ℕ} (f : Fin k → (PureU1 n).LinSols) (j
   · rfl
   · rename_i k hl
     rw [Fin.sum_univ_castSucc, Fin.sum_univ_castSucc]
-    erw [← hl (f ∘ Fin.castSucc)]
-    rfl
+    change ((∑ i : Fin k, f i.castSucc).val j) + (f (Fin.last k)).val j =
+      (∑ i : Fin k, (f i.castSucc).val j) + (f (Fin.last k)).val j
+    have h := hl (fun i : Fin k => f i.castSucc)
+    exact congrArg (fun x => x + (f (Fin.last k)).val j) h
 
 end PureU1

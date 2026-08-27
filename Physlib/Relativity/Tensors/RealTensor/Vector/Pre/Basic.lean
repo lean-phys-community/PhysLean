@@ -23,17 +23,14 @@ open Matrix Module MatrixGroups Complex TensorProduct
 
 namespace Lorentz
 open minkowskiMatrix
-/-- The representation of `LorentzGroup d` on real vectors corresponding to contravariant
-  Lorentz vectors. In index notation these have an up index `ψⁱ`. -/
-def Contr (d : ℕ) : Rep ℝ (LorentzGroup d) := Rep.of ContrMod.rep
 
 /-- The standard basis of contravariant Lorentz vectors. -/
-def contrBasis (d : ℕ := 3) : Basis (Fin 1 ⊕ Fin d) ℝ (Contr d) :=
+def contrBasis (d : ℕ := 3) : Basis (Fin 1 ⊕ Fin d) ℝ (ContrMod d) :=
   Basis.ofEquivFun ContrMod.toFin1dℝEquiv
 
 @[simp]
 lemma contrBasis_ρ_apply {d : ℕ} (M : LorentzGroup d) (i j : Fin 1 ⊕ Fin d) :
-    (LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M) i j =
+    (LinearMap.toMatrix (contrBasis d) (contrBasis d)) (ContrMod.rep M) i j =
     M.1 i j := by
   rw [LinearMap.toMatrix_apply]
   simp only [contrBasis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply]
@@ -46,8 +43,13 @@ lemma contrBasis_toFin1dℝ {d : ℕ} (i : Fin 1 ⊕ Fin d) :
   simp only [ContrMod.toFin1dℝ, contrBasis, Basis.coe_ofEquivFun]
   rfl
 
+lemma contrBasis_repr_apply {d : ℕ} (p : ContrMod d) (i : Fin 1 ⊕ Fin d) :
+    (contrBasis d).repr p i = p.val i := by
+  simp only [contrBasis, Basis.ofEquivFun_repr_apply]
+  rfl
+
 /-- The standard basis of contravariant Lorentz vectors indexed by `Fin (1 + d)`. -/
-def contrBasisFin (d : ℕ := 3) : Basis (Fin (1 + d)) ℝ (Contr d) :=
+def contrBasisFin (d : ℕ := 3) : Basis (Fin (1 + d)) ℝ (ContrMod d) :=
   Basis.reindex (contrBasis d) finSumFinEquiv
 
 @[simp]
@@ -55,42 +57,37 @@ lemma contrBasisFin_toFin1dℝ {d : ℕ} (i : Fin (1 + d)) :
     (contrBasisFin d i).toFin1dℝ = Pi.single (finSumFinEquiv.symm i) 1 := by
   simp only [contrBasisFin, Basis.reindex_apply, contrBasis_toFin1dℝ]
 
-lemma contrBasisFin_repr_apply {d : ℕ} (p : Contr d) (i : Fin (1 + d)) :
+lemma contrBasisFin_repr_apply {d : ℕ} (p : ContrMod d) (i : Fin (1 + d)) :
     (contrBasisFin d).repr p i = p.val (finSumFinEquiv.symm i) := by rfl
 
-/-- The representation of contravariant Lorentz vectors forms a topological space, induced
-  by its equivalence to `Fin 1 ⊕ Fin d → ℝ`. -/
-instance : TopologicalSpace (Contr d) := TopologicalSpace.induced
-  ContrMod.toFin1dℝEquiv (Pi.topologicalSpace)
-
-lemma continuous_contr {T : Type} [TopologicalSpace T] (f : T → Contr d)
+lemma continuous_contr {T : Type} [TopologicalSpace T] (f : T → ContrMod d)
     (h : Continuous (fun i => (f i).toFin1dℝ)) : Continuous f := by
   exact continuous_induced_rng.mpr h
 
-set_option backward.isDefEq.respectTransparency false in
-lemma contr_continuous {T : Type} [TopologicalSpace T] (f : Contr d → T)
+lemma contr_continuous {T : Type} [TopologicalSpace T] (f : ContrMod d → T)
     (h : Continuous (f ∘ (@ContrMod.toFin1dℝEquiv d).symm)) : Continuous f := by
   let x := Equiv.toHomeomorphOfIsInducing (@ContrMod.toFin1dℝEquiv d).toEquiv
     ContrMod.toFin1dℝEquiv_isInducing
   rw [← Homeomorph.comp_continuous_iff' x.symm]
   exact h
 
-/-- The representation of `LorentzGroup d` on real vectors corresponding to covariant
-  Lorentz vectors. In index notation these have an up index `ψⁱ`. -/
-def Co (d : ℕ) : Rep ℝ (LorentzGroup d) := Rep.of CoMod.rep
-
 /-- The standard basis of contravariant Lorentz vectors. -/
-def coBasis (d : ℕ := 3) : Basis (Fin 1 ⊕ Fin d) ℝ (Co d) :=
+def coBasis (d : ℕ := 3) : Basis (Fin 1 ⊕ Fin d) ℝ (CoMod d) :=
   Basis.ofEquivFun CoMod.toFin1dℝEquiv
 
 @[simp]
 lemma coBasis_ρ_apply {d : ℕ} (M : LorentzGroup d) (i j : Fin 1 ⊕ Fin d) :
-    (LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M) i j =
+    (LinearMap.toMatrix (coBasis d) (coBasis d)) (CoMod.rep M) i j =
     M⁻¹ᵀ i j := by
   rw [LinearMap.toMatrix_apply]
   simp only [coBasis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply, transpose_apply]
   change (_ *ᵥ (Pi.single j 1)) i = _
   simp [LorentzGroup.transpose, ← LorentzGroup.coe_inv]
+
+lemma coBasis_repr_apply {d : ℕ} (p : CoMod d) (i : Fin 1 ⊕ Fin d) :
+    (coBasis d).repr p i = p.val i := by
+  simp only [coBasis, Basis.ofEquivFun_repr_apply]
+  rfl
 
 @[simp]
 lemma coBasis_toFin1dℝ {d : ℕ} (i : Fin 1 ⊕ Fin d) :
@@ -99,7 +96,7 @@ lemma coBasis_toFin1dℝ {d : ℕ} (i : Fin 1 ⊕ Fin d) :
   rfl
 
 /-- The standard basis of covariant Lorentz vectors indexed by `Fin (1 + d)`. -/
-def coBasisFin (d : ℕ := 3) : Basis (Fin (1 + d)) ℝ (Co d) :=
+def coBasisFin (d : ℕ := 3) : Basis (Fin (1 + d)) ℝ (CoMod d) :=
   Basis.reindex (coBasis d) finSumFinEquiv
 
 @[simp]
@@ -107,7 +104,7 @@ lemma coBasisFin_toFin1dℝ {d : ℕ} (i : Fin (1 + d)) :
     (coBasisFin d i).toFin1dℝ = Pi.single (finSumFinEquiv.symm i) 1 := by
   simp only [coBasisFin, Basis.reindex_apply, coBasis_toFin1dℝ]
 
-lemma coBasisFin_repr_apply {d : ℕ} (p : Co d) (i : Fin (1 + d)) :
+lemma coBasisFin_repr_apply {d : ℕ} (p : CoMod d) (i : Fin (1 + d)) :
     (coBasisFin d).repr p i = p.val (finSumFinEquiv.symm i) := by rfl
 
 open CategoryTheory.MonoidalCategory
@@ -118,11 +115,28 @@ open CategoryTheory.MonoidalCategory
 
 -/
 
-/-- The morphism of representations from `Contr d` to `Co d` defined by multiplication
+open Representation
+/-- The morphism of representations from `ContrMod.rep` to `CoMod.rep` defined by multiplication
   with the metric. -/
-def Contr.toCo (d : ℕ) : Contr d ⟶ Co d := Rep.ofHom <|
-  {
-    toFun := fun ψ => CoMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ),
+def Contr.toCo (d : ℕ) : IntertwiningMap (ContrMod.rep (d := d)) (CoMod.rep (d := d)) where
+  toFun := fun ψ => CoMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ)
+  map_add' := by
+    intro ψ ψ'
+    simp only [map_add, mulVec_add]
+  map_smul' := by
+    intro r ψ
+    simp only [_root_.map_smul, mulVec_smul, RingHom.id_apply]
+  isIntertwining' g := by
+    ext1 ψ
+    conv_lhs =>
+      change CoMod.toFin1dℝEquiv.symm (η *ᵥ (g.1 *ᵥ ψ.toFin1dℝ))
+      rw [mulVec_mulVec, LorentzGroup.minkowskiMatrix_comm, ← mulVec_mulVec]
+    rfl
+
+/-- The morphism of representations from `CoMod.rep` to `ContrMod.rep` defined by multiplication
+  with the metric. -/
+def Co.toContr (d : ℕ) : IntertwiningMap (CoMod.rep (d := d)) (ContrMod.rep (d := d)) where
+    toFun := fun ψ => ContrMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ)
     map_add' := by
       intro ψ ψ'
       simp only [map_add, mulVec_add]
@@ -132,53 +146,18 @@ def Contr.toCo (d : ℕ) : Contr d ⟶ Co d := Rep.ofHom <|
     isIntertwining' g := by
       ext1 ψ
       conv_lhs =>
-        change CoMod.toFin1dℝEquiv.symm (η *ᵥ (g.1 *ᵥ ψ.toFin1dℝ))
-        rw [mulVec_mulVec, LorentzGroup.minkowskiMatrix_comm, ← mulVec_mulVec]
+        change ContrMod.toFin1dℝEquiv.symm (η *ᵥ ((LorentzGroup.transpose g⁻¹).1 *ᵥ ψ.toFin1dℝ))
+        rw [mulVec_mulVec, ← LorentzGroup.comm_minkowskiMatrix, ← mulVec_mulVec]
       rfl
-  }
 
-/-- The morphism of representations from `Co d` to `Contr d` defined by multiplication
-  with the metric. -/
-def Co.toContr (d : ℕ) : Co d ⟶ Contr d := Rep.ofHom <|
-    {
-      toFun := fun ψ => ContrMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ)
-      map_add' := by
-        intro ψ ψ'
-        simp only [map_add, mulVec_add]
-      map_smul' := by
-        intro r ψ
-        simp only [_root_.map_smul, mulVec_smul, RingHom.id_apply]
-      isIntertwining' g := by
-        ext1 ψ
-        conv_lhs =>
-          change ContrMod.toFin1dℝEquiv.symm (η *ᵥ ((LorentzGroup.transpose g⁻¹).1 *ᵥ ψ.toFin1dℝ))
-          rw [mulVec_mulVec, ← LorentzGroup.comm_minkowskiMatrix, ← mulVec_mulVec]
-        rfl
-    }
-
-/-- The isomorphism between `Contr d` and `Co d` induced by multiplication with the
+/-- The isomorphism between `ContrMod.rep` and `CoMod.rep` induced by multiplication with the
   Minkowski metric. -/
-def contrIsoCo (d : ℕ) : Contr d ≅ Co d where
-  hom := Contr.toCo d
-  inv := Co.toContr d
-  hom_inv_id := by
-    ext ψ
-    simp only [Rep.hom_comp, Representation.IntertwiningMap.comp_toLinearMap, LinearMap.coe_comp,
-      Representation.IntertwiningMap.coe_toLinearMap, Function.comp_apply, Rep.hom_id,
-      Representation.IntertwiningMap.toLinearMap_id, LinearMap.id_coe, id_eq]
-    conv_lhs => change ContrMod.toFin1dℝEquiv.symm (η *ᵥ
-      CoMod.toFin1dℝEquiv (CoMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ)))
-    rw [LinearEquiv.apply_symm_apply, mulVec_mulVec, minkowskiMatrix.sq]
-    simp
-  inv_hom_id := by
-    ext ψ
-    simp only [Rep.hom_comp, Representation.IntertwiningMap.comp_toLinearMap, LinearMap.coe_comp,
-      Representation.IntertwiningMap.coe_toLinearMap, Function.comp_apply, Rep.hom_id,
-      Representation.IntertwiningMap.toLinearMap_id, LinearMap.id_coe, id_eq]
-    conv_lhs => change CoMod.toFin1dℝEquiv.symm (η *ᵥ
-      ContrMod.toFin1dℝEquiv (ContrMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ)))
-    rw [LinearEquiv.apply_symm_apply, mulVec_mulVec, minkowskiMatrix.sq]
-    simp
+def contrIsoCo (d : ℕ) : Representation.Equiv (ContrMod.rep (d := d)) (CoMod.rep (d := d)) := by
+  refine Representation.Equiv.mk' (Contr.toCo d) (Co.toContr d) ?_ ?_
+  · intro x
+    simp [Contr.toCo, Co.toContr]
+  · intro x
+    simp [Contr.toCo, Co.toContr]
 
 /-!
 
@@ -189,7 +168,7 @@ namespace Contr
 
 open Lorentz
 lemma ρ_stdBasis (μ : Fin 1 ⊕ Fin 3) (Λ : LorentzGroup 3) :
-    (Contr 3).ρ Λ (ContrMod.stdBasis μ) = ∑ j, Λ.1 j μ • ContrMod.stdBasis j := by
+    ContrMod.rep Λ (ContrMod.stdBasis μ) = ∑ j, Λ.1 j μ • ContrMod.stdBasis j := by
   change Λ *ᵥ ContrMod.stdBasis μ = ∑ j, Λ.1 j μ • ContrMod.stdBasis j
   apply ContrMod.ext
   simp only [toLinAlgEquiv_self, Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero,

@@ -75,8 +75,8 @@ lemma toProd_eq_transpose : toProd A = (A.1, ⟨A.1ᵀ⟩) := rfl
 
 lemma toProd_injective : Function.Injective toProd := by
   intro A B h
-  rw [toProd_eq_transpose, toProd_eq_transpose, Prod.mk_inj] at h
-  exact Subtype.ext h.1
+  rw [toProd_eq_transpose, toProd_eq_transpose] at h
+  exact Subtype.ext (congrArg Prod.fst h)
 
 lemma toProd_continuous : Continuous toProd :=
   continuous_prodMk.mpr ⟨continuous_iff_le_induced.mpr fun _ a ↦ a,
@@ -160,7 +160,7 @@ lemma one_is_eigenvalue (A : SO(3)) : A.toEnd.HasEigenvalue 1 := by
   action of that `SO(3)` element. -/
 lemma exists_stationary_vec (A : SO(3)) :
     ∃ (v : EuclideanSpace ℝ (Fin 3)),
-    Orthonormal ℝ (({0} : Set (Fin 3)).restrict (fun _ => v))
+    Orthonormal ℝ (({0} : Set (Fin 3)).domRestrict (fun _ => v))
     ∧ A.toEnd v = v := by
   obtain ⟨v, hv⟩ := End.HasEigenvalue.exists_hasEigenvector $ one_is_eigenvalue A
   have hvn : ‖v‖ ≠ 0 := norm_ne_zero_iff.mpr hv.2
@@ -171,7 +171,8 @@ lemma exists_stationary_vec (A : SO(3)) :
     simp only [one_div]
     have hveq : v1 = v2 := by aesop
     subst hveq
-    rw [Set.restrict_apply, inner_smul_right, inner_smul_left, real_inner_self_eq_norm_sq v]
+    show inner ℝ (‖v‖⁻¹ • v) (‖v‖⁻¹ • v) = if v1 = v1 then 1 else 0
+    rw [inner_smul_right, inner_smul_left, real_inner_self_eq_norm_sq v]
     simp only [map_inv₀, conj_trivial, Fin.isValue, ↓reduceIte]
     field_simp
   · simp [End.mem_eigenspace_iff.mp hv.1]

@@ -25,7 +25,6 @@ variable {A B : HermitianMat d 𝕜} {x : ℝ}
 
 noncomputable section
 
-set_option backward.isDefEq.respectTransparency false in
 theorem Matrix.IsHermitian.log_smul_of_ne_zero {A : Matrix d d 𝕜} (hA : A.IsHermitian) (hx : x ≠ 0) :
     cfc Real.log (x • A) = (Real.log x) • cfc (if · = 0 then (0 : ℝ) else 1) A + cfc Real.log A := by
   have hCFC : cfc (Real.log ∘ (x * ·)) A = cfc Real.log (x • A) := by
@@ -85,7 +84,8 @@ TODO: We could add a fallback to give `nonnegative` if `Nonempty d` is not avail
 possibly also print a warning. (Users might often not have `Nonempty d` in context, and
 they probably want to.) -/
 @[positivity HermitianMat.exp _]
-meta def evalHermitianMatExp : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatExp : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let .app _exp (A : Expr) ← whnfR e | throwError "not HermitianMat.exp"
   pure (.positive (← mkAppM ``HermitianMat.exp_pos #[A]))
 
@@ -117,12 +117,10 @@ theorem _root_.Commute.log_right (hAB : Commute A.mat B.mat) :
 theorem reindex_log (e : d ≃ d₂) : (A.reindex e).log = A.log.reindex e :=
   cfc_reindex A Real.log e
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem log_zero : (0 : HermitianMat d 𝕜).log = 0 := by
   simp [log]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem log_one : (1 : HermitianMat d 𝕜).log = 0 := by
   simp [log]
@@ -130,7 +128,7 @@ theorem log_one : (1 : HermitianMat d 𝕜).log = 0 := by
 theorem log_smul_of_pos (A : HermitianMat d 𝕜) (hx : x ≠ 0) :
     (x • A).log = Real.log x • A.supportProj + A.log := by
   ext1
-  convert A.H.log_smul_of_ne_zero hx
+  convert! A.H.log_smul_of_ne_zero hx
   simp [cfc, log, supportProj_eq_cfc]
 
 theorem log_smul {A : HermitianMat d 𝕜} {x : ℝ} (hx : x ≠ 0) [NonSingular A] :
@@ -140,14 +138,14 @@ theorem log_smul {A : HermitianMat d 𝕜} {x : ℝ} (hx : x ≠ 0) [NonSingular
 /-
 The inverse function is operator antitone for positive definite matrices.
 -/
-set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder MatrixOrder in
 theorem inv_antitone (hA : A.mat.PosDef) (h : A ≤ B) : B⁻¹ ≤ A⁻¹ := by
   -- Since $B - A$ is positive semidefinite, we can write it as $C^*C$ for some matrix $C$.
   obtain ⟨C, hC⟩ : ∃ C : Matrix d d 𝕜, B.mat - A.mat = C.conjTranspose * C := by
     classical
     apply CStarAlgebra.nonneg_iff_eq_star_mul_self.mp
-    simpa using h
+    simp_all only [sub_nonneg]
+    exact h
   -- Using the fact that $B = A + C^*C$, we can write $B^{-1}$ as $(A + C^*C)^{-1}$.
   have h_inv_posDef : (1 + C * A.mat⁻¹ * C.conjTranspose).PosDef := by
     exact Matrix.PosDef.one.add_posSemidef (hA.inv.posSemidef.mul_mul_conjTranspose_same C)
@@ -196,7 +194,6 @@ lemma Real.integral_inv_sub_inv_finite (x T : ℝ) (hx : 0 < x) (hT : 0 < T) :
   · exact ContinuousOn.intervalIntegrable ( by exact continuousOn_of_forall_continuousAt fun t ht => ContinuousAt.div continuousAt_const ( continuousAt_const.add continuousAt_id ) ( by linarith [ Set.mem_Icc.mp ( by simpa [ hT.le ] using ht ) ] ) );
   · exact ContinuousOn.intervalIntegrable ( by exact continuousOn_of_forall_continuousAt fun t ht => ContinuousAt.div continuousAt_const ( continuousAt_const.add continuousAt_id ) ( by linarith [ Set.mem_Icc.mp ( by simpa [ hT.le ] using ht ) ] ) )
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The limit of $\log((1+T)/(x+T))$ as $T \to \infty$ is 0, for $x > 0$.
 -/
@@ -219,7 +216,8 @@ theorem logApprox_mono {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.m
     ∫ t in (0)..T, ((1 + t)⁻¹ • (1 : HermitianMat d 𝕜) - (y + t • 1)⁻¹) := by
   -- By the properties of the integral, we can bring the limit inside, so we have:
   have h_integrable : ContinuousOn (fun t : ℝ => (1 + t)⁻¹ • (1 : HermitianMat d 𝕜)) (Set.Icc 0 T) ∧ ContinuousOn (fun t : ℝ => (x + t • 1)⁻¹) (Set.Icc 0 T) ∧ ContinuousOn (fun t : ℝ => (y + t • 1)⁻¹) (Set.Icc 0 T) := by
-    refine' ⟨ ContinuousOn.smul ( ContinuousOn.inv₀ ( continuousOn_const.add continuousOn_id ) fun t ht => by linarith [ ht.1 ] ) continuousOn_const, _, _ ⟩;
+    refine' ⟨ ContinuousOn.smul ( ContinuousOn.inv₀ ( continuousOn_const.add continuousOn_id ) fun t ht => by
+        simp only [Pi.add_apply, id_eq]; linarith [ ht.1 ] ) continuousOn_const, _, _ ⟩;
     · refine' ContinuousOn.comp ( show ContinuousOn ( fun m : HermitianMat d 𝕜 => m⁻¹ ) ( { m : HermitianMat d 𝕜 | m.mat.PosDef } ) from _ ) _ _;
       · intro m hm;
         refine' ContinuousAt.continuousWithinAt _;
@@ -237,7 +235,7 @@ theorem logApprox_mono {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.m
         exact h_inv_cont.comp ( continuous_subtype_val.tendsto _ );
       · fun_prop;
       · intro t ht;
-        simp only [Set.mem_setOf_eq, mat_add, mat_smul, mat_one]
+        simp only [Set.mem_ofPred_eq, mat_add, mat_smul, mat_one]
         rw [Matrix.posDef_iff_dotProduct_mulVec] at hx ⊢
         refine' ⟨ _, _ ⟩;
         · exact H ((fun t => x + t • 1) t);
@@ -276,7 +274,7 @@ theorem logApprox_mono {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.m
           simp_all [ Matrix.inv_def ];
           exact ContinuousOn.smul ( h_cont_det.inv₀ fun t ht => h_inv t ht.1 ht.2 ) h_cont_adj;
         convert h_cont_inv using 1;
-      rw [ continuousOn_iff_continuous_restrict ] at *;
+      rw [ continuousOn_iff_continuous_domRestrict ] at *;
       exact continuous_induced_rng.mpr h_cont
   rw [ intervalIntegral.integral_of_le hT.le, intervalIntegral.integral_of_le hT.le ];
   apply_rules [ MeasureTheory.integral_mono_ae ];
@@ -366,7 +364,7 @@ theorem logApprox_eq_log_add_error
     (x : HermitianMat d 𝕜) (hx : x.mat.PosDef) (T : ℝ) (hT : 0 < T) :
     logApprox x T = x.log + x.cfc (fun u => Real.log ((1 + T) / (u + T))) := by
   have h_logApprox : ∫ t in (0)..T, ((1 + t)⁻¹ • (1 : HermitianMat d 𝕜) - (x + t • 1)⁻¹) = x.cfc (fun u => Real.log u + Real.log ((1 + T) / (u + T))) := by
-    convert logApprox_eq_cfc_scalar x hx T hT using 1;
+    convert! logApprox_eq_cfc_scalar x hx T hT using 1;
     apply cfc_congr_of_posDef hx;
     exact fun u hu => Eq.symm ( scalarLogApprox_eq u T hu.out hT );
   have h_cfc_add : x.cfc (fun u => Real.log u + Real.log ((1 + T) / (u + T))) = x.cfc Real.log + x.cfc (fun u => Real.log ((1 + T) / (u + T))) := by
@@ -386,7 +384,7 @@ lemma tendsto_cfc_log_div_add_atTop (x : HermitianMat d 𝕜) :
     exact fun T => cfc_toMat_eq_sum_smul_proj x fun u => Real.log ((1 + T) / (u + T));
   -- The limit of a sum is the sum of the limits.
   have h_sum : Filter.Tendsto (fun T : ℝ => ∑ i, Real.log ((1 + T) / (x.H.eigenvalues i + T)) • (x.H.eigenvectorUnitary.val * (Matrix.single i i 1) * x.H.eigenvectorUnitary.val.conjTranspose)) Filter.atTop (nhds (∑ i, 0 • (x.H.eigenvectorUnitary.val * (Matrix.single i i 1) * x.H.eigenvectorUnitary.val.conjTranspose))) := by
-    refine' tendsto_finset_sum _ fun i _ => _;
+    refine' tendsto_finsetSum _ fun i _ => _;
     convert Filter.Tendsto.smul_const ( Real.tendsto_log_div_add_atTop ( x.H.eigenvalues i ) ) _ using 1;
     all_goals try infer_instance;
     norm_num +zetaDelta at *
@@ -421,7 +419,7 @@ theorem log_mono (hA : A.mat.PosDef) (hAB : A ≤ B) : A.log ≤ B.log := by
   have hB : B.mat.PosDef := posDef_of_posDef_le hA hAB
   apply le_of_tendsto_of_tendsto (tendsto_logApprox hA) (tendsto_logApprox hB)
   rw [Filter.EventuallyLE, Filter.eventually_atTop]
-  exact ⟨1, fun T hT => by simpa using logApprox_mono hA hB hAB T ( zero_lt_one.trans_le hT )⟩
+  exact ⟨1, fun T hT => by exact logApprox_mono hA hB hAB T ( zero_lt_one.trans_le hT )⟩
 
 /-- Monotonicity of exp on commuting operators. -/
 theorem le_of_exp_commute (hAB₂ : A.exp ≤ B.exp) :
@@ -436,7 +434,7 @@ theorem le_of_exp_commute (hAB₂ : A.exp ≤ B.exp) :
   · exact hAB₂
 
 set_option maxHeartbeats 10000000 in
-open ComplexOrder Matrix in
+open ComplexOrder _root_.HermitianMat.Matrix in
 /--
 The inverse function is operator convex on positive definite matrices.
 -/
@@ -530,7 +528,6 @@ lemma inv_convex {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.mat.Pos
     refine this.trans_eq (Finset.sum_congr rfl fun _ _ => by ring );
 
 open ComplexOrder in
-set_option backward.isDefEq.respectTransparency false in
 /--
 The shifted inverse function is operator convex on positive definite matrices.
 -/
@@ -543,7 +540,8 @@ lemma inv_shift_convex {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.m
   ext
   simp [add_assoc, add_left_comm, hab, ← add_smul]
 
-open MeasureTheory intervalIntegral ComplexOrder Matrix in
+open MeasureTheory intervalIntegral ComplexOrder in
+open _root_.HermitianMat.Matrix in
 open scoped Matrix.Norms.Frobenius in
 set_option backward.isDefEq.respectTransparency false in
 /--
@@ -555,7 +553,7 @@ lemma integrable_inv_shift {A : HermitianMat d 𝕜} (hA : A.mat.PosDef) (b : �
   have h_inv : ∀ t : ℝ, 0 ≤ t → IsUnit (A + t • 1).mat := by
     intro t ht
     have h_pos_def : (A + t • 1).mat.PosDef := by
-      convert hA.add_posSemidef _ using 1
+      convert! hA.add_posSemidef _ using 1
       constructor <;> simp [*]
       · simp [ Matrix.IsHermitian];
       · simp [ Matrix.one_apply, Finsupp.sum ];
@@ -593,7 +591,8 @@ theorem logApprox_concave {n 𝕜 : Type*} [Fintype n] [DecidableEq n] [RCLike �
     have h_integrable := integrable_inv_shift hz T hT
     rw [ intervalIntegrable_iff_integrableOn_Ioc_of_le hT ] at *
     refine MeasureTheory.Integrable.sub ?_ h_integrable
-    exact ContinuousOn.integrableOn_Icc ( by exact continuousOn_of_forall_continuousAt fun t ht => ContinuousAt.smul ( ContinuousAt.inv₀ ( continuousAt_const.add continuousAt_id ) ( by linarith [ ht.1 ] ) ) continuousAt_const ) |> fun h => h.mono_set ( Set.Ioc_subset_Icc_self );
+    exact ContinuousOn.integrableOn_Icc ( by exact continuousOn_of_forall_continuousAt fun t ht => ContinuousAt.smul ( ContinuousAt.inv₀ ( continuousAt_const.add continuousAt_id ) ( by
+        simp only [Pi.add_apply, id_eq]; linarith [ ht.1 ] ) ) continuousAt_const ) |> fun h => h.mono_set ( Set.Ioc_subset_Icc_self );
   have h_int2 : IntervalIntegrable (fun t => (1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - ((a • x + b • y) + t • 1)⁻¹) MeasureTheory.volume 0 T := by
     exact h_integrable (Matrix.PosDef.Convex hx hy ha hb hab)
   have h_integral_mono : ∫ t in (0)..T, a • ((1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - (x + t • 1)⁻¹) + b • ((1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - (y + t • 1)⁻¹) ≤ ∫ t in (0)..T, (1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - ((a • x + b • y) + t • 1)⁻¹ := by
@@ -609,7 +608,7 @@ theorem logApprox_concave {n 𝕜 : Type*} [Fintype n] [DecidableEq n] [RCLike �
     · exact ( (h_integrable hx).1.smul a |> fun h => h.add ( (h_integrable hy).1.smul b ) ) |> fun h => h.mono_measure ( MeasureTheory.Measure.restrict_mono ( Set.Ioc_subset_Ioc le_rfl le_rfl ) le_rfl );
     · exact h_int2.1.mono_set (Set.Ioc_subset_Ioc le_rfl le_rfl)
     · filter_upwards [ MeasureTheory.ae_restrict_mem measurableSet_Ioc ] with t ht using h_integral_mono t <| Set.Ioc_subset_Icc_self ht;
-  convert h_integral_mono using 1;
+  convert! h_integral_mono using 1;
   rw [ intervalIntegral.integral_add ( by exact (h_integrable hx).smul a ) ( by exact (h_integrable hy).smul b ), intervalIntegral.integral_smul, intervalIntegral.integral_smul ]
   rw [logApprox, logApprox]
 
@@ -630,6 +629,7 @@ theorem log_concave {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.mat.
 /-
 The logarithm of the Kronecker product of two diagonal Hermitian matrices is the sum of the Kronecker products of their logarithms with the identity matrix.
 -/
+set_option backward.isDefEq.respectTransparency false in
 lemma log_kron_diagonal {m n 𝕜 : Type*} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] [RCLike 𝕜]
     {d₁ : m → ℝ} {d₂ : n → ℝ} (h₁ : ∀ i, 0 < d₁ i) (h₂ : ∀ j, 0 < d₂ j) :
     (diagonal 𝕜 d₁ ⊗ₖ diagonal 𝕜 d₂).log =
@@ -669,7 +669,6 @@ lemma log_conj_unitary (A : HermitianMat d 𝕜) (U : Matrix.unitaryGroup d 𝕜
   cfc_conj_unitary _ Real.log U
 
 open RealInnerProductSpace in
-set_option backward.isDefEq.respectTransparency false in
 theorem inner_log_smul_of [NonSingular A] {x : ℝ} (hx : x ≠ 0) :
     ⟪(x • A).log, B⟫ = Real.log x * B.trace + ⟪A.log, B⟫ := by
   simp [log_smul hx, inner_add_left]

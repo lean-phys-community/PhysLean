@@ -40,7 +40,6 @@ electromagnetic action.
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff
 
@@ -139,7 +138,7 @@ lemma constantEB_vectorPotential {c : SpeedOfLight}
     (constantEB c E₀ B₀ B₀_antisymm).vectorPotential c = fun _ x => WithLp.toLp 2 fun i =>
       (1 / 2) * ∑ j, B₀ (i, j) * x j := by
   ext t x i
-  simp [vectorPotential, timeSlice, constantEB, space_toCoord_symm, Equiv.coe_fn_mk,
+  simp [vectorPotential, timeSlice, constantEB, Equiv.coe_fn_mk,
     Function.curry_apply, Function.comp_apply]
 
 /-!
@@ -172,7 +171,7 @@ lemma constantEB_vectorPotential_space_deriv {c : SpeedOfLight}
   rw [Space.deriv_eq]
   rw [fderiv_const_mul (by fun_prop)]
   rw [fderiv_fun_sum (by fun_prop)]
-  simp only [one_div, ContinuousLinearMap.coe_smul', ContinuousLinearMap.coe_sum', Pi.smul_apply,
+  simp only [one_div, FunLike.coe_smul, FunLike.coe_sum, Pi.smul_apply,
     Finset.sum_apply, smul_eq_mul, mul_eq_mul_left_iff, inv_eq_zero, OfNat.ofNat_ne_zero, or_false]
   rw [Finset.sum_eq_single i]
   · rw [fderiv_const_mul (by fun_prop)]
@@ -191,7 +190,6 @@ lemma constantEB_vectorPotential_space_deriv {c : SpeedOfLight}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma constantEB_electricField {c : SpeedOfLight}
     {E₀ : EuclideanSpace ℝ (Fin d)} {B₀ : Fin d × Fin d → ℝ}

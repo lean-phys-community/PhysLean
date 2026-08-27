@@ -40,7 +40,6 @@ noncomputable abbrev ℍ₂ := selfAdjoint ℂ²ˣ²
 
 namespace SL2C
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Definitionally equal to `Lorentz.SL2C.toSelfAdjointMap` but dropping the requirement that `M` be
 special linear. -/
 noncomputable def toSelfAdjointMap' (M : ℂ²ˣ²) : ℍ₂ →ₗ[ℝ] ℍ₂ where
@@ -92,7 +91,6 @@ which is 1.
 -/
 open Matrix
 
-set_option backward.isDefEq.respectTransparency false in
 open Complex (I normSq) in
 lemma toSelfAdjointMap_det_one' {M : ℂ²ˣ²} (hM : M.IsUpperTriangular) (detM : M.det = 1) :
     LinearMap.det (toSelfAdjointMap' M) = 1 :=
@@ -123,16 +121,9 @@ lemma toSelfAdjointMap_det_one' {M : ℂ²ˣ²} (hM : M.IsUpperTriangular) (detM
   have he : M = !![x, _; 0, y] := Matrix.ext fun | 0, 0 | 0, 1 | 1, 1 => rfl | 1, 0 => hM10
   have he' : Mᴴ = !![conj x, 0; _, conj y] :=
     Matrix.ext fun | 0, 0 | 1, 0 | 1, 1 => rfl | 0, 1 => by simp [hM10]
-  have detA_one : normSq x * normSq y = 1 := congrArg Complex.re <|
-    calc ↑(normSq x * normSq y)
-      _ = x * conj x * (y * conj y) := by simp [Complex.mul_conj]
-      _ = x * y * (conj y * conj x) := by ring
-      _ = x * y * conj (x * y) := congrArg _ (StarMul.star_mul ..).symm
-      _ = 1 := suffices x * y = 1 by simp [this]
-        calc x * y
-          _ = !![x, _; 0, y].det := by simp
-          _ = M.det := congrArg _ he.symm
-          _ = 1 := detM
+  have hxy : x * y = 1 := by rw [show x * y = M.det by rw [he]; simp, detM]
+  have detA_one : normSq x * normSq y = 1 := by
+    rw [← Complex.normSq_mul, hxy, Complex.normSq_one]
   have detD_one : D.det = 1 :=
     let z := x * conj y
     have k₀ : (M * E₂ * Mᴴ) 0 1 = z := by rw [he', he]; simp [E₂, z]
@@ -200,7 +191,6 @@ lemma toSelfAdjointMap_mul (M N : ℂ²ˣ²) :
   LinearMap.ext fun A => Subtype.ext <|
     show M * N * A * (M * N)ᴴ = M * (N * A * Nᴴ) * Mᴴ by noncomm_ring [Matrix.conjTranspose_mul]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma toSelfAdjointMap_similar_det (M N : ℂ²ˣ²) [Invertible M] :
     LinearMap.det (toSelfAdjointMap' (M * N * M⁻¹)) = LinearMap.det (toSelfAdjointMap' N) :=
   let e := toSelfAdjointEquiv M

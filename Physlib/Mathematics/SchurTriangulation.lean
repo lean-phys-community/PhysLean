@@ -65,7 +65,6 @@ end Equiv
 /-- The type family parameterized by `Bool` is finite if each type variant is finite. -/
 instance [M : Fintype m] [N : Fintype n] (b : Bool) : Fintype (cond b m n) := b.rec N M
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The type family parameterized by `Bool` has decidable equality if each type variant is
 decidable. -/
 instance [DecidableEq m] [DecidableEq n] : DecidableEq (Σ b, cond b m n)
@@ -76,9 +75,6 @@ instance [DecidableEq m] [DecidableEq n] : DecidableEq (Σ b, cond b m n)
     if h : i = j then isTrue (Sigma.eq rfl h) else isFalse fun | rfl => h rfl
 
 namespace Matrix
-
-/-- The property of a matrix being upper triangular. See also `Matrix.det_of_upperTriangular`. -/
-abbrev IsUpperTriangular [LT n] [CommRing R] (A : Matrix n n R) := A.BlockTriangular id
 
 /-- The subtype of upper triangular matrices. -/
 abbrev UpperTriangular (n R) [LT n] [CommRing R] := { A : Matrix n n R // A.IsUpperTriangular }
@@ -137,7 +133,6 @@ variable [IsAlgClosed 𝕜]
 
 set_option maxHeartbeats 800000 in
 set_option maxRecDepth 2000 in
-set_option backward.isDefEq.respectTransparency false in
 /-- **Don't use this definition directly.** This is the key algorithm behind
 `Matrix.schur_triangulation`. -/
 protected noncomputable def SchurTriangulationAux.of
@@ -150,7 +145,7 @@ protected noncomputable def SchurTriangulationAux.of
     let W : Submodule 𝕜 E := Vᗮ
     let m := Module.finrank 𝕜 V
     have hdim : m + Module.finrank 𝕜 W = Module.finrank 𝕜 E := V.finrank_add_finrank_orthogonal
-    let g : Module.End 𝕜 W := Submodule.orthogonalProjection W ∘ₗ f.domRestrict W
+    let g : Module.End 𝕜 W := Submodule.orthogonalProjectionOnto W ∘ₗ f.domRestrict W
     let ⟨n, hn, bW, hg⟩ := SchurTriangulationAux.of g
 
     have bV : OrthonormalBasis (Fin m) 𝕜 V := stdOrthonormalBasis 𝕜 V
@@ -213,7 +208,7 @@ protected noncomputable def SchurTriangulationAux.of
               hf (Equiv.finAddEquivSigmaCond_false hi) (Equiv.finAddEquivSigmaCond_false hj)
             _ = ⟪bW i', g (bW j')⟫_𝕜 := by
               rw [coe_comp, ContinuousLinearMap.coe_coe, Function.comp_apply, domRestrict_apply,
-                Submodule.inner_orthogonalProjection_eq_of_mem_left]
+                Submodule.inner_orthogonalProjectionOnto_eq_of_mem_left]
             _ = toMatrixOrthonormal bW g i' j' := (g.toMatrixOrthonormal_apply_apply ..).symm
             _ = 0 := hg (Nat.sub_lt_sub_right (Nat.le_of_not_lt hj) hji)
     }

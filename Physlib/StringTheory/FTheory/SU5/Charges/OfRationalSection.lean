@@ -57,7 +57,7 @@ F-theory and All Things Rational: Surveying U(1) Symmetries with Rational Sectio
 
 @[expose] public section
 
-TODO "AETF6" "The results in this file are currently stated, but not proved.
+TODO "The results in this file are currently stated, but not proved.
   They should should be proved following e.g. https://arxiv.org/pdf/1504.05593.
   This is a large project."
 
@@ -95,9 +95,7 @@ namespace CodimensionOneConfig
 
 instance : Fintype CodimensionOneConfig where
   elems := {same, nearestNeighbor, nextToNearestNeighbor}
-  complete := by
-    intro I
-    cases I <;> decide
+  complete := by rintro (_ | _ | _) <;> decide
 
 /-!
 

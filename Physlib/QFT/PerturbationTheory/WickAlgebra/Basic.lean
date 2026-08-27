@@ -159,7 +159,7 @@ lemma ι_superCommuteF_ofCrAnOpF_ofCrAnOpF_bosonic_or_zero (φ ψ : 𝓕.CrAnFie
 lemma ι_superCommuteF_ofCrAnOpF_superCommuteF_ofCrAnOpF_ofCrAnOpF (φ1 φ2 φ3 : 𝓕.CrAnFieldOp) :
     ι [ofCrAnOpF φ1, [ofCrAnOpF φ2, ofCrAnOpF φ3]ₛF]ₛF = 0 := by
   apply ι_of_mem_fieldOpIdealSet
-  simp only [fieldOpIdealSet, exists_prop, exists_and_left, Set.mem_setOf_eq]
+  simp only [fieldOpIdealSet, exists_prop, exists_and_left, Set.mem_ofPred_eq]
   aesop
 
 lemma ι_superCommuteF_superCommuteF_ofCrAnOpF_ofCrAnOpF_ofCrAnOpF (φ1 φ2 φ3 : 𝓕.CrAnFieldOp) :
@@ -225,13 +225,13 @@ lemma ι_eq_zero_iff_mem_ideal (x : FieldOpFreeAlgebra 𝓕) :
     ι x = 0 ↔ x ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet := by
   rw [ι_apply]
   change ⟦x⟧ = ⟦0⟧ ↔ _
-  simp_all only [Quotient.eq, Con.rel_eq_coe, RingCon.toCon_coe_eq_coe, TwoSidedIdeal.mem_mk]
+  simp_all only [Quotient.eq, Con.rel_eq_coe, RingCon.toCon_coe_eq_coe, TwoSidedIdeal.mem_ofRingCon]
 
 lemma bosonicProjF_mem_fieldOpIdealSet_or_zero (x : FieldOpFreeAlgebra 𝓕)
     (hx : x ∈ 𝓕.fieldOpIdealSet) :
     x.bosonicProjF.1 ∈ 𝓕.fieldOpIdealSet ∨ x.bosonicProjF = 0 := by
   have hx' := hx
-  simp only [fieldOpIdealSet, exists_prop, Set.mem_setOf_eq] at hx
+  simp only [fieldOpIdealSet, exists_prop, Set.mem_ofPred_eq] at hx
   rcases hx with ⟨φ1, φ2, φ3, rfl⟩ | ⟨φc, φc', hφc, hφc', rfl⟩ | ⟨φa, φa', hφa, hφa', rfl⟩ |
     ⟨φ, φ', hdiff, rfl⟩
   · rcases superCommuteF_superCommuteF_ofCrAnOpF_bosonic_or_fermionic φ1 φ2 φ3 with h | h
@@ -263,7 +263,7 @@ lemma fermionicProjF_mem_fieldOpIdealSet_or_zero (x : FieldOpFreeAlgebra 𝓕)
     (hx : x ∈ 𝓕.fieldOpIdealSet) :
     x.fermionicProjF.1 ∈ 𝓕.fieldOpIdealSet ∨ x.fermionicProjF = 0 := by
   have hx' := hx
-  simp only [fieldOpIdealSet, exists_prop, Set.mem_setOf_eq] at hx
+  simp only [fieldOpIdealSet, exists_prop, Set.mem_ofPred_eq] at hx
   rcases hx with ⟨φ1, φ2, φ3, rfl⟩ | ⟨φc, φc', hφc, hφc', rfl⟩ | ⟨φa, φa', hφa, hφa', rfl⟩ |
     ⟨φ, φ', hdiff, rfl⟩
   · rcases superCommuteF_superCommuteF_ofCrAnOpF_bosonic_or_fermionic φ1 φ2 φ3 with h | h
@@ -291,10 +291,9 @@ lemma fermionicProjF_mem_fieldOpIdealSet_or_zero (x : FieldOpFreeAlgebra 𝓕)
       rw [fermionicProjF_of_mem_fermionic _ h]
       simpa using hx'
 
-TODO "7ERJ3" "The lemma `bosonicProjF_mem_ideal` has a proof which is really long.
+TODO "The lemma `bosonicProjF_mem_ideal` has a proof which is really long.
   We should either 1) split it up into smaller lemmas or 2) Put more comments into the proof."
 
-set_option backward.isDefEq.respectTransparency false in
 lemma bosonicProjF_mem_ideal (x : FieldOpFreeAlgebra 𝓕)
     (hx : x ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet) :
     x.bosonicProjF.1 ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet := by
@@ -310,115 +309,20 @@ lemma bosonicProjF_mem_ideal (x : FieldOpFreeAlgebra 𝓕)
     obtain ⟨d, hd, y, hy, rfl⟩ := Set.mem_mul.mp ha
     rw [bosonicProjF_mul, bosonicProjF_mul, fermionicProjF_mul]
     simp only [add_mul]
-    rcases fermionicProjF_mem_fieldOpIdealSet_or_zero y hy with hfy | hfy
-      <;> rcases bosonicProjF_mem_fieldOpIdealSet_or_zero y hy with hby | hby
-    · apply TwoSidedIdeal.add_mem
-      apply TwoSidedIdeal.add_mem
-      · /- boson, boson, boson mem-/
-        rw [TwoSidedIdeal.mem_span_iff_mem_addSubgroup_closure]
-        refine Set.mem_of_mem_of_subset ?_ AddSubgroup.subset_closure
-        apply Set.mem_mul.mpr
-        use ↑(bosonicProjF d) * ↑(bosonicProjF y)
-        apply And.intro
-        · apply Set.mem_mul.mpr
-          use bosonicProjF d
-          simp only [Set.mem_univ, mul_eq_mul_left_iff, ZeroMemClass.coe_eq_zero, true_and]
-          use (bosonicProjF y).1
-          simp [hby]
-        · aesop
-      · /- fermion, fermion, boson mem-/
-        rw [TwoSidedIdeal.mem_span_iff_mem_addSubgroup_closure]
-        refine Set.mem_of_mem_of_subset ?_ AddSubgroup.subset_closure
-        apply Set.mem_mul.mpr
-        use ↑(fermionicProjF d) * ↑(fermionicProjF y)
-        apply And.intro
-        · apply Set.mem_mul.mpr
-          use fermionicProjF d
-          simp only [Set.mem_univ, mul_eq_mul_left_iff, ZeroMemClass.coe_eq_zero, true_and]
-          use (fermionicProjF y).1
-          simp [hfy]
-        · aesop
-      apply TwoSidedIdeal.add_mem
-      · /- boson, fermion, fermion mem-/
-        rw [TwoSidedIdeal.mem_span_iff_mem_addSubgroup_closure]
-        refine Set.mem_of_mem_of_subset ?_ AddSubgroup.subset_closure
-        apply Set.mem_mul.mpr
-        use ↑(bosonicProjF d) * ↑(fermionicProjF y)
-        apply And.intro
-        · apply Set.mem_mul.mpr
-          use bosonicProjF d
-          simp only [Set.mem_univ, mul_eq_mul_left_iff, ZeroMemClass.coe_eq_zero, true_and]
-          use (fermionicProjF y).1
-          simp [hfy]
-        · aesop
-      · /- fermion, boson, fermion mem-/
-        rw [TwoSidedIdeal.mem_span_iff_mem_addSubgroup_closure]
-        refine Set.mem_of_mem_of_subset ?_ AddSubgroup.subset_closure
-        apply Set.mem_mul.mpr
-        use ↑(fermionicProjF d) * ↑(bosonicProjF y)
-        apply And.intro
-        · apply Set.mem_mul.mpr
-          use fermionicProjF d
-          simp only [Set.mem_univ, mul_eq_mul_left_iff, ZeroMemClass.coe_eq_zero, true_and]
-          use (bosonicProjF y).1
-          simp [hby]
-        · simp only [Set.mem_univ, mul_eq_mul_left_iff, mul_eq_zero, ZeroMemClass.coe_eq_zero,
-          true_and, exists_or_eq_left]
-    · simp only [hby, ZeroMemClass.coe_zero, mul_zero, zero_mul, zero_add, add_zero]
-      apply TwoSidedIdeal.add_mem
-      · /- fermion, fermion, boson mem-/
-        rw [TwoSidedIdeal.mem_span_iff_mem_addSubgroup_closure]
-        refine Set.mem_of_mem_of_subset ?_ AddSubgroup.subset_closure
-        apply Set.mem_mul.mpr
-        use ↑(fermionicProjF d) * ↑(fermionicProjF y)
-        apply And.intro
-        · apply Set.mem_mul.mpr
-          use fermionicProjF d
-          simp only [Set.mem_univ, mul_eq_mul_left_iff, ZeroMemClass.coe_eq_zero, true_and]
-          use (fermionicProjF y).1
-          simp [hfy]
-        · aesop
-      · /- boson, fermion, fermion mem-/
-        rw [TwoSidedIdeal.mem_span_iff_mem_addSubgroup_closure]
-        refine Set.mem_of_mem_of_subset ?_ AddSubgroup.subset_closure
-        apply Set.mem_mul.mpr
-        use ↑(bosonicProjF d) * ↑(fermionicProjF y)
-        apply And.intro
-        · apply Set.mem_mul.mpr
-          use bosonicProjF d
-          simp only [Set.mem_univ, mul_eq_mul_left_iff, ZeroMemClass.coe_eq_zero, true_and]
-          use (fermionicProjF y).1
-          simp [hfy]
-        · simp only [Set.mem_univ, mul_eq_mul_left_iff, mul_eq_zero, ZeroMemClass.coe_eq_zero,
-          true_and, exists_or_eq_left]
-    · simp only [hfy, ZeroMemClass.coe_zero, mul_zero, zero_mul, add_zero, zero_add]
-      apply TwoSidedIdeal.add_mem
-      · /- boson, boson, boson mem-/
-        rw [TwoSidedIdeal.mem_span_iff_mem_addSubgroup_closure]
-        refine Set.mem_of_mem_of_subset ?_ AddSubgroup.subset_closure
-        apply Set.mem_mul.mpr
-        use ↑(bosonicProjF d) * ↑(bosonicProjF y)
-        apply And.intro
-        · apply Set.mem_mul.mpr
-          use bosonicProjF d
-          simp only [Set.mem_univ, mul_eq_mul_left_iff, ZeroMemClass.coe_eq_zero, true_and]
-          use (bosonicProjF y).1
-          simp [hby]
-        · aesop
-      · /- fermion, boson, fermion mem-/
-        rw [TwoSidedIdeal.mem_span_iff_mem_addSubgroup_closure]
-        refine Set.mem_of_mem_of_subset ?_ AddSubgroup.subset_closure
-        apply Set.mem_mul.mpr
-        use ↑(fermionicProjF d) * ↑(bosonicProjF y)
-        apply And.intro
-        · apply Set.mem_mul.mpr
-          use fermionicProjF d
-          simp only [Set.mem_univ, mul_eq_mul_left_iff, ZeroMemClass.coe_eq_zero, true_and]
-          use (bosonicProjF y).1
-          simp [hby]
-        · aesop
-    · simp [hfy, hby]
-  · simp only [TwoSidedIdeal.mem_mk, map_zero, ZeroMemClass.coe_zero, p]
+    have key {u w v : 𝓕.FieldOpFreeAlgebra}
+        (hv : v ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet) :
+        u * v * w ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet :=
+      TwoSidedIdeal.mul_mem_right _ _ _ (TwoSidedIdeal.mul_mem_left _ _ _ hv)
+    have hBy : ↑(bosonicProjF y) ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet := by
+      rcases bosonicProjF_mem_fieldOpIdealSet_or_zero y hy with h | h
+      · exact TwoSidedIdeal.mem_span_iff.mpr fun I hI => hI h
+      · simp [h]
+    have hFy : ↑(fermionicProjF y) ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet := by
+      rcases fermionicProjF_mem_fieldOpIdealSet_or_zero y hy with h | h
+      · exact TwoSidedIdeal.mem_span_iff.mpr fun I hI => hI h
+      · simp [h]
+    exact add_mem (add_mem (key hBy) (key hFy)) (add_mem (key hFy) (key hBy))
+  · simp only [TwoSidedIdeal.mem_ofRingCon, map_zero, ZeroMemClass.coe_zero, p]
     exact (RingCon.eq (ringConGen fun a b => a - b ∈ 𝓕.fieldOpIdealSet)).mp rfl
   · intro x y hx hy hpx hpy
     simp_all only [map_add, Submodule.coe_add, p]

@@ -50,6 +50,7 @@ def sign (φs : List 𝓕.FieldOp) (φsΛ : WickContraction φs.length) : ℂ :=
   ∏ (a : φsΛ.1), 𝓢(𝓕 |>ₛ φs[φsΛ.sndFieldOfContract a],
     𝓕 |>ₛ ⟨φs.get, φsΛ.signFinset (φsΛ.fstFieldOfContract a) (φsΛ.sndFieldOfContract a)⟩)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma sign_empty (φs : List 𝓕.FieldOp) :
     sign φs empty = 1 := by
   rw [sign]

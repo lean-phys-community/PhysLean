@@ -31,15 +31,14 @@ def H₁ : Prob → ℝ :=
 
 /-- H₁ of 0 is zero.-/
 @[simp]
-def H₁_zero_eq_zero : H₁ 0 = 0 := by
+lemma H₁_zero_eq_zero : H₁ 0 = 0 := by
   simp [H₁]
 
 /-- H₁ of 1 is zero.-/
 @[simp]
-def H₁_one_eq_zero : H₁ 1 = 0 := by
+lemma H₁_one_eq_zero : H₁ 1 = 0 := by
   simp [H₁]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Entropy is nonnegative. -/
 theorem H₁_nonneg (p : Prob) : 0 ≤ H₁ p := by
   rw [H₁, Real.negMulLog, neg_mul, Left.nonneg_neg_iff]
@@ -59,6 +58,7 @@ theorem H₁_le_1 (p : Prob) : H₁ p < 1 := by
 theorem H₁_le_exp_m1 (p : Prob) : H₁ p ≤ Real.exp (-1) :=
   Real.negMulLog_le_rexp_neg_one p.zero_le_coe
 
+set_option backward.isDefEq.respectTransparency false in
 theorem H₁_concave : ∀ (x y : Prob), ∀ (p : Prob), p[H₁ x ↔ H₁ y] ≤ H₁ (p[x ↔ y]) := by
   intros x y p
   simp only [H₁, smul_eq_mul, Prob.coe_one_minus, Mixable.mix, Mixable.mix_ab, Mixable.mkT_instUniv,
@@ -96,7 +96,8 @@ theorem Hₛ_le_log_d (d : ProbDistribution α) : Hₛ d ≤ Real.log (Fintype.c
   --Thanks Aristotle
   by_cases h : Fintype.card α = 0
   · simp_all [Hₛ, Fintype.card_eq_zero_iff.mp h]
-  -- Since the sum of the probabilities is 1, we can apply Jensen's inequality for the convex function -x log x.
+  -- Since the sum of the probabilities is 1, we can apply Jensen's inequality for the
+    -- convex function -x log x.
   have h_jensen {p : α → ℝ} (hsum : ∑ i, p i = 1) (hp : ∀ i, 0 ≤ p i ∧ p i ≤ 1) :
       -∑ i, p i * (p i).log ≤ Real.log (Fintype.card α) := by
     have h_jensen : (∑ i, (Fintype.card α : ℝ)⁻¹ * p i) * (∑ i, (Fintype.card α : ℝ)⁻¹ * p i).log ≤

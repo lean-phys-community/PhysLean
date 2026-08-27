@@ -31,6 +31,18 @@ variable [RCLike 𝕜] [DecidableEq n]
 
 namespace Matrix
 
+open scoped ComplexOrder MatrixOrder
+
+omit [DecidableEq n] in
+/-- The block Gram matrix `[[YᴴY, YᴴX], [XᴴY, XᴴX]]` is positive semidefinite. -/
+theorem fromBlocks_gram_posSemidef {m n k : Type*} [Fintype m] [Fintype n] [Fintype k]
+    (X : Matrix k n ℂ) (Y : Matrix k m ℂ) :
+    (fromBlocks (Yᴴ * Y) (Yᴴ * X) (Xᴴ * Y) (Xᴴ * X)).PosSemidef := by
+  convert posSemidef_conjTranspose_mul_self
+    (fromBlocks Y X (0 : Matrix k m ℂ) (0 : Matrix k n ℂ)) using 1
+  rw [fromBlocks_conjTranspose, fromBlocks_multiply]
+  simp
+
 set_option backward.isDefEq.respectTransparency false in
 theorem zero_rank_eq_zero {A : Matrix n n 𝕜} [Fintype n] (hA : A.rank = 0) : A = 0 := by
   have h : ∀ v, A.mulVecLin v = 0 := by
@@ -63,13 +75,12 @@ theorem smul_real (c : ℝ) : (c • A).IsHermitian := by
   ext
   simp only [smul_apply, smul_eq_mul, RCLike.real_smul_eq_coe_mul]
 
-set_option backward.isDefEq.respectTransparency false in
 def HermitianSubspace (n 𝕜 : Type*) [Fintype n] [RCLike 𝕜] : Subspace ℝ (Matrix n n 𝕜) where
   carrier := { A : Matrix n n 𝕜 | A.IsHermitian }
-  add_mem' _ _ := by simp_all only [Set.mem_setOf_eq, IsHermitian.add]
-  zero_mem' := by simp only [Set.mem_setOf_eq, isHermitian_zero]
+  add_mem' _ _ := by simp_all only [Set.mem_ofPred_eq, IsHermitian.add]
+  zero_mem' := by simp only [Set.mem_ofPred_eq, isHermitian_zero]
   smul_mem' c A := by
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     intro hA
     exact IsHermitian.smul_real hA c
 
@@ -277,12 +288,11 @@ theorem zero_dotProduct_zero_iff : (∀ x : m → 𝕜, 0 = star x ⬝ᵥ A.mulV
     ext i j
     have h₂ := fun x ↦ (PosSemidef.dotProduct_mulVec_zero_iff hA x).mp (h x).symm
     classical have : DecidableEq m := inferInstance
-    convert congrFun (h₂ (Pi.single j 1)) i using 1
+    convert! congrFun (h₂ (Pi.single j 1)) i using 1
     simp
   · rintro rfl
     simp
 
-set_option backward.isDefEq.respectTransparency false in
 omit [Fintype m] in
 theorem pos_smul {c : 𝕜} (hA : (c • A).PosSemidef) (hc : 0 < c) : A.PosSemidef := by
   have : 0 < 1/c := by
@@ -327,7 +337,7 @@ theorem ker_range_antitone {d : Type*} [Fintype d] [DecidableEq d] {A B : Matrix
     LinearMap.ker A.toEuclideanLin ≤ LinearMap.ker B.toEuclideanLin ↔
     LinearMap.range B.toEuclideanLin ≤ LinearMap.range A.toEuclideanLin
      := by
-  rw [Matrix.isHermitian_iff_isSymmetric] at hA hB
+  rw [isSymmetric_toEuclideanLin_iff.symm] at hA hB
   exact ContinuousLinearMap.ker_le_ker_iff_range_le_range
     (T := Matrix.toEuclideanCLM.toFun B) (U := Matrix.toEuclideanCLM.toFun A) hB hA
 
@@ -595,13 +605,13 @@ def traceRight (m : Matrix (d₁ × d) (d₂ × d) R) : Matrix d₁ d₂ R :=
 variable [Fintype d₁] [Fintype d₂] in
 @[simp]
 theorem traceLeft_trace (A : Matrix (d₁ × d₂) (d₁ × d₂) R) : A.traceLeft.trace = A.trace := by
-  convert (Fintype.sum_prod_type_right _).symm
+  convert! (Fintype.sum_prod_type_right _).symm
   rfl
 
 variable [Fintype d₁] [Fintype d₂] in
 @[simp]
 theorem traceRight_trace (A : Matrix (d₁ × d₂) (d₁ × d₂) R) : A.traceRight.trace = A.trace := by
-  convert (Fintype.sum_prod_type _).symm
+  convert! (Fintype.sum_prod_type _).symm
   rfl
 
 variable [StarAddMonoid R] in
@@ -694,23 +704,6 @@ theorem PosDef.kron {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq d₁] [
     use (star hA.left.eigenvectorUnitary.val) ⊗ₖ (star hB.left.eigenvectorUnitary.val)
     simp [← Matrix.mul_kronecker_mul]
 
-theorem PosDef.submatrix {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂] [RCLike 𝕜]
-    {M : Matrix d₁ d₁ 𝕜} (hM : M.PosDef) {e : d₂ → d₁} (he : Function.Injective e) : (M.submatrix e e).PosDef := by
-  rw [Matrix.posDef_iff_dotProduct_mulVec] at hM ⊢
-  use hM.left.submatrix e
-  intro x hx
-  let y : d₁ → 𝕜 := fun i ↦ ∑ j ∈ { j | e j = i}, x j
-  have hy : y ≠ 0 := by
-    contrapose! hx
-    simp only [funext_iff] at hx ⊢
-    intro i
-    simpa [y, he.eq_iff, Finset.sum_eq_single_of_mem] using hx (e i)
-  convert @hM.right y hy
-  dsimp [Matrix.mulVec, dotProduct, y]
-  simp only [map_sum]
-  simp only [Finset.sum_mul, Finset.sum_filter, Finset.mul_sum]
-  simp [← Finset.mul_sum, Finset.sum_comm]
-
 theorem PosDef.reindex {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂] [RCLike 𝕜]
     {M : Matrix d₁ d₁ 𝕜} (hM : M.PosDef) (e : d₁ ≃ d₂) : (M.reindex e e).PosDef :=
   hM.submatrix e.symm.injective
@@ -722,7 +715,6 @@ theorem PosDef.reindex_iff {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq 
   convert h.reindex e.symm
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 theorem PosSemidef.rsmul {n : Type*} [Fintype n] {M : Matrix n n ℂ} (hM : M.PosSemidef) {c : ℝ} (hc : 0 ≤ c) :
     (c • M).PosSemidef := by
   rw [Matrix.posSemidef_iff_dotProduct_mulVec] at hM ⊢
@@ -754,7 +746,6 @@ theorem PosDef_iff_eigenvalues' (M : Matrix d d 𝕜) :
   ⟨fun h ↦ ⟨h.left, h.left.posDef_iff_eigenvalues_pos.mp h⟩,
     fun ⟨w, h⟩ ↦ w.posDef_iff_eigenvalues_pos.mpr h⟩
 
-set_option backward.isDefEq.respectTransparency false in
 --These is disgusting atm. There's cleaner versions of them headed to Mathlib. See #29526 and follow-ups
 theorem IsHermitian.cfc_eigenvalues {M : Matrix d d 𝕜} (hM : M.IsHermitian) (f : ℝ → ℝ) :
     ∃ (e : d ≃ d), Matrix.IsHermitian.eigenvalues (cfc_predicate f M) = f ∘ hM.eigenvalues ∘ e := by
@@ -776,11 +767,11 @@ theorem IsHermitian.cfc_eigenvalues {M : Matrix d d 𝕜} (hM : M.IsHermitian) (
         norm_num +zetaDelta at *;
       refine' Polynomial.funext fun t => _;
       convert h_char_poly t using 1;
-      · simp [ Matrix.det_apply', Polynomial.eval_finset_sum ];
+      · simp [ Matrix.det_apply', Polynomial.eval_finsetSum ];
         simp [ Matrix.one_apply, Polynomial.eval_prod ];
         congr! 3;
         aesop;
-      · simp [ Matrix.det_apply', Polynomial.eval_finset_sum ];
+      · simp [ Matrix.det_apply', Polynomial.eval_finsetSum ];
         simp [ Matrix.one_apply, Polynomial.eval_prod ];
         exact Finset.sum_congr rfl fun _ _ => by congr; ext; aesop;
     simp_all [ Matrix.charmatrix, Matrix.det_diagonal ];
@@ -818,15 +809,15 @@ lemma IsHermitian.eigenvalues_eq_of_unitary_similarity_diagonal {d 𝕜 : Type*}
         intro t
         have h_det : Matrix.det (t • 1 - U * Matrix.diagonal (fun i => (f i : 𝕜)) * Uᴴ) = Matrix.det (U * (t • 1 - Matrix.diagonal (fun i => (f i : 𝕜))) * Uᴴ) := by
           simp [ mul_sub, sub_mul, Matrix.mul_assoc ];
-          rw [ show U * Uᴴ = 1 from by simpa [mul_eq_one_comm] using hU.2 ];
+          rw [ show U * Uᴴ = 1 from by exact hU.2 ];
         rw [h_det, Matrix.det_mul_comm, ← mul_assoc]
         rw [← star_eq_conjTranspose, Matrix.UnitaryGroup.star_mul_self ⟨U, hU⟩]
         simp
       refine' Polynomial.funext fun t => _;
       convert h_det t using 1 <;> simp [ Matrix.charpoly, Matrix.det_apply' ];
-      · simp [ Polynomial.eval_finset_sum, Polynomial.eval_mul, Polynomial.eval_prod, Matrix.one_apply ];
+      · simp [ Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_prod, Matrix.one_apply ];
         exact Finset.sum_congr rfl fun _ _ => by congr; ext; aesop;
-      · simp [ Polynomial.eval_finset_sum, Polynomial.eval_mul, Polynomial.eval_prod, Matrix.one_apply ];
+      · simp [ Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_prod, Matrix.one_apply ];
         exact Finset.sum_congr rfl fun _ _ => by congr; ext; aesop;
     rw [ h, h_char_poly ];
   -- The roots of the characteristic polynomial of A are its eigenvalues (by `IsHermitian.charpoly_roots_eq_eigenvalues`).
@@ -873,7 +864,7 @@ theorem cfc_diagonal (g : d → ℝ) (f : ℝ → ℝ) :
       change Matrix.conjTranspose _ = _
       simp [Matrix.conjTranspose]
   --TODO cfc_cont_tac
-  rw [cfc, dif_pos ⟨h_self_adjoint, continuousOn_iff_continuous_restrict.mpr <| by fun_prop⟩]
+  rw [cfc, dif_pos ⟨h_self_adjoint, continuousOn_iff_continuous_domRestrict.mpr <| by fun_prop⟩]
   rw [cfcHom_eq_of_continuous_of_map_id]
   rotate_left
   · refine' { .. }
@@ -883,10 +874,16 @@ theorem cfc_diagonal (g : d → ℝ) (f : ℝ → ℝ) :
       )⟩
     · simp
     · simp [diagonal, ← Matrix.ext_iff, mul_apply]
-      grind
+      intro x y i j
+      split_ifs with h
+      · subst h; simp
+      · rfl
     · simp
     · simp [diagonal, funext_iff]
-      grind [add_zero]
+      intro x y i j
+      split_ifs with h
+      · simp
+      · simp
     · simp [← ext_iff, diagonal]
       exact fun r i j ↦ rfl
     · simp [← ext_iff, diagonal]
@@ -903,13 +900,11 @@ theorem PosSemidef.pos_of_mem_spectrum {A : Matrix d d 𝕜} (hA : A.PosSemidef)
   rcases hr with ⟨i, rfl⟩
   exact hA.eigenvalues_nonneg i
 
-set_option backward.isDefEq.respectTransparency false in
 theorem PosSemidef.pow_add {A : Matrix d d 𝕜} (hA : A.PosSemidef) {x y : ℝ} (hxy : x + y ≠ 0) :
     cfc (· ^ (x + y) : ℝ → ℝ) A = cfc (fun r ↦ r ^ x * r ^ y : ℝ → ℝ) A := by
   refine cfc_congr fun r hr ↦ ?_
   exact Real.rpow_add' (hA.pos_of_mem_spectrum r hr) hxy
 
-set_option backward.isDefEq.respectTransparency false in
 theorem PosSemidef.pow_mul {A : Matrix d d 𝕜} {x y : ℝ} (hA : A.PosSemidef) :
     cfc (· ^ (x * y) : ℝ → ℝ) A = cfc (fun r ↦ (r ^ x) ^ y : ℝ → ℝ) A := by
   refine cfc_congr fun r hr ↦ ?_
@@ -1070,7 +1065,7 @@ private lemma spectrum_prod_le {d d₂ : Type*}
   obtain ⟨_, ha, _, hb, h₁, ⟨a', rfl⟩, ⟨b', rfl⟩⟩ : ∃ a ∈ spectrum 𝕜 A, ∃ b ∈ spectrum 𝕜 B,
       x = a * b ∧
       a ∈ Set.range (algebraMap ℝ 𝕜) ∧ b ∈ Set.range (algebraMap ℝ 𝕜) := by
-    obtain ⟨a, ha, b, hb, hx_eq⟩ := spectrum_prod_complex hA hB x (by convert hx using 1);
+    obtain ⟨a, ha, b, hb, hx_eq⟩ := spectrum_prod_complex hA hB x (by exact hx);
     have ha' := ha
     have hb' := hb
     rw [hA.spectrum_eq_image_range] at ha
@@ -1146,25 +1141,13 @@ theorem spectrum_prod {d d₂ : Type*}
 
 end spectrum_kron
 
-set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 open MatrixOrder in
 theorem PosDef.zero_lt {n : Type*} [Nonempty n] [Fintype n] {A : Matrix n n ℂ} (hA : A.PosDef) : 0 < A := by
   apply lt_of_le_of_ne
   · replace hA := hA.posSemidef
     rwa [Matrix.nonneg_iff_posSemidef]
-  · rintro rfl
-    --wtf do better. TODO
-    have : ¬(0 < 0) := by trivial
-    classical rw [← Matrix.posDef_natCast_iff (n := n) (R := ℂ)] at this
-    revert hA
-    convert this
-    ext; simp
-    trans ((0 : ℕ) : ℂ)
-    · simp
-    classical
-    change _ = ite _ _ _
-    simp
+  · rintro rfl; exact absurd (hA.diag_pos (i := Classical.arbitrary n)) (by simp)
 
 
 lemma IsHermitian.spectrum_eq_image_eigenvalues [Fintype n] {A : Matrix n n ℂ} (hA : A.IsHermitian) :
@@ -1244,7 +1227,7 @@ lemma sub_iInf_eignevalues (hA : A.IsHermitian) :
       simp_all only [mul_assoc, mul_comm, mul_left_comm, RCLike.star_def] ;
       rw [ ← mul_assoc ];
       exact mul_nonneg h_nonneg ( sub_nonneg_of_le <| mod_cast h_eigenvalue i );
-    convert Finset.sum_nonneg fun i _ => h_sum_nonneg i;
+    convert! Finset.sum_nonneg fun i _ => h_sum_nonneg i;
     rw [ hΛ.1 ]
 
 lemma iInf_eigenvalues_le_dotProduct_mulVec (hA : A.IsHermitian) (v : d → ℂ) :
@@ -1258,7 +1241,6 @@ lemma iInf_eigenvalues_le_dotProduct_mulVec (hA : A.IsHermitian) (v : d → ℂ)
   rw [Matrix.posSemidef_iff_dotProduct_mulVec] at hA
   exact hA.right v
 
-set_option backward.isDefEq.respectTransparency false in
 lemma iInf_eigenvalues_le_of_posSemidef
   (hAB : (B - A).PosSemidef) (hA : A.IsHermitian) (hB : B.IsHermitian) :
     iInf hA.eigenvalues ≤ iInf hB.eigenvalues := by
@@ -1302,11 +1284,9 @@ open MatrixOrder
 
 variable {d : Type*} [Fintype d]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma _shortcut_posSMulMono : PosSMulMono ℝ (Matrix d d ℂ) :=
   inferInstance
 
-set_option backward.isDefEq.respectTransparency false in
 lemma _shortcut_posSmulReflectLE : PosSMulReflectLE ℝ (Matrix d d ℂ) :=
   inferInstance
 
@@ -1333,7 +1313,6 @@ theorem IsHermitian.spectrum_subset_Ici_of_sub {d 𝕜 : Type*} [Fintype d] [Dec
     intro v hv_nonzero
     have h_eigenvalue : (star v ⬝ᵥ (A.mulVec v)) ≥ (⨅ i, (hA.eigenvalues i)) * (star v ⬝ᵥ v) := by
       have h_expand : (star v ⬝ᵥ (A.mulVec v)) = ∑ i, (hA.eigenvalues i) * (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i)) := by
-        change (star v ⬝ᵥ (A.mulVec v)) = ∑ i, (hA.eigenvalues i) * (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i))
         have h_decomp : A = ∑ i, (hA.eigenvalues i) • (Matrix.of (fun j k => (hA.eigenvectorBasis i j) * (star (hA.eigenvectorBasis i k)))) := by
           convert Matrix.IsHermitian.spectral_theorem hA using 1;
           ext i j
@@ -1437,7 +1416,6 @@ theorem IsHermitian.spectrum_subset_Ici_of_sub {d 𝕜 : Type*} [Fintype d] [Dec
   norm_cast at this;
   nlinarith
 
-set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 theorem IsHermitian.spectrum_subset_Iic_of_sub {d 𝕜 : Type*} [Fintype d] [DecidableEq d] [RCLike 𝕜]
   {A x : Matrix d d 𝕜} (hA : A.IsHermitian) (hl : (A - x).PosSemidef) :
@@ -1449,7 +1427,7 @@ theorem IsHermitian.spectrum_subset_Iic_of_sub {d 𝕜 : Type*} [Fintype d] [Dec
     intro μ hμ
     specialize h (Set.neg_mem_neg.mpr hμ)
     rw [← Set.mem_neg, Set.neg_Ici] at h
-    convert h
+    convert! h
     rw [iInf, iSup, ← spectrum_real_eq_range_eigenvalues, ← spectrum_real_eq_range_eigenvalues]
     rw [← spectrum.neg_eq, csInf_neg ?_ (A.finite_real_spectrum.bddAbove), neg_neg]
     exact ContinuousFunctionalCalculus.spectrum_nonempty _ hA
@@ -1558,7 +1536,6 @@ theorem trace_piProd [CommSemiring R] :
   symm
   simp [trace, piProd, Fintype.prod_sum]
 
-set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder MatrixOrder in
 theorem PosSemidef.piProd [RCLike R] (hA : ∀ i, (A i).PosSemidef) :
     (piProd A).PosSemidef := by

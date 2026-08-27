@@ -107,6 +107,7 @@ lemma koszulSignInsert_eq_cons [Std.Total le] (φ : 𝓕) (φs : List 𝓕) :
     simpa only [or_self] using Std.Total.total (r := le) φ φ
   simp [h1]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma koszulSignInsert_eq_grade (φ : 𝓕) (φs : List 𝓕) :
     koszulSignInsert q le φ φs = if ofList q [φ] = fermionic ∧
     ofList q (List.filter (fun i => decide (¬ le φ i)) φs) = fermionic then -1 else 1 := by

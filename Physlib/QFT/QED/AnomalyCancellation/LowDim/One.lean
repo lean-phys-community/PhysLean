@@ -25,12 +25,9 @@ namespace One
 
 theorem solEqZero (S : (PureU1 1).LinSols) : S = 0 := by
   apply ACCSystemLinear.LinSols.ext
-  have hLin := pureU1_linear S
-  simp only [univ_unique, Fin.default_eq_zero, Fin.isValue, sum_singleton] at hLin
   funext i
-  simp only [PureU1_numberCharges] at i
-  rw [show i = (0 : Fin 1) from Fin.fin_one_eq_zero i]
-  exact hLin
+  rw [Fin.fin_one_eq_zero i, ← Fin.sum_univ_one S.val]
+  exact pureU1_linear S
 
 end One
 

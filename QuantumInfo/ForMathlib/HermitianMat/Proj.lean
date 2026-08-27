@@ -8,6 +8,7 @@ module
 public import QuantumInfo.ForMathlib.HermitianMat.CFC
 
 public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.InnerProductSpace.Positive
 public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.PosPart.Basic
 
 /-!
@@ -45,28 +46,49 @@ i.e. a matrix that squares to itself, preserves vectors in the submodule, and ze
 in the orthogonal complement of that submodule.
 -/
 noncomputable def projector (S : Submodule 𝕜 (EuclideanSpace 𝕜 n)) : HermitianMat n 𝕜 :=
-  let P := S.subtypeL.comp S.orthogonalProjection
+  let P := S.subtypeL.comp S.orthogonalProjectionOnto
   ⟨P.toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis, by
     ext i j
-    simpa [EuclideanSpace.inner_single_right, EuclideanSpace.inner_single_left] using
-      S.inner_starProjection_left_eq_right (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)⟩
+    have h1 := S.inner_starProjection_left_eq_right (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)
+    simp_all [EuclideanSpace.inner_single_right, EuclideanSpace.inner_single_left]
+    exact h1⟩
 
 theorem projector_add_orthogonal : projector S + projector Sᗮ = 1 := by
   unfold projector;
   erw [ Subtype.mk_eq_mk ];
   ext i j; simp [ LinearMap.toMatrix_apply, Matrix.one_apply ] ;
 
+theorem projector_nonneg : 0 ≤ projector S := by
+  rw [zero_le_iff]
+  unfold projector
+  let P := S.subtypeL.comp S.orthogonalProjectionOnto
+  have hP : P.toLinearMap.IsSymmetricProjection := by
+    simpa [Submodule.starProjection, P] using
+      (Submodule.isSymmetricProjection_starProjection (U := S))
+  exact LinearMap.posSemidef_toMatrix_iff _ |>.2
+    ((LinearMap.IsIdempotentElem.isPositive_iff_isSymmetric hP.1).2 hP.2)
+
+@[simp]
+theorem projector_ker : (projector S).ker = Sᗮ := by
+  ext v
+  change (Matrix.toEuclideanLin
+      (LinearMap.toMatrix (PiLp.basisFun 2 𝕜 n) (PiLp.basisFun 2 𝕜 n)
+        (S.subtypeL.comp S.orthogonalProjectionOnto)) v = 0 ↔ v ∈ Sᗮ)
+  rw [show Matrix.toEuclideanLin = Matrix.toLpLin (2 : ENNReal) (2 : ENNReal) from rfl,
+    Matrix.toLpLin_eq_toLin, Matrix.toLin_toMatrix]
+  exact Submodule.starProjection_apply_eq_zero_iff (K := S)
+
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem trace_projector : (projector S).trace = (Module.finrank 𝕜 S : ℝ) := by
-  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjection).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = Module.finrank 𝕜 S by
+  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjectionOnto).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = Module.finrank 𝕜 S by
     simp [projector, trace_eq_re_trace, h_trace]
-  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjection).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = (LinearMap.id.toMatrix (Module.finBasis 𝕜 S) (Module.finBasis 𝕜 S)).trace by
+  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjectionOnto).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = (LinearMap.id.toMatrix (Module.finBasis 𝕜 S) (Module.finBasis 𝕜 S)).trace by
     simp [h_trace]
   rw [LinearMap.toMatrix_comp _ (Module.finBasis 𝕜 ↥S), Matrix.trace_mul_comm, ← LinearMap.toMatrix_comp]
   congr 2
   ext1
-  simp [Submodule.orthogonalProjection_mem_subspace_eq_self]
+  simp [Submodule.orthogonalProjectionOnto_mem_subspace_eq_self]
 
 /--
 The `HermitianMat.projector` for the `HermitianMat.support` submodule.
@@ -77,6 +99,14 @@ noncomputable def supportProj (A : HermitianMat n 𝕜) : HermitianMat n 𝕜 :=
 The `HermitianMat.projector` for the `HermitianMat.ker` submodule.
 -/
 noncomputable def kerProj (A : HermitianMat n 𝕜) : HermitianMat n 𝕜 := projector A.ker
+
+@[simp]
+theorem supportProj_ker : A.supportProj.ker = A.ker := by
+  rw [supportProj, projector_ker, support_orthogonal_eq_range]
+
+@[simp]
+theorem kerProj_ker : A.kerProj.ker = A.support := by
+  rw [kerProj, projector_ker, ker_orthogonal_eq_support]
 
 @[simp]
 theorem kerProj_add_supportProj : A.kerProj + A.supportProj = 1 := by
@@ -91,7 +121,6 @@ theorem kerProj_of_nonSingular [NonSingular A] : A.kerProj = 0 := by
 theorem supportProj_of_nonSingular [NonSingular A] : A.supportProj = 1 := by
   simpa using A.kerProj_add_supportProj
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The projector onto a submodule S is the sum of the outer products of the vectors in an orthonormal basis of S.
 -/
@@ -102,17 +131,16 @@ theorem projector_eq_sum_rankOne (b : OrthonormalBasis ι 𝕜 S) :
   field_simp;
   simp [Matrix.vecMulVec]
   -- By definition of orthogonal projection, we can write the projection of $e_j$ onto $S$ as $\sum_{k} \langle e_j, b_k \rangle b_k$.
-  have h_proj : ∀ j : n, S.orthogonalProjection (EuclideanSpace.single j 1) = ∑ k, (star (b k |>.1 j)) • (b k |>.1) := by
+  have h_proj : ∀ j : n, S.orthogonalProjectionOnto (EuclideanSpace.single j 1) = ∑ k, (star (b k |>.1 j)) • (b k |>.1) := by
     intro j
-    have h_proj : S.orthogonalProjection (EuclideanSpace.single j 1) = ∑ k, (inner 𝕜 (b k |>.1) (EuclideanSpace.single j 1)) • (b k |>.1) := by
-      convert b.sum_repr ( S.orthogonalProjection ( EuclideanSpace.single j 1 ) ) using 1;
+    have h_proj : S.orthogonalProjectionOnto (EuclideanSpace.single j 1) = ∑ k, (inner 𝕜 (b k |>.1) (EuclideanSpace.single j 1)) • (b k |>.1) := by
+      convert b.sum_repr ( S.orthogonalProjectionOnto ( EuclideanSpace.single j 1 ) ) using 1;
       constructor <;> intro h <;> simp_all [ Subtype.ext_iff, b.repr_apply_apply ];
-    convert h_proj using 3
+    convert! h_proj using 3
     simp [ inner];
-  convert congr_arg ( fun x : EuclideanSpace ( _ ) n => x i ) ( h_proj j ) using 1
+  convert! congr_arg ( fun x : EuclideanSpace ( _ ) n => x i ) ( h_proj j ) using 1
   simp [ Matrix.sum_apply, mul_comm ]
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The projector onto the support of A is the sum of the projections onto the eigenvectors with non-zero eigenvalues.
 -/
@@ -160,12 +188,12 @@ lemma projector_support_eq_sum : A.supportProj.mat =
       exact hx fun i hi => ⟨ _, hp i hi, rfl ⟩;
   obtain ⟨ b, hb ⟩ := h_orthonormal_basis
   have h_sum_rankOne : (projector A.support).mat = ∑ i, Matrix.vecMulVec (b i) (star (b i)) := by
-    convert projector_eq_sum_rankOne _ b using 1
+    convert! projector_eq_sum_rankOne _ b using 1
     simp [h_support] at *
   simp_all [ Finset.sum_ite ];
   convert h_sum_rankOne using 1;
   · exact h_support ▸ rfl;
-  · refine' Finset.sum_bij ( fun i hi => ⟨ i, by simpa using hi ⟩ ) _ _ _ _ <;> simp [ Finset.mem_filter ]
+  · refine' Finset.sum_bij ( fun i hi => ⟨ i, by simpa using hi ⟩ ) _ _ _ _ <;> simp [ Finset.mem_filter, hb ]
 
 /-
 `HermitianMat.supportProj` as a cfc.
@@ -224,7 +252,6 @@ theorem projLE_zero_cfc : {0 ≤ₚ A} = A.cfc (fun x ↦ if 0 ≤ x then 1 else
 theorem projLT_zero_cfc : {0 <ₚ A} = A.cfc (fun x ↦ if 0 < x then 1 else 0) := by
   simp only [projLT_def, sub_zero]
 
-set_option backward.isDefEq.respectTransparency false in
 theorem projLE_zero_cfc' : {A ≤ₚ 0} = A.cfc (fun x ↦ if x ≤ 0 then 1 else 0) := by
   simp only [projLE_def, zero_sub]
   --TODO: Should do a `HermitianMat.cfc_comp_neg`?
@@ -233,7 +260,6 @@ theorem projLE_zero_cfc' : {A ≤ₚ 0} = A.cfc (fun x ↦ if x ≤ 0 then 1 els
   congr! 2 with x
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 theorem projLT_zero_cfc' : {A <ₚ 0} = A.cfc (fun x ↦ if x < 0 then 1 else 0) := by
   simp only [projLT_def, zero_sub]
   --TODO: Should do a `HermitianMat.cfc_comp_neg`?
@@ -261,7 +287,6 @@ theorem projLE_le_one : {A ≤ₚ B} ≤ 1 := by
   apply cfc_le_one (f := fun x ↦ if 0 ≤ x then 1 else 0)
   intros; split <;> norm_num
 
-set_option backward.isDefEq.respectTransparency false in
 open MatrixOrder in
 theorem projLE_mul_nonneg : 0 ≤ {A ≤ₚ B}.mat * (B - A).mat := by
   rw [projLE_def]
@@ -270,7 +295,6 @@ theorem projLE_mul_nonneg : 0 ≤ {A ≤ₚ B}.mat * (B - A).mat := by
   apply cfc_nonneg
   aesop
 
-set_option backward.isDefEq.respectTransparency false in
 open MatrixOrder in
 theorem projLE_mul_le : {A ≤ₚ B}.mat * A.mat ≤ {A ≤ₚ B}.mat * B.mat := by
   rw [← sub_nonneg, ← mul_sub_left_distrib]
@@ -324,14 +348,12 @@ theorem negPart_eq_cfc_ite : A⁻ = A.cfc (fun x ↦ if x ≤ 0 then -x else 0) 
   congr; ext
   split <;> split <;> grind
 
-set_option backward.isDefEq.respectTransparency false in
 /-- There is an existing (very slow) `PosPart` instance on `Matrix n n 𝕜`, this shows
 that this is equal. -/
 theorem posPart_eq_posPart_toMat : A⁺ = A.mat⁺ := by
   rw [CFC.posPart_def, cfcₙ_eq_cfc]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- There is an existing (very slow) `PosPart` instance on `Matrix n n 𝕜`, this shows
 that this is equal. -/
 theorem negPart_eq_negPart_toMat : A⁻ = A.mat⁻ := by
@@ -369,7 +391,6 @@ theorem negPart_nonneg : 0 ≤ A⁻ := by
   rw [negPart_eq_cfc_ite, cfc_nonneg_iff]
   intro; split <;> grind
 
-set_option backward.isDefEq.respectTransparency false in
 theorem posPart_le : A ≤ A⁺ := by
   nth_rw 1 [← cfc_id A]
   rw [posPart_eq_cfc_ite, ← sub_nonneg, ← cfc_sub, cfc_nonneg_iff]
@@ -387,7 +408,6 @@ theorem projLE_inner_nonneg  : 0 ≤ ⟪{A ≤ₚ B}, (B - A)⟫ :=
   --This inner is equal to `(B - A)⁺.trace`, could be better way to describe it
   inner_mul_nonneg (projLE_mul_nonneg A B)
 
-set_option backward.isDefEq.respectTransparency false in
 theorem projLE_inner_le : ⟪{A ≤ₚ B}, A⟫ ≤ ⟪{A ≤ₚ B}, B⟫ := by
   rw [← sub_nonneg, ← inner_sub_right]
   exact projLE_inner_nonneg A B
@@ -411,15 +431,6 @@ theorem negPart_Continuous : Continuous (·⁻ : HermitianMat n ℂ → _) := by
   simp_rw [negPart_eq_cfc_min]
   fun_prop
 
-proof_wanted posPart_le_zero_iff : A⁺ ≤ 0 ↔ A ≤ 0
-
-proof_wanted posPart_eq_zero_iff : A⁺ = 0 ↔ A ≤ 0
-/- := by
-   rw [← posPart_le_zero_iff]
-   have := zero_le_posPart A
-   constructor <;> order
--/
-
 --Many missing lemmas: see `Mathlib.Algebra.Order.Group.PosPart` for examples
 -- (They don't apply here since it's not a Lattice, and there's no well-defined `max` in
 --   the Loewner order.)
@@ -439,7 +450,6 @@ proof_wanted posPart_eq_zero_iff : A⁺ = 0 ↔ A ≤ 0
 theorem one_sub_projLT : 1 - {B ≤ₚ A} = {A <ₚ B} := by
   rw [sub_eq_iff_eq_add, proj_le_add_lt]
 
-set_option backward.isDefEq.respectTransparency false in
 open MatrixOrder ComplexOrder in
 theorem projLT_mul_nonneg : 0 ≤ {A <ₚ B}.mat * (B - A).mat := by
   rw [projLT_def]
@@ -450,13 +460,11 @@ theorem projLT_mul_nonneg : 0 ≤ {A <ₚ B}.mat * (B - A).mat := by
   simp only [Pi.mul_apply, id_eq, ite_mul, one_mul, zero_mul]
   split <;> order
 
-set_option backward.isDefEq.respectTransparency false in
 open MatrixOrder ComplexOrder in
 theorem proj_lt_mul_lt : {A <ₚ B}.mat * A.mat ≤ {A <ₚ B}.mat * B.mat := by
   rw [← sub_nonneg, ← mul_sub_left_distrib]
   exact A.projLT_mul_nonneg B
 
-set_option backward.isDefEq.respectTransparency false in
 theorem inner_negPart_nonpos : ⟪A, A⁻⟫ ≤ 0 := by
   rw [← neg_le_neg_iff, neg_zero, ← inner_neg_right]
   apply inner_mul_nonneg
@@ -479,7 +487,6 @@ theorem posPart_inner_negPart_zero : ⟪A⁺, A⁻⟫ = 0 := by
   rw [posPart_mul_negPart, Matrix.trace_zero] at hi
   simpa only [map_eq_zero] using hi
 
-set_option backward.isDefEq.respectTransparency false in
 theorem inner_negPart_zero_iff : ⟪A, A⁻⟫ = 0 ↔ 0 ≤ A := by
   constructor
   · intro h
@@ -497,6 +504,24 @@ theorem inner_negPart_zero_iff : ⟪A, A⁻⟫ = 0 ↔ 0 ≤ A := by
     apply le_antisymm
     · exact inner_negPart_nonpos A
     · exact inner_ge_zero h (negPart_nonneg A)
+
+theorem posPart_eq_zero_iff : A⁺ = 0 ↔ A ≤ 0 := by
+  refine ⟨fun h => by simpa [h] using posPart_le (A := A), fun hA => ?_⟩
+  have hnegPart : (-A)⁻ = A⁺ := by
+    rw [negPart_eq_cfc_ite, posPart_eq_cfc_ite]
+    nth_rw 1 [← cfc_id A]
+    rw [← cfc_neg, ← cfc_comp]
+    congr! 2 with x; simp
+  have h0 : ⟪-A, A⁺⟫ = 0 := by
+    simpa [hnegPart] using (inner_negPart_zero_iff (A := -A)).2 (by simpa using hA)
+  have hA_eq : -A = A⁻ - A⁺ := by
+    conv_lhs => rw [show A = A⁺ - A⁻ from (posPart_add_negPart A).symm]
+    abel
+  have hself : ⟪A⁺, A⁺⟫ = 0 := by
+    rw [hA_eq, HermitianMat.inner_sub_right, HermitianMat.inner_comm A⁻ A⁺,
+      posPart_inner_negPart_zero, zero_sub, neg_eq_zero] at h0
+    exact h0
+  exact inner_self_eq_zero.mp hself
 
 theorem inner_negPart_neg_iff : ⟪A, A⁻⟫ < 0 ↔ ¬0 ≤ A := by
   simp [← inner_negPart_zero_iff, lt_iff_le_and_ne, inner_negPart_nonpos A]

@@ -53,6 +53,7 @@ lemma accGrav_invariant {n : ℕ} (f : (PermGroup n)) (S : (PureU1 n).Charges) :
   simp
 
 open BigOperators
+set_option backward.isDefEq.respectTransparency false in
 lemma accCube_invariant {n : ℕ} (f : (PermGroup n)) (S : (PureU1 n).Charges) :
     accCube n (permCharges f S) = accCube n S := by
   rw [accCube_explicit, accCube_explicit]
@@ -70,9 +71,8 @@ def FamilyPermutations (n : ℕ) : ACCSystemGroupAction (PureU1 n) where
   rep := permCharges
   linearInvariant := by
     intro i
-    simp only [PureU1_numberLinear] at i
     match i with
-    | 0 => exact accGrav_invariant
+    | ⟨0, _⟩ => exact accGrav_invariant
   quadInvariant := by
     intro i
     simp only [PureU1_numberQuadratic] at i
@@ -225,6 +225,7 @@ lemma permThree_thd : (permThree hij hjk hik hij' hjk' hik').toFun k' = k := by
 
 end permThree
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Prop_two (P : ℚ × ℚ → Prop) {S : (PureU1 n).LinSols}
     {a b : Fin n} (hab : a ≠ b)
     (h : ∀ (f : (FamilyPermutations n).group),
@@ -241,6 +242,7 @@ lemma Prop_two (P : ℚ × ℚ → Prop) {S : (PureU1 n).LinSols}
   erw [permTwo_fst,permTwo_snd] at h1
   exact h1
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Prop_three (P : ℚ × ℚ × ℚ → Prop) {S : (PureU1 n).LinSols}
     {a b c : Fin n} (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c)
     (h : ∀ (f : (FamilyPermutations n).group),

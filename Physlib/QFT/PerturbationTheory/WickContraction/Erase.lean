@@ -35,6 +35,7 @@ def erase (c : WickContraction n.succ) (i : Fin n.succ) : WickContraction n := b
     rw [← Finset.disjoint_map i.succAboveEmb, ← (Finset.map_injective i.succAboveEmb).eq_iff]
     exact c.2.2 _ ha _ hb
 
+set_option backward.isDefEq.respectTransparency false in
 lemma mem_erase_uncontracted_iff (c : WickContraction n.succ) (i : Fin n.succ) (j : Fin n) :
     j ∈ (c.erase i).uncontracted ↔
     i.succAbove j ∈ c.uncontracted ∨ c.getDual? (i.succAbove j) = some i := by
@@ -127,7 +128,6 @@ lemma mem_not_eq_erase_of_isNone (c : WickContraction n.succ) (i : Fin n.succ)
     Fin.succAboveEmb_apply, Finset.map_singleton, true_and, and_true]
   exact ha
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Given a Wick contraction `c : WickContraction n.succ` and a `i : Fin n.succ` the (optional)
   element of `(erase c i).uncontracted` which comes from the element in `c` contracted
   with `i`. -/

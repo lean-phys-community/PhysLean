@@ -20,7 +20,7 @@ Lorentz vectors which have norm equal to one and which are future-directed.
 open TensorProduct
 
 namespace Lorentz
-open Vector
+open _root_.Lorentz.Vector
 
 /-- A Lorentz Velocity is a Lorentz vector which has norm equal to one
   and which is future-directed. -/
@@ -72,7 +72,6 @@ lemma norm_spatialPart_sq_eq (v : Velocity d) :
   rw [minkowskiProduct_self_eq_timeComponent_spatialPart]
   simp [timeComponent]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma zero_le_minkowskiProduct (u v : Velocity d) :
     0 ≤ ⟪u.1, v.1⟫ₘ := by
   trans ‖u.1.timeComponent‖ * ‖v.1.timeComponent‖ - ‖u.1.spatialPart‖ * ‖v.1.spatialPart‖
@@ -122,7 +121,6 @@ lemma zero_timeComponent : (0 : Velocity d).1.timeComponent = 1 := by
   change (Vector.basis (Sum.inl 0)).timeComponent = 1
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- A continuous path from a velocity `u` to the zero velocity. -/
 noncomputable def pathFromZero (u : Velocity d) : Path zero u where
   toFun t := ⟨(√(1 + t ^ 2 * ‖u.1.spatialPart‖ ^ 2) - u.1 (Sum.inl 0) * t) •
@@ -134,8 +132,8 @@ noncomputable def pathFromZero (u : Velocity d) : Path zero u where
         calc _
           _ = ⟪x • zero.1 + (t : ℝ) • u.1, x • zero.1 + (t : ℝ) • u.1⟫ₘ := by rfl
           _ = x ^ 2 + (t : ℝ) ^ 2 + 2 * x * (t : ℝ) * u.1 (Sum.inl 0) := by
-            simp only [zero, Fin.isValue, map_add, map_smul, ContinuousLinearMap.add_apply,
-              ContinuousLinearMap.coe_smul', Pi.smul_apply, minkowskiProduct_basis_right,
+            simp only [zero, Fin.isValue, map_add, map_smul, _root_.add_apply,
+              FunLike.coe_smul, Pi.smul_apply, minkowskiProduct_basis_right,
               minkowskiMatrix.inl_0_inl_0, basis_apply, ↓reduceIte, mul_one, smul_eq_mul, one_mul,
               minkowskiProduct_basis_left, minkowskiProduct_self_eq_one]
             ring
@@ -162,7 +160,7 @@ noncomputable def pathFromZero (u : Velocity d) : Path zero u where
   source' := by
     simp
   target' := by
-    ext
+    ext1
     simp only [Set.Icc.coe_one,
       one_pow, one_mul, Fin.isValue, mul_one, one_smul, add_eq_right, smul_eq_zero]
     left

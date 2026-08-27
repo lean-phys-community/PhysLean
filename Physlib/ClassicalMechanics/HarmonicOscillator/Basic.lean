@@ -7,7 +7,8 @@ module
 
 public import Physlib.ClassicalMechanics.EulerLagrange
 public import Physlib.ClassicalMechanics.HamiltonsEquations
-public import Mathlib.Data.Real.Hom
+public import Physlib.Mathematics.Calculus.Gradient
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
 /-!
 
 # The Classical Harmonic Oscillator
@@ -95,9 +96,7 @@ open Real
 open Space
 open InnerProductSpace
 
-TODO "6VZHC" "Create a new folder for the damped harmonic oscillator, initially as a place-holder."
-
-TODO "4DK2M" "Create a new file for the geometric model which properly models the position as a
+TODO "Create a new file for the geometric model which properly models the position as a
     configuration space and velocity as its tangent space, then show explicitly how this
     coordinate model is a simplification of the geometric model.
     A nice reference for such an analysis is:
@@ -128,10 +127,10 @@ namespace HarmonicOscillator
 variable (S : HarmonicOscillator)
 
 @[simp]
-lemma k_ne_zero : S.k ≠ 0 := Ne.symm (ne_of_lt S.k_pos)
+lemma k_ne_zero : S.k ≠ 0 := S.k_pos.ne'
 
 @[simp]
-lemma m_ne_zero : S.m ≠ 0 := Ne.symm (ne_of_lt S.m_pos)
+lemma m_ne_zero : S.m ≠ 0 := S.m_pos.ne'
 
 /-!
 
@@ -143,7 +142,7 @@ as `√(k/m)`.
 The angular frequency appears in the solutions to the equations of motion of the harmonic
 oscillator.
 
-Here we both define and proof properties related to the angular frequency.
+Here we both define and prove properties related to the angular frequency.
 
 -/
 
@@ -156,18 +155,14 @@ noncomputable def ω : ℝ := √(S.k / S.m)
 lemma ω_pos : 0 < S.ω := sqrt_pos.mpr (div_pos S.k_pos S.m_pos)
 
 /-- The square of the angular frequency of the classical harmonic oscillator is equal to `k/m`. -/
-lemma ω_sq : S.ω^2 = S.k / S.m := by
-  rw [ω, sq_sqrt]
-  exact div_nonneg (le_of_lt S.k_pos) (le_of_lt S.m_pos)
+lemma ω_sq : S.ω^2 = S.k / S.m := sq_sqrt (div_pos S.k_pos S.m_pos).le
 
 /-- The angular frequency of the classical harmonic oscillator is not equal to zero. -/
-lemma ω_ne_zero : S.ω ≠ 0 := Ne.symm (ne_of_lt S.ω_pos)
+lemma ω_ne_zero : S.ω ≠ 0 := S.ω_pos.ne'
 
 /-- The inverse of the square of the angular frequency of the classical harmonic oscillator
   is `m/k`. -/
-lemma inverse_ω_sq : (S.ω ^ 2)⁻¹ = S.m/S.k := by
-  rw [ω_sq]
-  field_simp
+lemma inverse_ω_sq : (S.ω ^ 2)⁻¹ = S.m/S.k := by rw [ω_sq, inv_div]
 
 /-!
 
@@ -229,20 +224,14 @@ On smooth trajectories the energies are differentiable.
 lemma kineticEnergy_differentiable (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     Differentiable ℝ (kineticEnergy S xₜ) := by
   rw [kineticEnergy_eq]
-  change Differentiable ℝ ((fun x => (1 / (2 : ℝ)) * S.m * ⟪x, x⟫_ℝ) ∘ (fun t => ∂ₜ xₜ t))
-  apply Differentiable.comp
-  · fun_prop
-  · exact deriv_differentiable_of_contDiff xₜ hx
+  fun_prop
 
 @[fun_prop]
 lemma potentialEnergy_differentiable (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     Differentiable ℝ (fun t => potentialEnergy S (xₜ t)) := by
-  simp only [potentialEnergy_eq, one_div, smul_eq_mul]
-  change Differentiable ℝ ((fun x => 2⁻¹ * (S.k * ⟪x, x⟫_ℝ)) ∘ xₜ)
-  apply Differentiable.comp
-  · fun_prop
-  · rw [contDiff_infty_iff_fderiv] at hx
-    exact hx.1
+  have hd : Differentiable ℝ xₜ := hx.differentiable (by simp)
+  simp only [potentialEnergy_eq]
+  fun_prop
 
 @[fun_prop]
 lemma energy_differentiable (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
@@ -259,63 +248,34 @@ the time derivatives of the energies.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma kineticEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (kineticEnergy S xₜ) = fun t => ⟪∂ₜ xₜ t, S.m • ∂ₜ (∂ₜ xₜ) t⟫_ℝ := by
   funext t
   unfold kineticEnergy
-  conv_lhs => simp only [Time.deriv, one_div, ringHom_apply]
-  change (fderiv ℝ ((fun x => 2⁻¹ * S.m * ⟪x, x⟫_ℝ) ∘ (fun t => ∂ₜ xₜ t)) t) 1 = _
-  rw [fderiv_comp]
-  rw [fderiv_const_mul (by fun_prop)]
-  simp only [ContinuousLinearMap.smul_comp, ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', Pi.smul_apply, Function.comp_apply, smul_eq_mul]
-  rw [fderiv_inner_apply]
-  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq]
-  rw [real_inner_comm, ← inner_add_left, ← Time.deriv, real_inner_comm, ← inner_smul_right]
-  congr 1
-  simp only [smul_add]
-  module
-  repeat fun_prop
+  have hd : DifferentiableAt ℝ (∂ₜ xₜ) t :=
+    (deriv_differentiable_of_contDiff xₜ hx).differentiableAt
+  rw [Time.deriv_eq, fderiv_const_mul (by fun_prop), _root_.smul_apply,
+    fderiv_inner_apply (𝕜 := ℝ) hd hd, ← Time.deriv_eq]
+  simp [inner_smul_right, real_inner_comm]
+  ring
 
-set_option backward.isDefEq.respectTransparency false in
 lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (fun t => potentialEnergy S (xₜ t)) = fun t => ⟪∂ₜ xₜ t, S.k • xₜ t⟫_ℝ := by
   funext t
-  unfold potentialEnergy
-  conv_lhs => simp only [Time.deriv, one_div, smul_eq_mul]
-  change (fderiv ℝ ((fun x => 2⁻¹ * (S.k * ⟪x, x⟫_ℝ)) ∘ (fun t => xₜ t)) t) 1 = _
-  rw [fderiv_comp]
-  rw [fderiv_const_mul (by fun_prop), fderiv_const_mul (by fun_prop)]
-  simp only [ContinuousLinearMap.smul_comp, ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', Pi.smul_apply, Function.comp_apply, smul_eq_mul]
-  rw [fderiv_inner_apply]
-  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq]
-  trans S.k * ⟪xₜ t, ∂ₜ xₜ t⟫_ℝ
-  · rw [real_inner_comm, ← inner_add_left, ← Time.deriv, real_inner_comm, ← inner_smul_right,
-      ← inner_smul_right, ← inner_smul_right]
-    congr 1
-    module
-  rw [real_inner_comm, ← inner_smul_right]
-  repeat fun_prop
-  apply Differentiable.differentiableAt
-  rw [contDiff_infty_iff_fderiv] at hx
-  exact hx.1
+  have hd : DifferentiableAt ℝ xₜ t := (hx.differentiable (by simp)).differentiableAt
+  simp only [potentialEnergy_eq, smul_eq_mul, ← mul_assoc]
+  rw [Time.deriv_eq, fderiv_const_mul (by fun_prop), _root_.smul_apply,
+    fderiv_inner_apply (𝕜 := ℝ) hd hd, ← Time.deriv_eq]
+  simp [inner_smul_right, real_inner_comm]
+  ring
 
-set_option backward.isDefEq.respectTransparency false in
 lemma energy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (energy S xₜ) = fun t => ⟪∂ₜ xₜ t, S.m • ∂ₜ (∂ₜ xₜ) t + S.k • xₜ t⟫_ℝ := by
   unfold energy
   funext t
-  rw [Time.deriv_eq]
-  rw [fderiv_fun_add (by fun_prop) (by apply S.potentialEnergy_differentiable xₜ hx)]
-  simp only [ContinuousLinearMap.add_apply]
-  rw [← Time.deriv_eq, ← Time.deriv_eq]
-  rw [potentialEnergy_deriv, kineticEnergy_deriv]
-  simp only
-  rw [← inner_add_right]
-  fun_prop
-  fun_prop
+  rw [Time.deriv_eq, fderiv_fun_add (by fun_prop) (S.potentialEnergy_differentiable xₜ hx t)]
+  simp only [_root_.add_apply, ← Time.deriv_eq, kineticEnergy_deriv _ _ hx,
+    potentialEnergy_deriv _ _ hx, ← inner_add_right]
 
 /-!
 
@@ -358,15 +318,12 @@ set_option linter.unusedVariables false in
 lemma lagrangian_eq : lagrangian S = fun t x v =>
     1 / (2 : ℝ) * S.m * ⟪v, v⟫_ℝ - 1 / (2 : ℝ) * S.k * ⟪x, x⟫_ℝ := by
   ext t x v
-  simp [lagrangian, potentialEnergy]
-  ring
+  simp [lagrangian, potentialEnergy, mul_assoc]
 
 lemma lagrangian_eq_kineticEnergy_sub_potentialEnergy (t : Time)
     (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
     lagrangian S t (xₜ t) (∂ₜ xₜ t) = kineticEnergy S xₜ t - potentialEnergy S (xₜ t) := by
-  rw [lagrangian_eq, kineticEnergy, potentialEnergy]
-  simp only [one_div, smul_eq_mul, sub_right_inj]
-  ring
+  rfl
 
 /-!
 
@@ -379,55 +336,7 @@ The lagrangian is smooth in all its arguments.
 @[fun_prop]
 lemma contDiff_lagrangian (n : WithTop ℕ∞) : ContDiff ℝ n ↿S.lagrangian := by
   rw [lagrangian_eq]
-  apply ContDiff.sub
-  · apply ContDiff.mul
-    · apply ContDiff.mul
-      · exact contDiff_const
-      · exact contDiff_const
-    · exact ContDiff.inner (𝕜 := ℝ) (contDiff_snd.comp contDiff_snd)
-        (contDiff_snd.comp contDiff_snd)
-  · apply ContDiff.mul
-    · apply ContDiff.mul
-      · exact contDiff_const
-      · exact contDiff_const
-    · exact ContDiff.inner (𝕜 := ℝ) (contDiff_fst.comp contDiff_snd)
-        (contDiff_fst.comp contDiff_snd)
-
-lemma toDual_symm_innerSL (x : EuclideanSpace ℝ (Fin 1)) :
-    (InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin 1))).symm (innerSL ℝ x) = x := by
-  apply (innerSL_inj (𝕜:=ℝ) (E:=EuclideanSpace ℝ (Fin 1))).1
-  ext y
-  simp [InnerProductSpace.toDual_symm_apply]
-
-set_option backward.isDefEq.respectTransparency false in
-lemma gradient_inner_self (x : EuclideanSpace ℝ (Fin 1)) :
-    gradient (fun y : EuclideanSpace ℝ (Fin 1) => ⟪y, y⟫_ℝ) x = (2 : ℝ) • x := by
-  refine ext_inner_right (𝕜 := ℝ) fun y => ?_
-  unfold gradient
-  rw [InnerProductSpace.toDual_symm_apply]
-  have hid : DifferentiableAt ℝ (fun y : EuclideanSpace ℝ (Fin 1) => y) x := differentiableAt_id
-  rw [show (fun y : EuclideanSpace ℝ (Fin 1) => ⟪y, y⟫_ℝ) =
-      fun y => ⟪(fun y => y) y, (fun y => y) y⟫_ℝ from rfl]
-  rw [fderiv_inner_apply (𝕜 := ℝ) hid hid]
-  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq, real_inner_comm, inner_smul_left',
-    ringHom_apply]
-  ring
-
-lemma gradient_const_mul_inner_self (c : ℝ) (x : EuclideanSpace ℝ (Fin 1)) :
-    gradient (fun y : EuclideanSpace ℝ (Fin 1) => c * ⟪y, y⟫_ℝ) x = (2 * c) • x := by
-  calc
-    gradient (fun y : EuclideanSpace ℝ (Fin 1) => c * ⟪y, y⟫_ℝ) x
-        = (InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin 1))).symm
-            (fderiv ℝ (fun y : EuclideanSpace ℝ (Fin 1) => c * ⟪y, y⟫_ℝ) x) := rfl
-    _ = (InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin 1))).symm
-            (c • fderiv ℝ (fun y : EuclideanSpace ℝ (Fin 1) => ⟪y, y⟫_ℝ) x) := by
-          rw [fderiv_const_mul]; fun_prop
-    _ = c • gradient (fun y : EuclideanSpace ℝ (Fin 1) => ⟪y, y⟫_ℝ) x := by
-          simp only [gradient, map_smul]
-    _ = c • ((2 : ℝ) • x) := by
-          rw [gradient_inner_self]
-    _ = (2 * c) • x := by
-          rw [smul_smul, mul_comm]
+  fun_prop
 
 /-!
 
@@ -438,30 +347,24 @@ position and velocity.
 
 -/
 
-private lemma gradient_add_const' {f : EuclideanSpace ℝ (Fin 1) → ℝ} {c : ℝ}
-    (x : EuclideanSpace ℝ (Fin 1)) :
-    gradient (fun y => f y + c) x = gradient f x := by
-  unfold gradient
-  rw [fderiv_add_const]
-
 lemma gradient_lagrangian_position_eq (t : Time) (x : EuclideanSpace ℝ (Fin 1))
     (v : EuclideanSpace ℝ (Fin 1)) :
     gradient (fun x => lagrangian S t x v) x = - S.k • x := by
   have h_eq : (fun y : EuclideanSpace ℝ (Fin 1) => lagrangian S t y v) =
       fun y => (-(1 / (2 : ℝ)) * S.k) * ⟪y, y⟫_ℝ + (1 / (2 : ℝ) * S.m * ⟪v, v⟫_ℝ) := by
-    funext y; unfold lagrangian potentialEnergy; simp only [smul_eq_mul]; ring
-  rw [h_eq, gradient_add_const', gradient_const_mul_inner_self]
-  ext; simp
+    funext y; simp only [lagrangian_eq]; ring
+  rw [h_eq, gradient_add_const, gradient_const_mul_inner_self]
+  module
 
 lemma gradient_lagrangian_velocity_eq (t : Time) (x : EuclideanSpace ℝ (Fin 1))
     (v : EuclideanSpace ℝ (Fin 1)) :
     gradient (lagrangian S t x) v = S.m • v := by
   have h_eq : (fun y : EuclideanSpace ℝ (Fin 1) => lagrangian S t x y) =
       fun y => ((1 / (2 : ℝ)) * S.m) * ⟪y, y⟫_ℝ + (-(1 / (2 : ℝ)) * S.k * ⟪x, x⟫_ℝ) := by
-    funext y; unfold lagrangian potentialEnergy; simp only [smul_eq_mul]; ring
+    funext y; simp only [lagrangian_eq]; ring
   change gradient (fun y : EuclideanSpace ℝ (Fin 1) => lagrangian S t x y) v = S.m • v
-  rw [h_eq, gradient_add_const', gradient_const_mul_inner_self]
-  ext; simp
+  rw [h_eq, gradient_add_const, gradient_const_mul_inner_self]
+  module
 
 /-!
 
@@ -494,8 +397,7 @@ Basic equalities for the variational derivative of the action.
 lemma gradLagrangian_eq_eulerLagrangeOp (xₜ : Time → EuclideanSpace ℝ (Fin 1))
     (hq : ContDiff ℝ ∞ xₜ) :
     gradLagrangian S xₜ = eulerLagrangeOp S.lagrangian xₜ := by
-  rw [gradLagrangian,
-    ClassicalMechanics.euler_lagrange_varGradient _ _ hq (S.contDiff_lagrangian _)]
+  rw [gradLagrangian, euler_lagrange_varGradient _ _ hq (S.contDiff_lagrangian _)]
 
 /-!
 
@@ -555,18 +457,13 @@ We now show that the force is equal to `- k x`.
 
 /-- The force on the classical harmonic oscillator is `- k x`. -/
 lemma force_eq_linear (x : EuclideanSpace ℝ (Fin 1)) : force S x = - S.k • x := by
-  unfold force potentialEnergy
-  have hpot : (fun y : EuclideanSpace ℝ (Fin 1) => (1 / (2 : ℝ)) • S.k • ⟪y, y⟫_ℝ) =
-      fun y => ((1 / (2 : ℝ)) * S.k) * ⟪y, y⟫_ℝ := by
+  have hpot : potentialEnergy S = fun y : EuclideanSpace ℝ (Fin 1) =>
+      ((1 / (2 : ℝ)) * S.k) * ⟪y, y⟫_ℝ := by
     funext y
-    simp [smul_eq_mul, mul_assoc]
-  rw [hpot]
-  have hgrad : gradient (fun y : EuclideanSpace ℝ (Fin 1) => ((1 / (2 : ℝ)) * S.k) * ⟪y, y⟫_ℝ) x
-      = S.k • x := by
-    simpa [smul_eq_mul, mul_assoc] using
-      (gradient_const_mul_inner_self (c := (1 / (2 : ℝ)) * S.k) x)
-  rw [hgrad]
-  simp [neg_smul]
+    simp [potentialEnergy, mul_assoc]
+  unfold force
+  rw [hpot, gradient_const_mul_inner_self]
+  module
 
 /-!
 
@@ -582,21 +479,8 @@ lemma gradLagrangian_eq_force (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx :
     S.gradLagrangian xₜ = fun t => force S (xₜ t) - S.m • ∂ₜ (∂ₜ xₜ) t := by
   funext t
   rw [gradLagrangian_eq_eulerLagrangeOp S xₜ hx, eulerLagrangeOp]
-  congr
-  · simp [gradient_lagrangian_position_eq, force_eq_linear]
-  · conv_lhs =>
-      arg 1
-      ext t'
-      rw [gradient_lagrangian_velocity_eq]
-    show ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t = S.m • ∂ₜ (∂ₜ xₜ) t
-    have hd : DifferentiableAt ℝ (∂ₜ xₜ) t :=
-      (deriv_differentiable_of_contDiff xₜ hx).differentiableAt
-    calc
-      ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t
-          = fderiv ℝ (fun t' => S.m • ∂ₜ xₜ t') t 1 := rfl
-      _ = S.m • (fderiv ℝ (∂ₜ xₜ) t 1) := by
-          simpa using congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
-      _ = S.m • ∂ₜ (∂ₜ xₜ) t := rfl
+  simp [gradient_lagrangian_position_eq, gradient_lagrangian_velocity_eq, force_eq_linear,
+    Time.deriv_smul _ S.m (deriv_differentiable_of_contDiff xₜ hx)]
 
 /-!
 
@@ -611,10 +495,8 @@ lemma equationOfMotion_iff_newtons_2nd_law (xₜ : Time → EuclideanSpace ℝ (
     S.EquationOfMotion xₜ ↔
     (∀ t, S.m • ∂ₜ (∂ₜ xₜ) t = force S (xₜ t)) := by
   rw [EquationOfMotion, gradLagrangian_eq_force S xₜ hx, funext_iff]
-  simp only [Pi.zero_apply]
-  conv_lhs =>
-    enter [x]
-    rw [sub_eq_zero, eq_comm]
+  simp only [Pi.zero_apply, sub_eq_zero]
+  exact forall_congr' fun t => eq_comm
 
 /-!
 
@@ -639,12 +521,10 @@ the equation of motion.
 lemma energy_conservation_of_equationOfMotion (xₜ : Time → EuclideanSpace ℝ (Fin 1))
     (hx : ContDiff ℝ ∞ xₜ)
     (h : S.EquationOfMotion xₜ) : ∂ₜ (S.energy xₜ) = 0 := by
-  rw [energy_deriv _ _ hx]
   rw [equationOfMotion_iff_newtons_2nd_law _ _ hx] at h
-  funext x
-  simp only [Pi.zero_apply]
-  rw [h]
-  simp [force_eq_linear]
+  funext t
+  rw [energy_deriv _ _ hx]
+  simp [h, force_eq_linear]
 
 /-!
 
@@ -657,19 +537,12 @@ We prove that the energy is constant for any trajectory satisfying the equation 
 lemma energy_conservation_of_equationOfMotion' (xₜ : Time → EuclideanSpace ℝ (Fin 1))
     (hx : ContDiff ℝ ∞ xₜ)
     (h : S.EquationOfMotion xₜ) (t : Time) : S.energy xₜ t = S.energy xₜ 0 := by
-  have h1 := S.energy_conservation_of_equationOfMotion xₜ hx h
-  unfold Time.deriv at h1
-  apply is_const_of_fderiv_eq_zero (𝕜 := ℝ)
-  · exact energy_differentiable S xₜ hx
+  apply is_const_of_fderiv_eq_zero (𝕜 := ℝ) (energy_differentiable S xₜ hx)
   intro t
   ext p
-  simp only [ContinuousLinearMap.zero_apply]
-  have hp : p = p.val • 1 := by ext; simp
-  rw [hp]
-  simp only [map_smul, smul_eq_mul, mul_eq_zero]
-  right
-  rw [funext_iff] at h1
-  simpa using h1 t
+  rw [p.eq_one_smul, map_smul, ← Time.deriv_eq,
+    S.energy_conservation_of_equationOfMotion xₜ hx h]
+  simp
 
 /-!
 
@@ -715,8 +588,8 @@ An simple equality for the canonical momentum.
 
 lemma toCanonicalMomentum_eq (t : Time) (x : EuclideanSpace ℝ (Fin 1))
     (v : EuclideanSpace ℝ (Fin 1)) :
-    toCanonicalMomentum S t x v = S.m • v := by
-  simp [toCanonicalMomentum, gradient_lagrangian_velocity_eq]
+    toCanonicalMomentum S t x v = S.m • v :=
+  gradient_lagrangian_velocity_eq S t x v
 
 /-!
 
@@ -743,14 +616,12 @@ We prove a simple equality for the Hamiltonian, to help in computations.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma hamiltonian_eq :
     hamiltonian S = fun _ p x => (1 / (2 : ℝ)) * (1 / S.m) * ⟪p, p⟫_ℝ +
       (1 / (2 : ℝ)) * S.k * ⟪x, x⟫_ℝ := by
   funext t x p
   simp only [hamiltonian, toCanonicalMomentum, lagrangian_eq, one_div, LinearEquiv.coe_symm_mk',
     inner_smul_right, inner_smul_left, map_inv₀, ringHom_apply]
-  have hm : S.m ≠ 0 := by exact m_ne_zero S
   field_simp
   ring
 
@@ -765,19 +636,7 @@ We show that the Hamiltonian is smooth in all its arguments.
 @[fun_prop]
 lemma hamiltonian_contDiff (n : WithTop ℕ∞) : ContDiff ℝ n ↿S.hamiltonian := by
   rw [hamiltonian_eq]
-  apply ContDiff.add
-  · apply ContDiff.mul
-    · apply ContDiff.mul
-      · exact contDiff_const
-      · exact contDiff_const
-    · exact ContDiff.inner (𝕜 := ℝ) (contDiff_fst.comp contDiff_snd)
-        (contDiff_fst.comp contDiff_snd)
-  · apply ContDiff.mul
-    · apply ContDiff.mul
-      · exact contDiff_const
-      · exact contDiff_const
-    · exact ContDiff.inner (𝕜 := ℝ) (contDiff_snd.comp contDiff_snd)
-        (contDiff_snd.comp contDiff_snd)
+  fun_prop
 
 /-!
 
@@ -787,41 +646,30 @@ We now write down the gradients of the Hamiltonian with respect to the momentum 
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradient_hamiltonian_position_eq (t : Time) (x : EuclideanSpace ℝ (Fin 1))
     (p : EuclideanSpace ℝ (Fin 1)) :
     gradient (hamiltonian S t p) x = S.k • x := by
   have h_eq : (fun y : EuclideanSpace ℝ (Fin 1) => hamiltonian S t p y) =
       fun y => ((1 / (2 : ℝ)) * S.k) * ⟪y, y⟫_ℝ +
         ((1 / (2 : ℝ)) * (1 / S.m) * ⟪p, p⟫_ℝ) := by
-    funext y; unfold hamiltonian; simp only [toCanonicalMomentum, lagrangian, one_div,
-      inner_self_eq_norm_sq_to_K, ringHom_apply, potentialEnergy, smul_eq_mul,
-      LinearEquiv.coe_symm_mk', inner_smul_right, norm_smul, norm_inv, norm_eq_abs]
-    have hm : S.m ≠ 0 := m_ne_zero S
-    field_simp
-    ring_nf
-    simp [mul_two]
+    funext y
+    simp only [hamiltonian_eq]
+    ring
   change gradient (fun y : EuclideanSpace ℝ (Fin 1) => hamiltonian S t p y) x = S.k • x
-  rw [h_eq, gradient_add_const', gradient_const_mul_inner_self]
-  ext; simp
+  rw [h_eq, gradient_add_const, gradient_const_mul_inner_self]
+  module
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradient_hamiltonian_momentum_eq (t : Time) (x : EuclideanSpace ℝ (Fin 1))
     (p : EuclideanSpace ℝ (Fin 1)) :
     gradient (hamiltonian S t · x) p = (1 / S.m) • p := by
   have h_eq : (fun y : EuclideanSpace ℝ (Fin 1) => hamiltonian S t y x) =
       fun y => ((1 / (2 : ℝ)) * (1 / S.m)) * ⟪y, y⟫_ℝ +
         ((1 / (2 : ℝ)) * S.k * ⟪x, x⟫_ℝ) := by
-    funext y; unfold hamiltonian; simp only [toCanonicalMomentum, lagrangian, one_div,
-      inner_self_eq_norm_sq_to_K, ringHom_apply, potentialEnergy, smul_eq_mul,
-      LinearEquiv.coe_symm_mk', inner_smul_right, norm_smul, norm_inv, norm_eq_abs]
-    have hm : S.m ≠ 0 := m_ne_zero S
-    field_simp
-    ring_nf
-    simp [mul_two]
+    funext y
+    simp only [hamiltonian_eq]
   change gradient (fun y : EuclideanSpace ℝ (Fin 1) => hamiltonian S t y x) p = (1 / S.m) • p
-  rw [h_eq, gradient_add_const', gradient_const_mul_inner_self]
-  ext; simp
+  rw [h_eq, gradient_add_const, gradient_const_mul_inner_self]
+  module
 
 /-!
 
@@ -832,21 +680,13 @@ This is independent of whether the trajectory satisfies the equations of motion 
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma hamiltonian_eq_energy (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
     (fun t => hamiltonian S t (toCanonicalMomentum S t (xₜ t) (∂ₜ xₜ t)) (xₜ t)) = energy S xₜ := by
   funext t
-  have hsymm :
-      (toCanonicalMomentum S t (xₜ t)).symm (S.m • ∂ₜ xₜ t) = ∂ₜ xₜ t := by
-    rw [← toCanonicalMomentum_eq (S := S) (t := t) (x := xₜ t) (v := ∂ₜ xₜ t)]
-    exact LinearEquiv.symm_apply_apply (toCanonicalMomentum S t (xₜ t)) (∂ₜ xₜ t)
-  unfold hamiltonian lagrangian energy kineticEnergy potentialEnergy
-  simp only [toCanonicalMomentum_eq, inner_smul_left, one_div, smul_eq_mul]
-  rw [hsymm]
-  ring_nf
-  simp only [ringHom_apply, inner_self_eq_norm_sq_to_K, one_div, add_left_inj]
+  rw [hamiltonian_eq]
+  unfold energy kineticEnergy potentialEnergy
+  simp only [toCanonicalMomentum_eq, inner_smul_left, inner_smul_right, smul_eq_mul, ringHom_apply]
   field_simp
-  ring
 
 /-!
 
@@ -878,17 +718,7 @@ lemma equationOfMotion_iff_hamiltonEqOp_eq_zero (xₜ : Time → EuclideanSpace 
   rw [hamiltonEqOp, hamiltonEqOp_eq_zero_iff_hamiltons_equations]
   simp [toCanonicalMomentum_eq, gradient_hamiltonian_momentum_eq, gradient_hamiltonian_position_eq]
   rw [equationOfMotion_iff_newtons_2nd_law _ _ hx]
-  have hderiv_smul : ∀ t, ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t = S.m • ∂ₜ (∂ₜ xₜ) t := by
-    intro t
-    have hd : DifferentiableAt ℝ (∂ₜ xₜ) t :=
-      (deriv_differentiable_of_contDiff xₜ hx).differentiableAt
-    calc
-      ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t
-          = fderiv ℝ (fun t' => S.m • ∂ₜ xₜ t') t 1 := rfl
-      _ = S.m • (fderiv ℝ (∂ₜ xₜ) t 1) := by
-          simpa using congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
-      _ = S.m • ∂ₜ (∂ₜ xₜ) t := rfl
-  simp [hderiv_smul, force_eq_linear]
+  simp [Time.deriv_smul _ S.m (deriv_differentiable_of_contDiff xₜ hx), force_eq_linear]
 
 /-!
 

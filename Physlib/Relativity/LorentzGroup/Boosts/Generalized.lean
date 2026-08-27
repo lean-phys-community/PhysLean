@@ -49,7 +49,7 @@ def genBoostAux₁ (u v : Velocity d) : Vector d →ₗ[ℝ] Vector d where
     simp [map_add, mul_add, _root_.add_smul]
   map_smul' c x := by
     simp only [map_smul, RingHom.id_apply, smul_smul]
-    dsimp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+    simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
     congr 1
     ring
 
@@ -61,29 +61,19 @@ def genBoostAux₂ (u v : Velocity d) : Vector d →ₗ[ℝ] Vector d where
     apply congrFun (congrArg _ _)
     have hx := Velocity.one_add_minkowskiProduct_ne_zero u v
     field_simp [add_tmul]
-    simp only [map_add, ContinuousLinearMap.add_apply, neg_add_rev]
+    simp only [map_add, add_apply, neg_add_rev]
     ring
   map_smul' c x := by
     rw [map_smul]
-    dsimp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+    simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
     rw [smul_smul, mul_div_assoc, neg_mul_eq_mul_neg]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma genBoostAux₂_self (u : Velocity d) : genBoostAux₂ u u = - genBoostAux₁ u u := by
   ext1 x
-  simp only [genBoostAux₂, LinearMap.coe_mk, AddHom.coe_mk, genBoostAux₁, LinearMap.neg_apply]
-  rw [_root_.neg_smul]
-  apply congrArg
-  conv => lhs; rhs; rw [← (two_smul ℝ u.val)]
-  rw [smul_smul]
-  congr 1
-  rw [Velocity.minkowskiProduct_self_eq_one u]
-  conv => lhs; lhs; rhs; rhs; change 1
-  rw [show 1 + (1 : ℝ) = (2 : ℝ) by ring]
-  simp only [isUnit_iff_ne_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-    IsUnit.div_mul_cancel]
-  rw [← (two_smul ℝ u.1)]
-  simp only [map_smul, smul_eq_mul]
+  simp only [genBoostAux₂, LinearMap.coe_mk, AddHom.coe_mk, genBoostAux₁, LinearMap.neg_apply,
+    map_add, Velocity.minkowskiProduct_self_eq_one]
+  match_scalars
+  ring
 
 open minkowskiMatrix
 
@@ -118,29 +108,35 @@ lemma genBoostAux₂_basis_minkowskiProduct (u v : Velocity d) (μ ν : Fin 1 �
   rw [genBoostAux₂_apply_basis, genBoostAux₂_apply_basis]
   rw [map_smul, map_smul]
   have h1 : ⟪u.1 + v.1, u.1 + v.1⟫ₘ = 2 * (1 + ⟪u.1, v.1⟫ₘ) := by
-    simp only [map_add, ContinuousLinearMap.add_apply, Velocity.minkowskiProduct_self_eq_one]
+    simp only [map_add, add_apply, Velocity.minkowskiProduct_self_eq_one]
     rw [minkowskiProduct_symm]
     ring
   dsimp
-  rw [h1]
   have h2 : (1 + ⟪u.1, v.1⟫ₘ) ≠ 0 := by
     exact Velocity.one_add_minkowskiProduct_ne_zero u v
   field_simp [h2]
+  have h2 : (minkowskiProduct ↑v) u.1  = ⟪u.1, v.1⟫ₘ := by rw [minkowskiProduct_symm]
+  simp only [map_add, _root_.smul_add, _root_.neg_smul, add_apply, _root_.neg_apply, smul_apply,
+    Velocity.minkowskiProduct_self_eq_one, smul_eq_mul, h2]
+  field_simp
+  ring
 
 lemma genBoostAux₁_basis_genBoostAux₂_minkowskiProduct (u v : Velocity d) (μ ν : Fin 1 ⊕ Fin d) :
     ⟪genBoostAux₁ u v (Vector.basis μ), genBoostAux₂ u v (Vector.basis ν)⟫ₘ =
     - 2 * η μ μ * η ν ν * u.1 μ * (u.1 ν + v.1 ν) := by
   rw [genBoostAux₁_apply_basis, genBoostAux₂_apply_basis]
   rw [map_smul, map_smul]
-  have h1 : ⟪ v.1, u.1 + v.1⟫ₘ = (1 + ⟪u.1, v.1⟫ₘ) := by
+  have h1 : ⟪v.1, u.1 + v.1⟫ₘ = (1 + ⟪u.1, v.1⟫ₘ) := by
     simp only [map_add, Velocity.minkowskiProduct_self_eq_one]
     rw [minkowskiProduct_symm]
     ring
-  dsimp
-  rw [h1]
+  simp only [smul_apply, map_add, Velocity.minkowskiProduct_self_eq_one, smul_eq_mul, neg_mul,
+    neg_inj]
   have h2 : (1 + ⟪u.1, v.1⟫ₘ) ≠ 0 := by
     exact Velocity.one_add_minkowskiProduct_ne_zero u v
   field_simp [h2]
+  rw [minkowskiProduct_symm]
+  ring
 
 lemma genBoostAux₂_toMatrix_apply (u v : Velocity d) (μ ν : Fin 1 ⊕ Fin d) :
     (LinearMap.toMatrix Vector.basis Vector.basis (genBoostAux₂ u v)) μ ν =
@@ -161,7 +157,7 @@ lemma genBoostAux₁_add_genBoostAux₂_minkowskiProduct (u v : Velocity d) (μ 
       + (u.1 μ + v.1 μ) * (u.1 ν + v.1 ν) * (1 + ⟪u, v.1⟫ₘ)⁻¹ +
       2 * u.1 μ * u.1 ν) := by
   conv_lhs =>
-    simp only [map_add, ContinuousLinearMap.add_apply]
+    simp only [map_add, add_apply]
     rw [genBoostAux₁_basis_minkowskiProduct, genBoostAux₂_basis_minkowskiProduct,
       genBoostAux₁_basis_genBoostAux₂_minkowskiProduct,
       minkowskiProduct_symm,
@@ -200,14 +196,14 @@ def generalizedBoost (u v : Velocity d) : LorentzGroup d :=
   trans ⟪(basis μ) + (genBoostAux₁ u v (basis μ) + genBoostAux₂ u v (basis μ)),
     (basis ν) + (genBoostAux₁ u v (basis ν) + genBoostAux₂ u v (basis ν))⟫ₘ
   · simp only [LinearMap.add_apply, LinearMap.id_coe, id_eq, map_add,
-    ContinuousLinearMap.add_apply, minkowskiProduct_basis_right, basis_apply, mul_ite, mul_one,
+    add_apply, minkowskiProduct_basis_right, basis_apply, mul_ite, mul_one,
     MulZeroClass.mul_zero, minkowskiProduct_basis_left]
     ring
   rw [map_add]
   conv_lhs =>
     enter [1]
     rw [map_add]
-    dsimp
+    simp only [add_apply]
     enter [2]
     rw [minkowskiProduct_symm, basis_minkowskiProduct_genBoostAux₁_add_genBoostAux₂]
   conv_lhs =>
@@ -215,11 +211,12 @@ def generalizedBoost (u v : Velocity d) : LorentzGroup d :=
     rw [map_add]
   conv_lhs =>
     enter [2]
-    dsimp
+    simp only [add_apply]
     rw [basis_minkowskiProduct_genBoostAux₁_add_genBoostAux₂,
       genBoostAux₁_add_genBoostAux₂_minkowskiProduct]
   ring⟩
 
+set_option backward.isDefEq.respectTransparency false in
 lemma generalizedBoost_apply (u v : Velocity d) (x : Vector d) :
     generalizedBoost u v • x = x + genBoostAux₁ u v x + genBoostAux₂ u v x:= by
   rw [smul_eq_mulVec]
@@ -255,42 +252,28 @@ lemma generalizedBoost_apply_mul_one_plus_contr (u v : Velocity d) (x : Vector d
 lemma generalizedBoost_apply_expand (u v : Velocity d) (x : Vector d) :
     generalizedBoost u v • x = x + (2 * ⟪x, u⟫ₘ) • v.1 -
       (⟪x, u + v⟫ₘ / (1 + ⟪u, v.1⟫ₘ)) • (u.1 + v.1) := by
-  apply (smul_right_inj (Velocity.one_add_minkowskiProduct_ne_zero u v)).mp
+  have h := Velocity.one_add_minkowskiProduct_ne_zero u v
+  apply (smul_right_inj h).mp
   rw [generalizedBoost_apply_mul_one_plus_contr]
-  conv_rhs =>
-    rw [_root_.smul_sub, _root_.smul_add, smul_smul, smul_smul]
-  congr 1
-  · ring_nf
-  · congr
-    have := (Velocity.one_add_minkowskiProduct_ne_zero u v)
-    field_simp
+  match_scalars <;> field_simp
 
 @[simp]
 lemma generalizedBoost_apply_fst (u v : Velocity d) :
     generalizedBoost u v • u.1 = v.1 := by
   apply (smul_right_inj (Velocity.one_add_minkowskiProduct_ne_zero u v)).mp
   rw [generalizedBoost_apply_mul_one_plus_contr]
-  simp only [Velocity.minkowskiProduct_self_eq_one, mul_one, map_add]
-  simp only [_root_.smul_add, add_sub_add_left_eq_sub]
-  rw [← _root_.sub_smul]
-  congr
-  ring
+  simp only [Velocity.minkowskiProduct_self_eq_one, map_add]
+  match_scalars <;> ring
 
 @[simp]
 lemma generalizedBoost_apply_snd (u v : Velocity d) :
     generalizedBoost u v • v.1 = (2 * ⟪u, v.1⟫ₘ) • ↑v - ↑u:= by
   apply (smul_right_inj (Velocity.one_add_minkowskiProduct_ne_zero u v)).mp
   rw [generalizedBoost_apply_mul_one_plus_contr]
-  simp only [map_add, Velocity.minkowskiProduct_self_eq_one, _root_.smul_add]
-  repeat rw [minkowskiProduct_symm v.1 u.1]
-  abel_nf
-  rw [_root_.smul_add, smul_smul]
-  congr 1
-  · congr 1
-    ring
-  · rw [smul_comm]
+  simp only [map_add, Velocity.minkowskiProduct_self_eq_one,
+    minkowskiProduct_symm v.1 u.1]
+  match_scalars <;> ring
 
-set_option backward.isDefEq.respectTransparency false in
 /-- This lemma states that for a given four-velocity `u`, the general boost
   transformation `genBoost u u` is equal to the identity linear map `LinearMap.id`.
 -/
@@ -305,11 +288,7 @@ lemma genearlizedBoost_apply_basis (u v : Velocity d) (μ : Fin 1 ⊕ Fin d) :
     Vector.basis μ + (2 * η μ μ * u.1 μ) • v - (η μ μ * (u.1 μ + v.1 μ)
       / (1 + ⟪u.1, v.1⟫ₘ)) • (u.1 + v.1) := by
   rw [generalizedBoost_apply, genBoostAux₁_apply_basis, genBoostAux₂_apply_basis]
-  funext i
-  simp only [_root_.smul_add, _root_.neg_smul, apply_add, basis_apply, apply_smul, neg_apply,
-    apply_sub]
-  congr 1
-  ring
+  module
 
 lemma generalizedBoost_apply_eq_minkowskiProduct (u v : Velocity d) (μ ν : Fin 1 ⊕ Fin d) :
     (generalizedBoost u v).1 μ ν = η μ μ * (⟪Vector.basis μ, Vector.basis ν⟫ₘ + 2 *
@@ -349,32 +328,22 @@ lemma generalizedBoost_apply_eq_toCoord (u v : Velocity d) (μ ν : Fin 1 ⊕ Fi
     simp only [neg_add_rev]
     ring_nf
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma generalizedBoost_continuous_snd (u : Velocity d) : Continuous (generalizedBoost u) := by
   have : Continuous (fun v => (generalizedBoost u v).1) := by
     refine continuous_matrix ?_
     intro i j
     simp only [generalizedBoost_apply_eq_minkowskiProduct]
-    refine (continuous_const_mul (η i i)).comp' (?_)
-    refine Continuous.sub (by fun_prop) (?_)
-    refine .mul (by fun_prop) ?_
-    · refine .inv₀ (by fun_prop) ?_
-      exact fun x => Velocity.one_add_minkowskiProduct_ne_zero u x
+    fun_prop (disch := exact fun x => Velocity.one_add_minkowskiProduct_ne_zero u x)
   refine Continuous.subtype_mk this _
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma generalizedBoost_continuous_fst (u : Velocity d) : Continuous (generalizedBoost · u) := by
   have : Continuous (fun v => (generalizedBoost v u).1) := by
     refine continuous_matrix ?_
     intro i j
     simp only [generalizedBoost_apply_eq_minkowskiProduct]
-    refine (continuous_const_mul (η i i)).comp' (?_)
-    refine Continuous.sub (by fun_prop) (?_)
-    refine .mul (by fun_prop) ?_
-    · refine .inv₀ (by fun_prop) ?_
-      exact fun x => Velocity.one_add_minkowskiProduct_ne_zero _ _
+    fun_prop (disch := exact fun x => Velocity.one_add_minkowskiProduct_ne_zero x u)
   refine Continuous.subtype_mk this _
 
 lemma id_joined_generalizedBoost (u v : Velocity d) : Joined 1 (generalizedBoost u v) := by
@@ -403,61 +372,17 @@ lemma generalizedBoost_mem_restricted (u v : Velocity d) :
   · exact generalizedBoost_isProper u v
   · exact generalizedBoost_isOrthochronous u v
 
-set_option backward.isDefEq.respectTransparency false in
 lemma generalizedBoost_inv (u v : Velocity d) :
     (generalizedBoost u v)⁻¹ = generalizedBoost v u := by
   rw [← mul_eq_one_iff_inv_eq']
   apply LorentzGroup.eq_of_action_vector_eq
   intro p
-  apply (smul_right_inj (Velocity.one_add_minkowskiProduct_ne_zero v u)).mp
+  have h1 := Velocity.one_add_minkowskiProduct_ne_zero u v
   rw [SemigroupAction.mul_smul]
-  rw [generalizedBoost_apply_mul_one_plus_contr]
-  conv_lhs =>
-    enter [1, 1]
-    rw [minkowskiProduct_symm, generalizedBoost_apply_mul_one_plus_contr]
-  trans (1 + ⟪u.1, v.1⟫ₘ) • p + ((2 * ⟪p, u.1⟫ₘ * (1 + ⟪u.1, v.1⟫ₘ)) • v.1 -
-      ⟪p, u.1 + v.1⟫ₘ • (u.1 + v.1) +
-      (2 * ⟪generalizedBoost u v • p, v.1⟫ₘ * (1 + ⟪v.1, u.1⟫ₘ)) • u.1 -
-      ⟪generalizedBoost u v • p, v.1 + u.1⟫ₘ • (v.1 + u.1))
-  · abel
-  trans (1 + ⟪u.1, v.1⟫ₘ) • p + ((2 * ⟪p, u.1⟫ₘ * (1 + ⟪u.1, v.1⟫ₘ) - ⟪p, u.1 + v.1⟫ₘ) • v.1 +
-      (2 * ⟪generalizedBoost u v • p, v.1⟫ₘ * (1 + ⟪v.1, u.1⟫ₘ) - ⟪p, u.1 + v.1⟫ₘ) • u.1 -
-      ⟪generalizedBoost u v • p, v.1 + u.1⟫ₘ • (v.1 + u.1))
-  · rw [sub_smul, sub_smul, _root_.smul_add]
-    abel_nf
-  trans (1 + ⟪u.1, v.1⟫ₘ) • p + ((2 * ⟪p, u.1⟫ₘ * (1 + ⟪u.1, v.1⟫ₘ) - ⟪p, u.1 + v.1⟫ₘ
-      - ⟪generalizedBoost u v • p, v.1 + u.1⟫ₘ) • v.1 +
-      (2 * ⟪generalizedBoost u v • p, v.1⟫ₘ * (1 + ⟪v.1, u.1⟫ₘ) - ⟪p, u.1 + v.1⟫ₘ
-      - ⟪generalizedBoost u v • p, v.1 + u.1⟫ₘ) • u.1)
-  · conv_rhs =>
-      rw [sub_smul]
-      enter [2, 2]
-      rw [sub_smul]
-    rw [_root_.smul_add]
-    abel
-  trans (1 + ⟪u.1, v.1⟫ₘ) • p + ((0 : ℝ) • v.1 + (0 : ℝ) • u.1)
-  · have h1 := Velocity.one_add_minkowskiProduct_ne_zero u v
-    congr 1
-    congr 1
-    · congr 1
-      rw [generalizedBoost_apply_expand u v]
-      simp only [map_add, _root_.smul_add, map_sub, map_smul, ContinuousLinearMap.coe_sub',
-        Pi.sub_apply, ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_smul', Pi.smul_apply,
-        Velocity.minkowskiProduct_self_eq_one, smul_eq_mul, mul_one]
-      field_simp [h1]
-      rw [minkowskiProduct_symm v.1 u.1]
-      ring
-    · congr 1
-      rw [generalizedBoost_apply_expand u v]
-      simp only [map_add, _root_.smul_add, map_sub, map_smul, ContinuousLinearMap.coe_sub',
-        Pi.sub_apply, ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_smul', Pi.smul_apply,
-        Velocity.minkowskiProduct_self_eq_one, smul_eq_mul, mul_one]
-      field_simp [h1]
-      rw [minkowskiProduct_symm v.1 u.1]
-      ring
-  trans (1 + ⟪u.1, v.1⟫ₘ) • p
-  · simp
-  simp [minkowskiProduct_symm]
+  simp only [generalizedBoost_apply_expand, map_add, map_sub, map_smul, add_apply, sub_apply,
+    smul_apply, smul_eq_mul, Velocity.minkowskiProduct_self_eq_one, one_smul,
+    minkowskiProduct_symm v.1 u.1]
+  match_scalars <;> field_simp <;> ring
 
 /-- The time component of a generalised boost.
 

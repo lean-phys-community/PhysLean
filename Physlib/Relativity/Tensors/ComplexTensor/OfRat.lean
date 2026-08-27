@@ -16,12 +16,11 @@ public import Physlib.Relativity.Tensors.Dual
 
 @[expose] public section
 
-open Module IndexNotation
+open Module
 open CategoryTheory
 open MonoidalCategory
 
 namespace complexLorentzTensor
-open OverColor
 open Physlib.RatComplexNum
 open Physlib
 
@@ -68,38 +67,42 @@ lemma basis_eq_ofRat {n : ℕ} {c : Fin n → complexLorentzTensor.Color}
   simp only [Rat.cast_one, Rat.cast_zero, zero_mul, add_zero]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contr_basis_ratComplexNum {c : complexLorentzTensor.Color}
     (i : Fin (complexLorentzTensor.repDim c))
     (j : Fin (complexLorentzTensor.repDim (complexLorentzTensor.τ c))) :
-    complexLorentzTensor.castToField
-      ((complexLorentzTensor.contr.app (Discrete.mk c)).hom
+      ((complexLorentzTensor.contr c)
       (complexLorentzTensor.basis c i ⊗ₜ
       complexLorentzTensor.basis (complexLorentzTensor.τ c) j))
       = toComplexNum (if i.val = j.val then 1 else 0) := by
   match c with
   | Color.upL =>
-    change Fermion.leftAltContraction.hom (Fermion.leftBasis i ⊗ₜ Fermion.altLeftBasis j) = _
-    rw [Fermion.leftAltContraction_basis]
+    change Fermion.leftDualContraction
+      (Fermion.LeftHandedWeyl.basis i ⊗ₜ Fermion.DualLeftHandedWeyl.basis j) = _
+    rw [Fermion.leftDualContraction_basis]
     simp
   | Color.downL =>
-    change Fermion.altLeftContraction.hom (Fermion.altLeftBasis i ⊗ₜ Fermion.leftBasis j) = _
-    rw [Fermion.altLeftContraction_basis]
+    change Fermion.dualLeftContraction
+      (Fermion.DualLeftHandedWeyl.basis i ⊗ₜ Fermion.LeftHandedWeyl.basis j) = _
+    rw [Fermion.dualLeftContraction_basis]
     simp
   | Color.upR =>
-    change Fermion.rightAltContraction.hom (Fermion.rightBasis i ⊗ₜ Fermion.altRightBasis j) = _
-    rw [Fermion.rightAltContraction_basis]
+    change Fermion.rightDualContraction
+      (Fermion.RightHandedWeyl.basis i ⊗ₜ Fermion.DualRightHandedWeyl.basis j) = _
+    rw [Fermion.rightDualContraction_basis]
     simp
   | Color.downR =>
-    change Fermion.rightAltContraction.hom (Fermion.rightBasis i ⊗ₜ Fermion.altRightBasis j) = _
-    rw [Fermion.rightAltContraction_basis]
+    change Fermion.rightDualContraction
+      (Fermion.RightHandedWeyl.basis i ⊗ₜ Fermion.DualRightHandedWeyl.basis j) = _
+    rw [Fermion.rightDualContraction_basis]
     simp
   | Color.up =>
-    change Lorentz.contrCoContraction.hom
+    change Lorentz.contrCoContraction
       (Lorentz.complexContrBasisFin4 i ⊗ₜ Lorentz.complexCoBasisFin4 j) = _
     rw [Lorentz.contrCoContraction_basis]
     simp
   | Color.down =>
-    change Lorentz.contrCoContraction.hom
+    change Lorentz.contrCoContraction
       (Lorentz.complexContrBasisFin4 i ⊗ₜ Lorentz.complexCoBasisFin4 j) = _
     rw [Lorentz.contrCoContraction_basis]
     simp
@@ -118,7 +121,6 @@ lemma prodT_ofRat_ofRat {n n1 : ℕ} {c : Fin n → complexLorentzTensor.Color}
   rw [prodT_basis_repr_apply]
   simp only [ofRat_basis_repr_apply, map_mul]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contrT_ofRat_eq_sum_dropPairSection {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.Color}
     {i j : Fin (n + 1 + 1)} {h : i ≠ j ∧ complexLorentzTensor.τ (c i) = c j }
     (f : (ComponentIdx c) → RatComplexNum) :
@@ -136,16 +138,17 @@ lemma contrT_ofRat_eq_sum_dropPairSection {n : ℕ} {c : Fin (n + 1 + 1) → com
     mul_zero, Function.comp_apply]
     rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
   rw [← map_sum Physlib.RatComplexNum.toComplexNum]
-  erw [ofRat_basis_repr_apply]
+  rw [ofRat_basis_repr_apply]
+  simp [basisIdxCongr_eq_cast]
 
 open ComponentIdx
-set_option backward.isDefEq.respectTransparency false in
 lemma contrT_ofRat {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.Color}
     {i j : Fin (n + 1 + 1)} {h : i ≠ j ∧ complexLorentzTensor.τ (c i) = c j }
     (f : (ComponentIdx c) → RatComplexNum) :
   (contrT n i j h (ofRat f)) = ((ofRat (fun b =>
     (∑ x : Fin (complexLorentzTensor.repDim (c i)),
-      f (DropPairSection.ofFinEquiv h.1 b (x, Fin.cast (by simp [← h.2]) x)))))) := by
+      f (DropPairSection.ofFinEquiv h.1 b (x, Fin.cast (by
+        simp [← h.2, complexLorentzTensor.repDim_tau]) x)))))) := by
   rw [contrT_ofRat_eq_sum_dropPairSection]
   congr
   funext b
@@ -153,7 +156,7 @@ lemma contrT_ofRat {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.Color
   rw [Fintype.sum_prod_type]
   congr
   funext x
-  rw [Finset.sum_eq_single (Fin.cast (by simp [← h.2]) x)]
+  rw [Finset.sum_eq_single (Fin.cast (by simp [← h.2, repDim_tau]) x)]
   · simp
   · intro y _ hy
     rw [if_neg]
@@ -166,13 +169,16 @@ lemma contrT_ofRat {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.Color
 
 lemma permT_ofRat {n m : ℕ} {c : Fin n → complexLorentzTensor.Color}
     {c1 : Fin m → complexLorentzTensor.Color}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ)
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ)
     (f : ComponentIdx c → RatComplexNum) :
     (permT σ h ((ofRat f))) =
-    ((ofRat (fun b => f (fun i => Fin.cast (by simp [PermCond.inv_perserve_color])
+    ((ofRat (fun b => f (fun i => Fin.cast (by simp [IsReindexing.inv_perserve_color])
       (b (h.inv σ i)))))) := by
   apply (Tensor.basis _).repr.injective
   ext b
   simp only [permT_basis_repr_symm_apply, ofRat_basis_repr_apply]
+  congr
+  ext i
+  simp [basisIdxCongr_eq_cast]
 
 end complexLorentzTensor

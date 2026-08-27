@@ -7,17 +7,25 @@ module
 
 /-!
 
-# Condensed Matter
+# A. Condensed matter
 
-This directory is currently a place holder.
-Please feel free to contribute!
+Condensed matter physics studies the collective behavior of matter, from crystalline structure
+and lattice models to interacting phases, topology, and material response.
 
-Some directories which are NOT currently place holders are:
-- Mathematics
-- Meta
-- Particles
-- QFT
-- Quantum Mechanics
-- Relativity
+## A.1. Scope
 
--/@[expose] public section
+- `Crystal` covers crystal structures, reciprocal-space descriptions, symmetries, and dynamics.
+- `LatticeModels` covers Hamiltonian models whose degrees of freedom live on lattices.
+- `BandTheory` covers Bloch descriptions, energy bands, gaps, and band geometry.
+- `ManyBody` covers correlations, quasiparticles, Green functions, and interacting matter.
+- `Topology` covers topological phases and invariants in condensed matter systems.
+- `Response` covers transport and the linear, optical, and nonlinear response of materials.
+
+## A.2. Existing modules
+
+Existing condensed-matter modules currently include `TightBindingChain` and `Thermoelectric`.
+They remain in their existing locations and have not been reorganized into the scopes above.
+
+-/
+
+@[expose] public section

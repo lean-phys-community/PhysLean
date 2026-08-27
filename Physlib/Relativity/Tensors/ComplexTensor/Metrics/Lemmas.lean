@@ -14,16 +14,11 @@ public import Physlib.Relativity.Tensors.ComplexTensor.Units.Basic
 -/
 
 @[expose] public section
-open IndexNotation
-open CategoryTheory
-open MonoidalCategory
+
 open Matrix
 open MatrixGroups
 open Complex
 open TensorProduct
-open IndexNotation
-open CategoryTheory
-open OverColor.Discrete
 noncomputable section
 
 namespace complexLorentzTensor
@@ -39,7 +34,6 @@ open Tensor
 lemma coMetric_symm : {η' | μ ν = η' | ν μ}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [Tensorial.self_toTensor_apply]
   rw [permT_basis_repr_symm_apply]
   rw [coMetric_eq_ofRat, ofRat_basis_repr_apply, ofRat_basis_repr_apply]
   congr 1
@@ -50,7 +44,6 @@ lemma coMetric_symm : {η' | μ ν = η' | ν μ}ᵀ := by
 lemma contrMetric_symm : {η | μ ν = η | ν μ}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [Tensorial.self_toTensor_apply]
   rw [permT_basis_repr_symm_apply]
   rw [contrMetric_eq_ofRat, ofRat_basis_repr_apply, ofRat_basis_repr_apply]
   congr 1
@@ -61,7 +54,6 @@ lemma contrMetric_symm : {η | μ ν = η | ν μ}ᵀ := by
 lemma leftMetric_antisymm : {εL | α α' = - (εL| α' α)}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [Tensorial.self_toTensor_apply]
   rw [permT_basis_repr_symm_apply]
   rw [leftMetric_eq_ofRat, ofRat_basis_repr_apply, ← map_neg, ofRat_basis_repr_apply]
   congr 1
@@ -72,31 +64,28 @@ lemma leftMetric_antisymm : {εL | α α' = - (εL| α' α)}ᵀ := by
 lemma rightMetric_antisymm : {εR | β β' = - (εR| β' β)}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [Tensorial.self_toTensor_apply]
   rw [permT_basis_repr_symm_apply]
   rw [rightMetric_eq_ofRat, ofRat_basis_repr_apply, ← map_neg, ofRat_basis_repr_apply]
   congr 1
   revert b
   decide
 
-/-- The alt-left metric is antisymmetric `{εL' | α α' = - εL' | α' α}ᵀ`. -/
-lemma altLeftMetric_antisymm : {εL' | α α' = - (εL' | α' α)}ᵀ := by
+/-- The dual-left metric is antisymmetric `{εL' | α α' = - εL' | α' α}ᵀ`. -/
+lemma dualLeftMetric_antisymm : {εL' | α α' = - (εL' | α' α)}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [Tensorial.self_toTensor_apply]
   rw [permT_basis_repr_symm_apply]
-  rw [altLeftMetric_eq_ofRat, ofRat_basis_repr_apply, ← map_neg, ofRat_basis_repr_apply]
+  rw [dualLeftMetric_eq_ofRat, ofRat_basis_repr_apply, ← map_neg, ofRat_basis_repr_apply]
   congr 1
   revert b
   decide
 
-/-- The alt-right metric is antisymmetric `{εR' | β β' = - εR' | β' β}ᵀ`. -/
-lemma altRightMetric_antisymm : {εR' | α α' = - (εR' | α' α)}ᵀ := by
+/-- The dual-right metric is antisymmetric `{εR' | β β' = - εR' | β' β}ᵀ`. -/
+lemma dualRightMetric_antisymm : {εR' | α α' = - (εR' | α' α)}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [Tensorial.self_toTensor_apply]
   rw [permT_basis_repr_symm_apply]
-  rw [altRightMetric_eq_ofRat, ofRat_basis_repr_apply, ← map_neg, ofRat_basis_repr_apply]
+  rw [dualRightMetric_eq_ofRat, ofRat_basis_repr_apply, ← map_neg, ofRat_basis_repr_apply]
   congr 1
   revert b
   decide
@@ -119,28 +108,28 @@ lemma coMetric_contr_contrMetric : {η' | μ ρ ⊗ η | ρ ν = δ' | μ ν}ᵀ
 lemma contrMetric_contr_coMetric : {η | μ ρ ⊗ η' | ρ ν = δ | μ ν}ᵀ := by
   exact contrT_metricTensor_metricTensor_eq_dual_unit
 
-/-- The contraction of the left metric with the alt-left metric is the unit
+/-- The contraction of the left metric with the dual-left metric is the unit
 `{εL | α β ⊗ εL' | β γ = δL | α γ}ᵀ`.
 -/
-lemma leftMetric_contr_altLeftMetric : {εL | α β ⊗ εL' | β γ = δL | α γ}ᵀ := by
+lemma leftMetric_contr_dualLeftMetric : {εL | α β ⊗ εL' | β γ = δL | α γ}ᵀ := by
   exact contrT_metricTensor_metricTensor_eq_dual_unit
 
-/-- The contraction of the right metric with the alt-right metric is the unit
+/-- The contraction of the right metric with the dual-right metric is the unit
 `{εR | α β ⊗ εR' | β γ = δR | α γ}ᵀ`.
 -/
-lemma rightMetric_contr_altRightMetric : {εR | α β ⊗ εR' | β γ = δR | α γ}ᵀ := by
+lemma rightMetric_contr_dualRightMetric : {εR | α β ⊗ εR' | β γ = δR | α γ}ᵀ := by
   exact contrT_metricTensor_metricTensor_eq_dual_unit
 
-/-- The contraction of the alt-left metric with the left metric is the unit
+/-- The contraction of the dual-left metric with the left metric is the unit
 `{εL' | α β ⊗ εL | β γ = δL' | α γ}ᵀ`.
 -/
-lemma altLeftMetric_contr_leftMetric : {εL' | α β ⊗ εL | β γ = δL' | α γ}ᵀ := by
+lemma dualLeftMetric_contr_leftMetric : {εL' | α β ⊗ εL | β γ = δL' | α γ}ᵀ := by
   exact contrT_metricTensor_metricTensor_eq_dual_unit
 
-/-- The contraction of the alt-right metric with the right metric is the unit
+/-- The contraction of the dual-right metric with the right metric is the unit
 `{εR' | α β ⊗ εR | β γ = δR' | α γ}ᵀ`.
 -/
-lemma altRightMetric_contr_rightMetric : {εR' | α β ⊗ εR | β γ = δR' | α γ}ᵀ := by
+lemma dualRightMetric_contr_rightMetric : {εR' | α β ⊗ εR | β γ = δR' | α γ}ᵀ := by
   exact contrT_metricTensor_metricTensor_eq_dual_unit
 
 /-!

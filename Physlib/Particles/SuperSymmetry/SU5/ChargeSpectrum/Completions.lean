@@ -101,29 +101,18 @@ subset of `y` and `x` is complete, then `y` is also complete.
 
 lemma isComplete_mono {x y : ChargeSpectrum 𝓩} (h : x ⊆ y) (hx : IsComplete x) :
     IsComplete y := by
-  simp [IsComplete] at *
   rw [subset_def] at h
+  obtain ⟨hd, hu, h5, h10⟩ := h
+  obtain ⟨hxd, hxu, hx5, hx10⟩ := hx
   refine ⟨?_, ?_, ?_, ?_⟩
-  · by_contra hn
-    simp only [Bool.not_eq_true, Option.isSome_eq_false_iff, Option.isNone_iff_eq_none] at hn
-    have h1 := h.1
-    have hx1 := hx.1
-    rw [Option.isSome_iff_exists] at hx1
-    obtain ⟨a, ha⟩ := hx1
-    rw [hn, ha] at h1
-    simp at h1
-  · by_contra hn
-    simp only [Bool.not_eq_true, Option.isSome_eq_false_iff, Option.isNone_iff_eq_none] at hn
-    have h1 := h.2.1
-    have hx1 := hx.2.1
-    rw [Option.isSome_iff_exists] at hx1
-    obtain ⟨a, ha⟩ := hx1
-    rw [hn, ha] at h1
-    simp at h1
-  · by_contra hn
-    simp_all
-  · by_contra hn
-    simp_all
+  · obtain ⟨a, ha⟩ := Option.isSome_iff_exists.mp hxd
+    rw [ha, Option.toFinset_some, Finset.singleton_subset_iff, Option.mem_toFinset] at hd
+    exact Option.isSome_of_mem hd
+  · obtain ⟨a, ha⟩ := Option.isSome_iff_exists.mp hxu
+    rw [ha, Option.toFinset_some, Finset.singleton_subset_iff, Option.mem_toFinset] at hu
+    exact Option.isSome_of_mem hu
+  · exact fun hy => hx5 (Finset.subset_empty.mp (hy ▸ h5))
+  · exact fun hy => hx10 (Finset.subset_empty.mp (hy ▸ h10))
 
 /-!
 
@@ -338,54 +327,25 @@ lemma exist_completions_subset_of_complete (S5 S10 : Finset 𝓩) (x y : ChargeS
     simp_all
   have hy1' : some y1 ∈ if x1.isSome = true then {x1} else
       Multiset.map (fun y => some y) S5.val := by
-    by_cases h1 : x1.isSome
-    · simp_all
-      rw [Option.isSome_iff_exists] at h1
-      obtain ⟨a, rfl⟩ := h1
-      simp_all
-    · simp_all
+    match x1 with
+    | none => simpa using hy.1
+    | some a => simp_all
   have hy2' : some y2 ∈ if x2.isSome = true then {x2} else
       Multiset.map (fun y => some y) S5.val := by
-    by_cases h2 : x2.isSome
-    · simp_all
-      rw [Option.isSome_iff_exists] at h2
-      obtain ⟨a, rfl⟩ := h2
-      simp_all
-    · simp_all
+    match x2 with
+    | none => simpa using hy.2.1
+    | some a => simp_all
   simp_all
-  by_cases h3 : x3 ≠ ∅
-  · by_cases h4 : x4 ≠ ∅
-    · use ⟨y1, y2, x3, x4⟩
-      constructor
-      · simp_all [mem_completions_iff]
-      · rw [Subset]
-        dsimp [hasSubset]
-        simp_all
-    · simp at h4
-      subst h4
-      use ⟨y1, y2, x3, {z4}⟩
-      constructor
-      · simp_all [mem_completions_iff]
-      · rw [Subset]
-        dsimp [hasSubset]
-        simp_all
-  · simp at h3
-    subst h3
-    by_cases h4 : x4 ≠ ∅
-    · use ⟨y1, y2, {z3}, x4⟩
-      constructor
-      · simp_all [mem_completions_iff]
-      · rw [Subset]
-        dsimp [hasSubset]
-        simp_all
-    · simp at h4
-      subst h4
-      use ⟨y1, y2, {z3}, {z4}⟩
-      constructor
-      · simp_all [mem_completions_iff]
-      · rw [Subset]
-        dsimp [hasSubset]
-        simp_all
+  refine ⟨⟨y1, y2, if x3 = ∅ then {z3} else x3, if x4 = ∅ then {z4} else x4⟩, ?_, ?_⟩
+  · rw [mem_completions_iff]
+    refine ⟨by simp_all, by simp_all, ?_, ?_⟩
+    · split_ifs with h3 <;> simp_all
+    · split_ifs with h4 <;> simp_all
+  · rw [Subset]
+    dsimp [hasSubset]
+    refine ⟨by simp_all, by simp_all, ?_, ?_⟩
+    · split_ifs with h3 <;> simp_all [Finset.singleton_subset_iff]
+    · split_ifs with h4 <;> simp_all [Finset.singleton_subset_iff]
 
 /-!
 

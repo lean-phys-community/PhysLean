@@ -5,7 +5,7 @@ Authors: Shlok Vaibhav Singh
 -/
 module
 
-public import Physlib.Meta.Linters.Sorry
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Angle
 /-!
 # Sliding Pendulum
 ### Tag: LnL_1.5.2
@@ -63,9 +63,21 @@ namespace ClassicalMechanics
 
 namespace SlidingPendulum
 
-/-- The configuration space of the sliding pendulum system. -/
-@[sorryful]
-def ConfigurationSpace : Type := sorry
+/-!
+## A. Configuration space
+-/
+
+/--
+The configuration space of the sliding pendulum system.
+
+The generalized coordinates are the horizontal position of the support mass and the angle
+that the string makes with the vertical.
+-/
+structure ConfigurationSpace where
+  /-- The horizontal position `x₁` of the support mass. -/
+  supportPosition : ℝ
+  /-- The angle `φ` that the string makes with the vertical. -/
+  angle : Real.Angle
 
 end SlidingPendulum
 

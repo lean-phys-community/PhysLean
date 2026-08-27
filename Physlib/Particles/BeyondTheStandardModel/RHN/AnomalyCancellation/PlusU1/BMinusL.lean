@@ -37,17 +37,15 @@ def BL₁ : (PlusU1 1).Sols where
     | (5 : Fin 6) => 3
   linearSol := by
     intro i
-    simp only [PlusU1_numberLinear] at i
     match i with
-    | 0 => with_unfolding_all rfl
-    | 1 => with_unfolding_all rfl
-    | 2 => with_unfolding_all rfl
-    | 3 => with_unfolding_all rfl
+    | ⟨0, _⟩ => with_unfolding_all rfl
+    | ⟨1, _⟩ => with_unfolding_all rfl
+    | ⟨2, _⟩ => with_unfolding_all rfl
+    | ⟨3, _⟩ => with_unfolding_all rfl
   quadSol := by
     intro i
-    simp only [PlusU1_numberQuadratic] at i
     match i with
-    | 0 => with_unfolding_all rfl
+    | ⟨0, _⟩ => with_unfolding_all rfl
   cubicSol := by with_unfolding_all rfl
 
 /-- $B - L$ in the $n$-family case. -/
@@ -59,11 +57,12 @@ namespace BL
 
 variable {n : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 lemma on_quadBiLin (S : (PlusU1 n).Charges) :
     quadBiLin (BL n).val S = 1/2 * accYY S + 3/2 * accSU2 S - 2 * accSU3 S := by
   erw [familyUniversal_quadBiLin]
   rw [accYY_decomp, accSU2_decomp, accSU3_decomp]
-  simp only [Fin.isValue, BL₁_val, SMνSpecies_numberCharges, toSpecies_apply, one_mul, mul_neg,
+  simp only [Fin.isValue, BL₁_val, toSpecies_apply, one_mul, mul_neg,
     mul_one, neg_mul, sub_neg_eq_add]
   ring
 
@@ -92,11 +91,12 @@ lemma addQuad_zero (S : (PlusU1 n).QuadSols) (a : ℚ) : addQuad S a 0 = a • S
   simp only [addQuad, linearToQuad, zero_smul, add_zero]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma on_cubeTriLin (S : (PlusU1 n).Charges) :
     cubeTriLin (BL n).val (BL n).val S = 9 * accGrav S - 24 * accSU3 S := by
   erw [familyUniversal_cubeTriLin']
   rw [accGrav_decomp, accSU3_decomp]
-  simp only [Fin.isValue, BL₁_val, mul_one, SMνSpecies_numberCharges, toSpecies_apply, mul_neg,
+  simp only [Fin.isValue, BL₁_val, mul_one, toSpecies_apply, mul_neg,
     neg_neg, neg_mul]
   ring
 

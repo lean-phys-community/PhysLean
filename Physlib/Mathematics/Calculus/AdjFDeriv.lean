@@ -126,7 +126,6 @@ protected lemma HasAdjFDerivAt.contDiffAt_deriv
     · apply ContinuousLinearMap.adjoint.isBoundedBilinearMap_real.contDiff
     · fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradient_eq_adjFDeriv
     {f : U → 𝕜} {x : U} (hf : DifferentiableAt 𝕜 f x) :
     gradient f x = adjFDeriv 𝕜 f x 1 := by
@@ -164,7 +163,7 @@ lemma HasAdjFDerivAt.comp {f : F → G} {g : E → F} {f' g'} {x : E}
   differentiableAt := by
     fun_prop
   hasAdjoint_fderiv := by
-    simp (disch:=fun_prop) [fderiv_comp']
+    simp (disch:=fun_prop) [fderiv_fun_comp]
     exact hf.hasAdjoint_fderiv.comp hg.hasAdjoint_fderiv
 
 lemma adjFDeriv_comp [CompleteSpace E] [CompleteSpace F] [CompleteSpace G]

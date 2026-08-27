@@ -65,7 +65,6 @@ lemma finset_succAbove_succ_disjoint (a : Finset (Fin n)) (i : Fin n.succ) :
   · exact fun x hx => Fin.succ_ne_zero (i.succAbove x)
   · exact fun x hx => Fin.succAbove_ne i x
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The Wick contraction in `WickContraction n.succ.succ` formed by a Wick contraction
   `WickContraction n` by inserting at the `0` and `i.succ` and contracting these two. -/
 def consAddContract (i : Fin n.succ) (c : WickContraction n) :
@@ -73,7 +72,7 @@ def consAddContract (i : Fin n.succ) (c : WickContraction n) :
   ⟨(c.1.map (Finset.mapEmbedding i.succAboveEmb).toEmbedding).map
     (Finset.mapEmbedding (Fin.succEmb n.succ)).toEmbedding ∪ {{0, i.succ}}, by
     intro a
-    simp only [succ_eq_add_one, Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
+    simp only [succ_eq_add_one, Finset.mem_union, Finset.mem_map,
       RelEmbedding.coe_toEmbedding, exists_exists_and_eq_and, Finset.mem_singleton]
     intro h
     rcases h with h | h
@@ -87,7 +86,7 @@ def consAddContract (i : Fin n.succ) (c : WickContraction n) :
       simp only [succ_eq_add_one, ne_eq, and_true]
       exact ne_of_beq_false rfl, by
     intro a ha b hb
-    simp only [succ_eq_add_one, Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
+    simp only [succ_eq_add_one, Finset.mem_union, Finset.mem_map,
       RelEmbedding.coe_toEmbedding, exists_exists_and_eq_and, Finset.mem_singleton] at ha hb
     rcases ha with ha | ha <;> rcases hb with hb | hb
     · obtain ⟨a, ha, rfl⟩ := ha
@@ -121,10 +120,9 @@ lemma consAddContract_getDual?_self_succ (i : Fin n.succ) (c : WickContraction n
   rw [getDual?_eq_some_iff_mem]
   simp [consAddContract, Finset.pair_comm]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma mem_consAddContract_of_mem_iff (i : Fin n.succ) (c : WickContraction n) (a : Finset (Fin n)) :
     a ∈ c.1 ↔ (a.map i.succAboveEmb).map (Fin.succEmb n.succ) ∈ (consAddContract i c).1 := by
-  simp only [succ_eq_add_one, consAddContract, Finset.le_eq_subset, Finset.mem_union,
+  simp only [succ_eq_add_one, consAddContract, Finset.mem_union,
     Finset.mem_map, RelEmbedding.coe_toEmbedding, exists_exists_and_eq_and, Finset.mem_singleton]
   apply Iff.intro
   · intro h
@@ -161,7 +159,6 @@ lemma consAddContract_injective (i : Fin n.succ) : Function.Injective (consAddCo
     rw [← mem_consAddContract_of_mem_iff] at ha'
     exact ha'
 
-set_option backward.isDefEq.respectTransparency false in
 lemma consAddContract_surjective_on_zero_contract (i : Fin n.succ)
     (c : WickContraction n.succ.succ)
     (h : (c.getDual? 0).isSome) (h2 : (c.getDual? 0).get h = i.succ) :
@@ -189,7 +186,6 @@ lemma consAddContract_surjective_on_zero_contract (i : Fin n.succ)
       rw [← h2]
       simp
     · obtain ⟨b, hb, rfl⟩ := h
-      rw [Finset.mapEmbedding_apply, Finset.mapEmbedding_apply]
       simp only [succ_eq_add_one, Finset.mem_filter, Finset.mem_univ, true_and, c'] at hb
       exact hb
   · intro h
@@ -210,7 +206,6 @@ lemma consAddContract_surjective_on_zero_contract (i : Fin n.succ)
       obtain ⟨y, rfl⟩ := (Fin.exists_succAbove_eq (x := y) (y := i)) (by omega)
       use {x, y}
       simp only [c']
-      rw [Finset.mapEmbedding_apply, Finset.mapEmbedding_apply]
       simpa using h
 
 lemma consAddContract_bijection (i : Fin n.succ) :

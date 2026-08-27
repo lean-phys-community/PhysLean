@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
-public import Physlib.Meta.TODO.Basic
 /-!
 
 # Units on Length
@@ -63,29 +62,34 @@ lemma div_eq_val (x y : LengthUnit) :
 lemma div_ne_zero (x y : LengthUnit) : ¬ x / y = (0 : ℝ≥0) := by
   rw [div_eq_val]
   refine coe_ne_zero.mp ?_
-  simp
+  simp [toReal]
 
 @[simp]
 lemma div_pos (x y : LengthUnit) : (0 : ℝ≥0) < x/ y := by
   apply lt_of_le_of_ne
-  · exact zero_le (x / y)
+  · exact zero_le
   · exact Ne.symm (div_ne_zero x y)
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma div_self (x : LengthUnit) :
     x / x = (1 : ℝ≥0) := by
   simp [div_eq_val, x.val_ne_zero]
+  rfl
 
 lemma div_symm (x y : LengthUnit) :
     x / y = (y / x)⁻¹ := NNReal.eq <| by
-  rw [div_eq_val, inv_eq_one_div, div_eq_val]
-  simp
+  show x.val / y.val = (y.val / x.val)⁻¹
+  rw [inv_div]
+
+/-- The unit-ratio cocycle at `ℝ≥0` (the un-coerced form of `div_mul_div_coe`). -/
+lemma div_mul_div (x y z : LengthUnit) : (x / y) * (y / z) = x / z := NNReal.eq <| by
+  show x.val / y.val * (y.val / z.val) = x.val / z.val
+  rw [div_mul_div_comm, mul_comm x.val y.val, mul_div_mul_left _ _ y.val_ne_zero]
 
 @[simp]
 lemma div_mul_div_coe (x y z : LengthUnit) :
-    (x / y : ℝ) * (y /z : ℝ) = x /z := by
-  simp [div_eq_val]
+    (x / y : ℝ) * (y / z : ℝ) = x / z := by
+  simp [div_eq_val, toReal]
   field_simp
 
 /-!
@@ -102,13 +106,13 @@ def scale (r : ℝ) (x : LengthUnit) (hr : 0 < r := by norm_num) : LengthUnit :=
 lemma scale_div_self (x : LengthUnit) (r : ℝ) (hr : 0 < r) :
     scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
   simp [scale, div_eq_val]
+  rfl
 
 @[simp]
 lemma self_div_scale (x : LengthUnit) (r : ℝ) (hr : 0 < r) :
     x / scale r x hr = (⟨1/r, _root_.div_nonneg (by simp) (le_of_lt hr)⟩ : ℝ≥0) := by
   simp [scale, div_eq_val]
-  ext
-  simp only [coe_mk]
+
   field_simp
 
 @[simp]
@@ -119,8 +123,8 @@ lemma scale_one (x : LengthUnit) : scale 1 x = x := by
 lemma scale_div_scale (x1 x2 : LengthUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :
     scale r1 x1 hr1 / scale r2 x2 hr2 = (⟨r1, le_of_lt hr1⟩ / ⟨r2, le_of_lt hr2⟩) * (x1 / x2) := by
   refine NNReal.eq ?_
-  simp [scale, div_eq_val]
-  field_simp
+  show r1 * x1.val / (r2 * x2.val) = r1 / r2 * (x1.val / x2.val)
+  rw [div_mul_div_comm]
 
 @[simp]
 lemma scale_scale (x : LengthUnit) (r1 r2 : ℝ) (hr1 : 0 < r1) (hr2 : 0 < r2) :
@@ -136,6 +140,20 @@ We first define the notion of a meter to correspond to the length unit with unde
 equal to `1`. This is really down to a choice in the isomorphism between the set of metrics
 on the space manifold and the positive reals.
 From this choice of meters, we can define other length units by scaling meters.
+
+The references for the numerical definitions used below are:
+* the BIPM SI Brochure for the meter, the speed of light, and SI prefixes:
+  https://www.bipm.org/documents/d/guest/si-brochure-9-en-pdf
+* NIST Handbook 44, Appendix C, for the international foot-based units and
+  the international nautical mile:
+  https://doi.org/10.6028/NIST.HB.44-2023
+* IAU 2012 Resolution B2 for the astronomical unit:
+  https://iauarchive.eso.org/static/resolutions/IAU2012_English.pdf
+* the IAU Style Manual recommendations for the Julian year convention used in
+  the light-year:
+  https://iauarchive.eso.org/publications/proceedings_rules/units/
+* IAU 2015 Resolution B2 for the exact parsec convention:
+  https://iauarchive.eso.org/static/resolutions/IAU2015_English.pdf
 
 -/
 
@@ -196,13 +214,9 @@ noncomputable def astronomicalUnits : LengthUnit := scale (149597870700) meters
 /-- The length unit of a light year (9,460,730,472,580,800 meters). -/
 noncomputable def lightYears : LengthUnit := scale (9460730472580800) meters
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The length unit of a parsec (648,000/π astronomicalUnits). -/
 noncomputable def parsecs : LengthUnit := scale (648000/Real.pi) astronomicalUnits
   (by norm_num; exact Real.pi_pos)
-
-TODO "ITXJV" "For each unit of charge give the reference the literature where it's definition
-  is defined."
 
 /-!
 
@@ -212,10 +226,17 @@ TODO "ITXJV" "For each unit of charge give the reference the literature where it
 
 /-- There are exactly 1760 yards in a mile. -/
 lemma miles_div_yards : miles / yards = (⟨1760, by norm_num⟩ : ℝ≥0) :=
-  NNReal.eq <| by simp [miles, yards]; norm_num
+  NNReal.eq <| by
+    simp [miles, yards]
+    show (1609.344 : ℝ) / 0.9144 = ((⟨1760, by norm_num⟩ : ℝ≥0) : ℝ)
+    push_cast
+    norm_num
 
 /-- There are exactly 220 yards in a furlong. -/
 lemma furlongs_div_yards : furlongs / yards = (⟨220, by norm_num⟩ : ℝ≥0) := NNReal.eq <| by
-  simp [furlongs, yards]; norm_num
+  simp [furlongs, yards]
+  show (201.168 : ℝ) / 0.9144 = ((⟨220, by norm_num⟩ : ℝ≥0) : ℝ)
+  push_cast
+  norm_num
 
 end LengthUnit

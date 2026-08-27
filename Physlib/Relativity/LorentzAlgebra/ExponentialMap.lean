@@ -48,7 +48,6 @@ lemma transpose_eq_neg_eta_conj (A : lorentzAlgebra) :
     _ = (-η * A.1) * η := by rw [h]
     _ = - (η * A.1 * η) := by simp_all only [neg_mul]
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The exponential of the transpose of a Lorentz algebra element.
 This connects `exp(Aᵀ)` to a conjugation of `exp(-A)`.
@@ -114,7 +113,6 @@ lemma trace_reindex [Semiring R] [Fintype ι] (e : n ≃ ι) (A : Matrix n n R) 
 
 variable {n R ι : Type*} [Fintype n] [DecidableEq n]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma exp_reindex {k : Type*}
     [RCLike k] [Fintype ι] [DecidableEq ι] (e : n ≃ ι) (A : Matrix n n k) :
@@ -130,7 +128,6 @@ noncomputable section
 
 attribute [local instance] Matrix.linftyOpNormedAlgebra
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The exponential of an element of the Lorentz algebra is proper (has determinant 1). -/
 theorem exp_isProper (A : lorentzAlgebra) :
     LorentzGroup.IsProper ⟨NormedSpace.exp A.1, exp_mem_lorentzGroup A⟩ := by
@@ -138,10 +135,9 @@ theorem exp_isProper (A : lorentzAlgebra) :
   let e : (Fin 1 ⊕ Fin 3) ≃ Fin 4 := finSumFinEquiv
   -- we reindex to Fin 4 to use the faster LinearOrder
   rw [← det_reindex_self e, ← exp_reindex e]
-  convert det_exp_real (reindex e e A.1)
+  convert! det_exp_real (reindex e e A.1)
   erw [trace_reindex e, trace_of_mem_is_zero A, Real.exp_zero]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The exponential of an element of the Lorentz algebra is orthochronous. -/
 theorem exp_isOrthochronous (A : lorentzAlgebra) :
     LorentzGroup.IsOrthochronous ⟨NormedSpace.exp A.1, exp_mem_lorentzGroup A⟩ := by
@@ -149,9 +145,7 @@ theorem exp_isOrthochronous (A : lorentzAlgebra) :
   let γ : Path (0 : lorentzAlgebra) A :=
   { toFun := fun t => t.val • A,
     continuous_toFun := by
-      apply Continuous.smul
-      · exact continuous_subtype_val
-      · exact continuous_const,
+      exact Continuous.smul continuous_subtype_val continuous_const,
     source' := by simp [zero_smul],
     target' := by simp [one_smul] }
   let exp_γ : Path (1 : LorentzGroup 3) ⟨NormedSpace.exp A.1, exp_mem_lorentzGroup A⟩ :=
@@ -177,7 +171,6 @@ theorem exp_isOrthochronous (A : lorentzAlgebra) :
   rw [← LorentzGroup.isOrthochronous_on_connected_component h_connected]
   exact LorentzGroup.id_isOrthochronous
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The exponential of an element of the Lorentz algebra is a member of the
 restricted Lorentz group. -/
 theorem exp_mem_restricted_lorentzGroup (A : lorentzAlgebra) :

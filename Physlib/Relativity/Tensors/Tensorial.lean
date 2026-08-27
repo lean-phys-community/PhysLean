@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.Product
+public import Physlib.Relativity.Tensors.Evaluation
 public import Mathlib.Topology.Algebra.Module.FiniteDimension
 /-!
 
@@ -56,14 +57,14 @@ There are no known references for this material.
 
 @[expose] public section
 
-open IndexNotation
-open CategoryTheory
-open MonoidalCategory
-
 namespace TensorSpecies
-open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G] {S : TensorSpecies k C G}
+variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Module.Basis (basisIdx c) k (V c)}
+    {S : TensorSpecies k C G V basisIdx rep b}
+attribute [-simp] LinearEquiv.cast_apply
 
 /-!
 
@@ -75,9 +76,15 @@ We first define the `Tensorial` class.
 
 /-- The tensorial class is used to define a tensor structure on a type `M` through a
   linear equivalence with a module `S.Tensor c` for `S` a tensor species. -/
-class Tensorial
-    {k : outParam Type} [CommRing k] {C G : outParam Type} [Group G]
-    {n : outParam ℕ} (S : outParam (TensorSpecies k C G)) (c :outParam (Fin n → C)) (M : Type)
+class Tensorial {n : outParam ℕ}
+
+    {k : outParam Type} [CommRing k] {C : outParam Type} {G : outParam Type} [Group G]
+    {V :outParam (C → Type)} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : outParam (C → Type)} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : outParam ((c : C) → Representation k G (V c))}
+    {b : outParam ((c : C) → Module.Basis (basisIdx c) k (V c))}
+    (S : outParam (TensorSpecies k C G V basisIdx rep b))
+    (c :outParam (Fin n → C)) (M : Type)
     [AddCommMonoid M] [Module k M] where
   /-- The equivalence between `M` and `S.Tensor c` in a tensorial instance. -/
   toTensor : M ≃ₗ[k] S.Tensor c
@@ -94,12 +101,13 @@ The module of tensors of a tensor species carries a canonical tensorial instance
 through the equivalence.
 
 -/
-noncomputable instance self {n : ℕ} (S : TensorSpecies k C G) (c : Fin n → C) :
+noncomputable instance self {n : ℕ} (S : TensorSpecies k C G V basisIdx rep b) (c : Fin n → C) :
     Tensorial S c (S.Tensor c) where
   toTensor := LinearEquiv.refl k (S.Tensor c)
 
 @[simp]
-lemma self_toTensor_apply {n : ℕ} (S : TensorSpecies k C G) (c : Fin n → C) (t : S.Tensor c) :
+lemma self_toTensor_apply {n : ℕ} (S : TensorSpecies k C G V basisIdx rep b)
+    (c : Fin n → C) (t : S.Tensor c) :
     Tensorial.toTensor t = t := by
   rw [Tensorial.toTensor]
   rfl
@@ -112,7 +120,7 @@ lemma self_toTensor_apply {n : ℕ} (S : TensorSpecies k C G) (c : Fin n → C) 
 
 /-- The number of indices of a elements `t : M` where `M` carries a tensorial instance. -/
 noncomputable def numIndices (t : M) [Tensorial S c M] : ℕ :=
-  TensorSpecies.numIndices (toTensor t)
+  TensorSpecies.numIndices (S := S) (toTensor t)
 
 /-!
 
@@ -168,7 +176,7 @@ noncomputable instance (priority := high) distribMulAction [Tensorial S c M] :
     DistribMulAction G M where
   smul_add g m m' := by
     apply toTensor.injective
-    simp [toTensor_smul, map_add, Tensor.actionT_add]
+    simp [toTensor_smul, map_add]
   smul_zero g := by
     apply toTensor.injective
     simp only [toTensor_smul, map_zero, Tensor.actionT_zero]
@@ -282,6 +290,69 @@ lemma basis_map_prod {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
   simp only [LinearEquiv.apply_symm_apply]
   rfl
 
+open Tensor in
+lemma prod_basis_of_map_reindex {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
+    [Tensorial S c M] [AddCommMonoid M₂] [Module k M₂]
+    [Tensorial S c2 M₂] {ι ι2 : Type} {b : Module.Basis ι k M} {b2 : Module.Basis ι2 k M₂}
+    {e : Tensor.ComponentIdx c ≃ ι} {e2 : Tensor.ComponentIdx c2 ≃ ι2}
+    (h : b = ((Tensor.basis (S := S) c).map toTensor.symm).reindex e)
+    (h2 : b2 = ((Tensor.basis (S := S) c2).map toTensor.symm).reindex e2) :
+    b.tensorProduct b2 = ((Tensor.basis (S := S) (Fin.append c c2)).map
+    (toTensor (S := S) (M := M ⊗[k] M₂)).symm).reindex
+    (ComponentIdx.prod.trans (e.prodCongr e2)) := by
+  ext ⟨i, j⟩
+  simp_rw [Tensorial.basis_map_prod, Module.Basis.tensorProduct_apply]
+  simp [h, h2]
+
+open Tensor in
+lemma prod_tensor_basis_eq_map_reindex {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
+    [Tensorial S c M] [AddCommMonoid M₂] [Module k M₂]
+    [Tensorial S c2 M₂] {ι ι2 : Type} {b : Module.Basis ι k M} {b2 : Module.Basis ι2 k M₂}
+    {e : Tensor.ComponentIdx c ≃ ι} {e2 : Tensor.ComponentIdx c2 ≃ ι2}
+    (h : b = ((Tensor.basis (S := S) c).map toTensor.symm).reindex e)
+    (h2 : b2 = ((Tensor.basis (S := S) c2).map toTensor.symm).reindex e2) :
+    Tensor.basis (S := S) (Fin.append c c2) =
+    ((b.tensorProduct b2).map (toTensor (S := S) (M := M ⊗[k] M₂))).reindex
+    (ComponentIdx.prod.trans (e.prodCongr e2)).symm := by
+  rw [Tensor.basis_prod_eq]
+  ext r
+  simp
+  obtain ⟨⟨i, j⟩, rfl⟩ := ComponentIdx.prod.symm.surjective r
+  simp [h, h2, tensorEquivProd, toTensor_tprod]
+
+attribute [-simp] Matrix.cons_val_zero Matrix.cons_val Fin.succAbove_zero
+
+open Tensor in
+set_option backward.isDefEq.respectTransparency false in
+/-- Double basis expansion of an element of a tensor product `M ⊗[k] M₂` of two `Tensorial`
+  one-index spaces. Given bases `b`, `b2` of `M`, `M₂` coming from the single-index tensor bases,
+  every `x : M ⊗[k] M₂` is the double sum over `i, j` of the iterated evaluation coefficient
+  `toField (evalT 0 j (evalT 0 i (toTensor x)))` times `b i ⊗ₜ b2 j`. -/
+lemma prod_eq_sum_eval {c c2 : C} {M₂ : Type}
+    [Tensorial S ![c] M] [AddCommMonoid M₂] [Module k M₂]
+    [Tensorial S ![c2] M₂] {b : Module.Basis (basisIdx c) k M}
+    {b2 : Module.Basis (basisIdx c2) k M₂}
+    (h : b = ((Tensor.basis (S := S) ![c]).map toTensor.symm).reindex ComponentIdx.single)
+    (h2 : b2 = ((Tensor.basis (S := S) ![c2]).map toTensor.symm).reindex ComponentIdx.single)
+    (x : M ⊗[k] M₂) : x = ∑ i : (basisIdx c), ∑ j : (basisIdx c2),
+    toField (evalT 0 (basisIdxCongr (by rfl) j)
+      (evalT 0 (basisIdxCongr (by rfl) i) (toTensor x))) • b i ⊗ₜ[k] b2 j := by
+  apply toTensor.injective
+  conv_lhs => rw [eq_sum_evalT_zero (toTensor x)]
+  simp only [map_sum, map_smul]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [eq_sum_evalT_zero ((evalT 0 i) (toTensor x))]
+  simp only [map_sum]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  simp only [prodT_zero_right, map_smul, permT_basis, prodT_basis']
+  congr 1
+  subst h h2
+  simp only [toTensor_tprod, Function.comp_apply, Module.Basis.coe_reindex, Module.Basis.map_apply,
+    LinearEquiv.apply_symm_apply, prodT_basis']
+  congr 1
+  funext i
+  fin_cases i <;> rfl
+
 /-!
 
 ## E. Continuous properties
@@ -290,8 +361,12 @@ lemma basis_map_prod {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
 
 section Continuous
 
-variable {k : Type} [RCLike k] {C G : Type} [Group G] (S : TensorSpecies k C G)
-    {c : Fin n → C} {M : Type} [AddCommGroup M] [Module k M]
+variable {k : Type} [RCLike k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Module.Basis (basisIdx c) k (V c)}
+    (S : TensorSpecies k C G V basisIdx rep b) {c : Fin n → C} {M : Type}
+    [AddCommGroup M] [Module k M]
     [TopologicalSpace M]
 
 /-!

@@ -23,7 +23,6 @@ variable (M : Type)
     [MeasurableSpace M] [self : MeasurableConstSMul ℝ M]
 
 open MeasureTheory
-set_option backward.isDefEq.respectTransparency false in
 noncomputable instance (M : Type)
     [NormedAddCommGroup M] [NormedSpace ℝ M] [HasDim M]
     [MeasurableSpace M] [self : MeasurableConstSMul ℝ M] :
@@ -55,10 +54,9 @@ variable {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] [HasDim M]
     {G : Type}
     [NormedAddCommGroup G] [NormedSpace ℝ G] [HasDim G]
 
-lemma scaleUnit_measure (u1 u2 : UnitChoices) (μ : MeasureTheory.Measure M) :
+lemma scaleUnit_measure (u1 u2 : LTMCTUnitChoices) (μ : MeasureTheory.Measure M) :
     scaleUnit u1 u2 μ = μ.map (fun m => scaleUnit u1 u2 m) := by rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The statement that for a measure `μ` of dimension `d`, and a function
   `f : M → G` of dimension `(CarriesDimension.d G * d⁻¹)` (where `CarriesDimension.d G`
   is the dimension associated with terms of type `G`), then
@@ -71,7 +69,7 @@ fun (μ : DimSet (MeasureTheory.Measure M) d)
     (f : DimSet (M → G) (CarriesDimension.d G * d⁻¹)) ↦ ∫ x, f.1 x ∂μ.1
 ```
   is dimensionally correct. -/
-lemma integral_isDimensionallyCorrect (d : Dimension) :
+lemma integral_isDimensionallyCorrect (d : Dimension LTMCTDimensionBase) :
     IsDimensionallyCorrect (fun (μ : DimSet (MeasureTheory.Measure M) d)
       (f : DimSet (M → G) (dim G * d⁻¹)) ↦ ∫ x, f.1 x ∂μ.1) := by
   intro u1 u2
@@ -111,6 +109,6 @@ lemma integral_isDimensionallyCorrect (d : Dimension) :
         * (u2.dimScale u1 d * u1.dimScale u2 d)) • ∫ (x : M), f x ∂ μ := by
       congr 1
       conv_lhs => simp only [map_mul]
-      rw [UnitChoices.dimScale_of_inv_eq_swap]
+      rw [LTMCTUnitChoices.dimScale_of_inv_eq_swap]
       ring
     _ = ∫ (x : M), f x ∂ μ := by simp

@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.LorentzAlgebra.Basic
-public import Physlib.Meta.TODO.Basic
 /-!
 # Generators of the Lorentz Algebra
 
@@ -39,7 +38,7 @@ block, while rotation generators are antisymmetric matrices acting only on spati
 
 ## Future Work
 
-TODO "6VZKA" can be completed by proving linear independence and spanning of these
+TODO can be completed by proving linear independence and spanning of these
 6 generators, then constructing a formal `Basis (Fin 2 × Fin 3) ℝ lorentzAlgebra`.
 
 -/
@@ -105,63 +104,42 @@ def rotationGenerator (i : Fin 3) : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) �
 lemma boostGenerator_mem (i : Fin 3) : boostGenerator i ∈ lorentzAlgebra := by
   rw [lorentzAlgebra.mem_iff]
   ext μ ν
-  simp only [boostGenerator, minkowskiMatrix.as_diagonal, mul_diagonal, transpose_apply]
-  rcases μ with μ | μ <;> rcases ν with ν | ν
-  · -- (time, time) case
-    simp only [Sum.elim_inl]
-    have : μ = 0 := Subsingleton.elim _ _
-    have : ν = 0 := Subsingleton.elim _ _
-    simp [boostGenerator, *]
-  · -- (time, space) case
-    simp only [Sum.elim_inr]
-    have : μ = 0 := Subsingleton.elim _ _
-    simp [boostGenerator, *]
-    split_ifs <;> norm_num
-  · -- (space, time) case
-    simp only [Sum.elim_inl]
-    have : ν = 0 := Subsingleton.elim _ _
-    simp [boostGenerator, *]
-  · -- (space, space) case
-    simp [Sum.elim_inr, boostGenerator]
+  fin_cases μ <;> fin_cases ν <;>
+    simp [boostGenerator, minkowskiMatrix.as_diagonal, mul_diagonal, diagonal_mul, neg_ite]
 
 /-- The rotation generator J_i is in the Lorentz algebra. -/
 lemma rotationGenerator_mem (i : Fin 3) : rotationGenerator i ∈ lorentzAlgebra := by
   rw [lorentzAlgebra.mem_iff]
   ext μ ν
-  simp only [rotationGenerator, minkowskiMatrix.as_diagonal, mul_diagonal, transpose_apply]
-  rcases μ with μ | μ <;> rcases ν with ν | ν
-  · -- (time, time) case
-    have : μ = 0 := Subsingleton.elim _ _
-    have : ν = 0 := Subsingleton.elim _ _
-    simp [rotationGenerator, *]
-    fin_cases i <;> norm_num
-  · -- (time, space) case
-    have : μ = 0 := Subsingleton.elim _ _
-    simp [rotationGenerator, *]
-  · -- (space, time) case
-    have : ν = 0 := Subsingleton.elim _ _
-    simp [rotationGenerator, *]
-  · -- (space, space) case: need explicit computation
-    simp only [Sum.elim_inr]
-    fin_cases i <;> fin_cases μ <;> fin_cases ν <;> simp [rotationGenerator]
+  fin_cases i <;> fin_cases μ <;> fin_cases ν <;>
+    simp [rotationGenerator, minkowskiMatrix.as_diagonal, mul_diagonal, diagonal_mul]
 
-/-!
-## TODO: Properties of Generators
+/-- The boost generators are symmetric. -/
+@[simp]
+lemma boostGenerator_transpose (i : Fin 3) :
+    (boostGenerator i)ᵀ = boostGenerator i := by
+  ext μ ν
+  simp only [transpose_apply, boostGenerator, and_comm, or_comm]
 
-The following properties are documented in the docstrings but not yet formally proven.
-These should be established in future PRs to complete the characterization of the generators.
--/
+/-- The boost generators are traceless. -/
+@[simp]
+lemma boostGenerator_trace (i : Fin 3) :
+    Matrix.trace (boostGenerator i) = 0 := by
+  simp [Matrix.trace, Matrix.diag, boostGenerator]
 
-TODO "BOOST_SYM" "Prove that boost generators are symmetric: \
-  (boostGenerator i)ᵀ = boostGenerator i"
+/-- The rotation generators are antisymmetric. -/
+@[simp]
+lemma rotationGenerator_transpose (i : Fin 3) :
+    (rotationGenerator i)ᵀ = -rotationGenerator i := by
+  ext μ ν
+  fin_cases i <;> fin_cases μ <;> fin_cases ν <;> simp [rotationGenerator]
 
-TODO "BOOST_TRACE" "Prove that boost generators are traceless: \
-  Matrix.trace (boostGenerator i) = 0"
-
-TODO "ROT_ANTISYM" "Prove that rotation generators are antisymmetric: \
-  (rotationGenerator i)ᵀ = -(rotationGenerator i)"
-
-TODO "ROT_TRACE" "Prove that rotation generators are traceless: \
-  Matrix.trace (rotationGenerator i) = 0"
+/-- The rotation generators are traceless. -/
+@[simp]
+lemma rotationGenerator_trace (i : Fin 3) :
+    Matrix.trace (rotationGenerator i) = 0 := by
+  have h := Matrix.trace_transpose (rotationGenerator i)
+  rw [rotationGenerator_transpose, Matrix.trace_neg] at h
+  exact eq_zero_of_neg_eq h
 
 end lorentzAlgebra

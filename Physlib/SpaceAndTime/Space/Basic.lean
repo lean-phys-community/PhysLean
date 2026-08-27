@@ -7,7 +7,7 @@ module
 
 public import Physlib.Meta.TODO.Basic
 public import Mathlib.Analysis.InnerProductSpace.PiL2
-public import Mathlib.Geometry.Manifold.ContMDiff.Defs
+public import Mathlib.Geometry.Manifold.Instances.Real
 /-!
 
 # Space
@@ -75,11 +75,6 @@ the `VAdd (EuclideanSpace ℝ (Fin d)) (Space d)` instance instead.
 ## A. The `Space` type
 
 -/
-
-TODO "HB6RR" "In the above documentation describe the notion of a type, and
-  introduce the type `Space d`."
-
-TODO "HB6VC" "Convert `Space` from an `abbrev` to a `def`."
 
 /-- The type `Space d` is the world-volume which corresponds to
 `d` dimensional (flat) Euclidean space with a given (but arbitrary)
@@ -245,12 +240,12 @@ noncomputable instance {d} : MetricSpace (Space d) where
 
 -/
 
-instance {d : ℕ} : Nontrivial (Space d.succ) where
+instance instNontrivial {d : ℕ} [NeZero d] : Nontrivial (Space d) where
   exists_pair_ne := by
     obtain k := Classical.choice Space.instNonempty
-    obtain ⟨v1, hv⟩ := exists_ne (0 : EuclideanSpace ℝ (Fin d.succ))
+    obtain ⟨v1, hv⟩ := exists_ne (0 : EuclideanSpace ℝ (Fin d))
     use k, v1 +ᵥ k
-    simpa only [ne_eq, eq_vadd_iff_vsub_eq, vsub_self] using hv.symm
+    simpa [ne_eq, eq_vadd_iff_vsub_eq, vsub_self] using hv.symm
 
 /-!
 
@@ -258,60 +253,35 @@ instance {d : ℕ} : Nontrivial (Space d.succ) where
 
 -/
 
-/-- The manifold structure on `Space d`. -/
-noncomputable def manifoldStructure (d : ℕ) :
-    ModelWithCorners ℝ (EuclideanSpace ℝ (Fin d)) (Space d) where
-  toFun := (Equiv.vaddConst (Classical.choice Space.instNonempty)).symm
-  invFun := Equiv.vaddConst (Classical.choice Space.instNonempty)
-  source := Set.univ
-  target := Set.univ
-  map_source' := by simp
-  map_target' := by simp
-  left_inv' := by simp
-  right_inv' := by simp
-  source_eq := by simp
-  convex_range' := by
-    rw [dif_pos (instIsRCLikeNormedField ℝ), Equiv.range_eq_univ]
-    exact fun _ _ _ ↦ by simp
-  nonempty_interior' := by
-    rw [Equiv.range_eq_univ]
-    simp
+open Manifold Real
+
+/--
+`Space d` is homoemorphic to d-dimensional euclidean space. This is used to define the `IsManifold`
+instance on `Space d`.
+-/
+noncomputable def homEuclideanSpaceSpace (d : ℕ) : EuclideanSpace ℝ (Fin d) ≃ₜ Space d where
+  toFun v := ⟨EuclideanSpace.equiv (Fin d) ℝ v⟩
+  invFun s := EuclideanSpace.equiv (Fin d) ℝ|>.symm s.val
   continuous_toFun := by
-    simp only [Equiv.coe_vaddConst_symm]
-    fun_prop
+    rw [Metric.continuous_iff]
+    intro b ε hε
+    use ε
+    simp_all [dist, Real.sqrt_eq_rpow]
   continuous_invFun := by
-    simp only [Equiv.coe_vaddConst]
-    fun_prop
+    rw [Metric.continuous_iff]
+    intro b ε hε
+    use ε
+    simp_all [dist, Real.sqrt_eq_rpow]
 
-@[simp]
-lemma manifoldStructure_comp_manifoldStructure_symm {d : ℕ} :
-    (↑(manifoldStructure d) ∘ ↑(manifoldStructure d).symm) = id := by
-  ext1 x
-  simpa using (manifoldStructure d).right_inv' (x := x) (by simp [manifoldStructure])
+noncomputable instance (d : ℕ) : ChartedSpace (EuclideanSpace ℝ (Fin d)) (Space d) :=
+    (homEuclideanSpaceSpace d).symm.toOpenPartialHomeomorph.singletonChartedSpace (by simp)
 
-lemma manifoldStructure_comp_manifoldStructure_symm_apply {d : ℕ}
-    (x : EuclideanSpace ℝ (Fin d)) :
-    (manifoldStructure d) ((manifoldStructure d).symm x) = x := by
-  simpa using (manifoldStructure d).right_inv' (x := x) (by simp [manifoldStructure])
+instance (d : ℕ) : IsManifold (𝓡 d) ⊤ (Space d) :=
+  (homEuclideanSpaceSpace d).symm.toOpenPartialHomeomorph.isManifold_singleton (by simp)
 
-@[simp]
-lemma range_manifoldStructure {d : ℕ} :
-    (Set.range ↑(manifoldStructure d)) = Set.univ := by
-  ext x
-  simpa using ⟨(manifoldStructure d).symm x, manifoldStructure_comp_manifoldStructure_symm_apply x⟩
-
-open Manifold in
-set_option backward.isDefEq.respectTransparency false in
-lemma contMDiff_vaddConst (d : ℕ) : ContMDiff
-    (manifoldStructure d) (𝓘(ℝ, EuclideanSpace ℝ (Fin d))) ⊤ (manifoldStructure d).toFun := by
-  rw [contMDiff_iff]
-  refine ⟨(manifoldStructure d).continuous_toFun, fun x y ↦ ?_⟩
-  simp only [extChartAt, OpenPartialHomeomorph.extend, OpenPartialHomeomorph.refl_partialEquiv,
-    PartialEquiv.refl_source, OpenPartialHomeomorph.singletonChartedSpace_chartAt_eq,
-    modelWithCornersSelf_partialEquiv, PartialEquiv.trans_refl, PartialEquiv.refl_coe,
-    ModelWithCorners.toPartialEquiv_coe, PartialEquiv.refl_trans,
-    ModelWithCorners.toPartialEquiv_coe_symm, manifoldStructure_comp_manifoldStructure_symm,
-    CompTriple.comp_eq, ModelWithCorners.target_eq, Set.preimage_univ, Set.inter_univ]
-  exact contDiffOn_id
+lemma chartAt_eq (d : ℕ) (p : Space d) :
+    chartAt (EuclideanSpace ℝ (Fin d)) p =
+    (homEuclideanSpaceSpace d).symm.toOpenPartialHomeomorph :=
+  rfl
 
 end Space

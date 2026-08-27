@@ -22,6 +22,8 @@ to non-relativistic physics (defined using `Space` and `Time`).
 
 noncomputable section
 
+open Physlib
+
 namespace SpaceTime
 
 open Time
@@ -40,6 +42,7 @@ def timeSlice {d : ℕ} {M : Type} (c : SpeedOfLight := 1) :
     funext x t
     simp
 
+@[fun_prop]
 lemma timeSlice_contDiff {d : ℕ} {M : Type} [NormedAddCommGroup M]
     [NormedSpace ℝ M]
     {n} (c : SpeedOfLight) (f : SpaceTime d → M) (h : ContDiff ℝ n f) :
@@ -49,6 +52,7 @@ lemma timeSlice_contDiff {d : ℕ} {M : Type} [NormedAddCommGroup M]
   · exact h
   · exact ContinuousLinearEquiv.contDiff (toTimeAndSpace c).symm
 
+@[fun_prop]
 lemma timeSlice_differentiable {d : ℕ} {M : Type} [NormedAddCommGroup M]
     [NormedSpace ℝ M] (c : SpeedOfLight)
     (f : SpaceTime d → M) (h : Differentiable ℝ f) :
@@ -57,6 +61,25 @@ lemma timeSlice_differentiable {d : ℕ} {M : Type} [NormedAddCommGroup M]
   apply Differentiable.comp
   · exact h
   · exact ContinuousLinearEquiv.differentiable (toTimeAndSpace c).symm
+
+@[fun_prop]
+lemma timeSlice_symm_contDiff {d : ℕ} {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    {n} (c : SpeedOfLight) (f : Time → Space d → M) (h : ContDiff ℝ n ↿f) :
+    ContDiff ℝ n ((timeSlice c).symm f) := by
+  change ContDiff ℝ n (Function.uncurry f ∘ toTimeAndSpace c)
+  apply ContDiff.comp
+  · exact h
+  · exact ContinuousLinearEquiv.contDiff (toTimeAndSpace c)
+
+@[fun_prop]
+lemma timeSlice_symm_differentiable {d : ℕ} {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (c : SpeedOfLight)
+    (f : Time → Space d → M) (h : Differentiable ℝ ↿f) :
+    Differentiable ℝ ↿((timeSlice c).symm f) := by
+  change Differentiable ℝ (Function.uncurry f ∘ toTimeAndSpace c)
+  apply Differentiable.comp
+  · exact h
+  · exact ContinuousLinearEquiv.differentiable (toTimeAndSpace c)
 
 /-- The timeslice of a function `SpaceTime d → M` forming a function
   `Time → Space d → M`, as a linear equivalence. -/
@@ -91,7 +114,6 @@ lemma timeSliceLinearEquiv_symm_apply {d : ℕ} {M : Type} [AddCommGroup M] [Mod
 -/
 open Distribution SchwartzMap
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The time slice of a distribution on `SpaceTime d` to form a distribution
   on `Time × Space d`. -/
 noncomputable def distTimeSlice {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
@@ -103,13 +125,13 @@ noncomputable def distTimeSlice {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
       (F := ℝ) ℝ (SpaceTime.toTimeAndSpace c (d := d)).symm
   left_inv f := by
     ext κ
-    simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+    simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
     congr
     ext x
     simp [compCLMOfContinuousLinearEquiv_apply]
   right_inv f := by
     ext κ
-    simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+    simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
     congr
     ext x
     simp
@@ -136,7 +158,6 @@ lemma distTimeSlice_symm_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma distTimeSlice_distDeriv_inl {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     {c : SpeedOfLight}
     (f : (SpaceTime d) →d[ℝ] M) :
@@ -144,7 +165,7 @@ lemma distTimeSlice_distDeriv_inl {M d} [NormedAddCommGroup M] [NormedSpace ℝ 
     (1/c.val) • Space.distTimeDeriv (distTimeSlice c f) := by
   ext κ
   rw [distTimeSlice_apply, distDeriv_apply, fderivD_apply]
-  simp only [Fin.isValue, one_div, ContinuousLinearMap.coe_smul', Pi.smul_apply]
+  simp only [Fin.isValue, one_div, FunLike.coe_smul, Pi.smul_apply]
   rw [distTimeDeriv_apply, fderivD_apply, distTimeSlice_apply]
   simp only [Fin.isValue, smul_neg, neg_inj]
   rw [← map_smul]
@@ -153,7 +174,7 @@ lemma distTimeSlice_distDeriv_inl {M d} [NormedAddCommGroup M] [NormedSpace ℝ 
   change fderiv ℝ (κ ∘ toTimeAndSpace c) x (Lorentz.Vector.basis (Sum.inl 0)) =
     c.val⁻¹ • fderiv ℝ κ (toTimeAndSpace c x) (1, 0)
   rw [fderiv_comp]
-  simp only [toTimeAndSpace_fderiv, Fin.isValue, ContinuousLinearMap.coe_comp',
+  simp only [toTimeAndSpace_fderiv, Fin.isValue, ContinuousLinearMap.coe_comp,
     ContinuousLinearEquiv.coe_coe, Function.comp_apply, smul_eq_mul]
   rw [toTimeAndSpace_basis_inl']
   rw [map_smul]
@@ -182,7 +203,6 @@ lemma distTimeSlice_symm_distTimeDeriv_eq {M d} [NormedAddCommGroup M] [NormedSp
   rw [distDeriv_inl_distTimeSlice_symm]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma distTimeSlice_distDeriv_inr {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     {c : SpeedOfLight}
     (i : Fin d) (f : (SpaceTime d) →d[ℝ] M) :
@@ -197,7 +217,7 @@ lemma distTimeSlice_distDeriv_inr {M d} [NormedAddCommGroup M] [NormedSpace ℝ 
   change fderiv ℝ (κ ∘ toTimeAndSpace c) x (Lorentz.Vector.basis (Sum.inr i)) =
     fderiv ℝ κ (toTimeAndSpace c x) (0, Space.basis i)
   rw [fderiv_comp]
-  simp only [toTimeAndSpace_fderiv, ContinuousLinearMap.coe_comp', ContinuousLinearEquiv.coe_coe,
+  simp only [toTimeAndSpace_fderiv, ContinuousLinearMap.coe_comp, ContinuousLinearEquiv.coe_coe,
     Function.comp_apply]
   rw [toTimeAndSpace_basis_inr]
   · apply Differentiable.differentiableAt

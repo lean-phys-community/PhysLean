@@ -17,4 +17,4 @@ public import Physlib.Meta.TODO.Basic
 
 @[expose] public section
 
-TODO "L7OTP" "Derive the scattering cross section of a perfectly rigid sphere."
+TODO "Derive the scattering cross section of a perfectly rigid sphere."

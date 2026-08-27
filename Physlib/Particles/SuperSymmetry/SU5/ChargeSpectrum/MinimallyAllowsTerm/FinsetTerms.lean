@@ -146,14 +146,10 @@ def minTopBottom (S5 S10 : Finset 𝓩) : Multiset (ChargeSpectrum 𝓩) := Mult
 lemma allowsTerm_topYukawa_of_mem_minTopBottom {S5 S10 : Finset 𝓩}
     {x : ChargeSpectrum 𝓩} (h : x ∈ minTopBottom S5 S10) :
     x.AllowsTerm topYukawa := by
-  simp only [minTopBottom, Multiset.mem_dedup, Multiset.mem_map, Multiset.mem_product,
-    Finset.mem_val, Prod.exists] at h
-  obtain ⟨qHd, qHu, q5, q10, ⟨hHd, hHu, h5, h10⟩, rfl⟩ := h
-  rw [allowsTerm_iff_subset_allowsTermForm]
-  simp [allowsTermForm]
-  use -qHu, q10
-  rw [subset_def]
-  simp
+  simp [minTopBottom] at h
+  obtain ⟨qHd, qHu, q5, q10, _, rfl⟩ := h
+  simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def]
+  exact ⟨-qHu, by simp, q10, by simp⟩
 
 /-!
 
@@ -165,12 +161,8 @@ lemma allowsTerm_bottomYukawa_of_mem_minTopBottom {S5 S10 : Finset 𝓩}
     {x : ChargeSpectrum 𝓩} (h : x ∈ minTopBottom S5 S10) :
     x.AllowsTerm bottomYukawa := by
   simp [minTopBottom] at h
-  obtain ⟨qHd, qHu, q5, q10, ⟨hHd, hHu, h5, h10⟩, rfl⟩ := h
-  rw [allowsTerm_iff_subset_allowsTermForm]
-  simp [allowsTermForm]
-  use qHd, q5
-  rw [subset_def]
-  simp
+  obtain ⟨qHd, qHu, q5, q10, _, rfl⟩ := h
+  simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def]
 
 /-!
 
@@ -188,38 +180,24 @@ lemma mem_minTopBottom_of_minimallyAllowsFinsetTerms
   have hBottom : x.AllowsTerm bottomYukawa := allowsTerm_of_minimallyAllowsFinsetTerms h (by simp)
   match x with
   | ⟨none, qHu, Q5, Q10⟩ =>
-    rw [allowsTerm_iff_subset_allowsTermForm] at hBottom
-    simp [allowsTermForm, subset_def] at hBottom
+    simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def] at hBottom
   | ⟨qHd, none, Q5, Q10⟩ =>
-    rw [allowsTerm_iff_subset_allowsTermForm] at hTop
-    simp [allowsTermForm, subset_def] at hTop
+    simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def] at hTop
   | ⟨some qHd, some qHu, Q5, Q10⟩ =>
-  rw [allowsTerm_iff_subset_allowsTermForm] at hTop hBottom
-  simp [allowsTermForm, subset_def] at hTop hBottom
+  simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def] at hTop hBottom
   obtain ⟨n, hn, q10, h10⟩ := hTop
   obtain ⟨q5, h5⟩ := hBottom
   use qHd, qHu, q5, q10
-  rw [mem_ofFinset_iff] at hx
-  simp at hx
+  simp [mem_ofFinset_iff] at hx
   refine ⟨⟨hx.1, hx.2.1, hx.2.2.1 h5.1, hx.2.2.2 (h10 (Finset.mem_insert_self _ _))⟩, ?_⟩
   refine (h _ ?_).mpr ?_
   · simp [subset_def]
-    refine ⟨h5.1, ?_⟩
-    refine Finset.insert_subset h5.2 ?_
-    refine Finset.insert_subset (h10 ?_) ?_
-    · simp
-    · refine Finset.singleton_subset_iff.mpr (h10 ?_)
-      simp [hn]
+    exact ⟨h5.1, Finset.insert_subset h5.2 (hn ▸ h10)⟩
   · intro T hT
     fin_cases hT
-    · rw [allowsTerm_iff_subset_allowsTermForm]
-      simp [allowsTermForm, subset_def]
-      use -qHu
-      simp only [neg_neg, true_and]
-      use q10
-      simp
-    · rw [allowsTerm_iff_subset_allowsTermForm]
-      simp [allowsTermForm, subset_def]
+    · simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def]
+      exact ⟨-qHu, by simp, q10, by simp⟩
+    · simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def]
 
 end ChargeSpectrum
 

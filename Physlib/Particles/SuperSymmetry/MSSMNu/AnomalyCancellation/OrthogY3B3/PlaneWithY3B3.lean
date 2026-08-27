@@ -52,44 +52,16 @@ lemma planeY₃B₃_val_eq' (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (hR' : R
   rw [planeY₃B₃_val, planeY₃B₃_val] at h
   have h1 := congrArg (fun S => dot Y₃.val S) h
   have h2 := congrArg (fun S => dot B₃.val S) h
-  simp only at h1 h2
-  erw [dot.map_add₂, dot.map_add₂] at h1 h2
-  erw [dot.map_add₂ Y₃.val (a' • Y₃.val + b' • B₃.val) (c' • R.val)] at h1
-  erw [dot.map_add₂ B₃.val (a' • Y₃.val + b' • B₃.val) (c' • R.val)] at h2
-  rw [dot.map_add₂] at h1 h2
-  rw [dot.map_smul₂, dot.map_smul₂, dot.map_smul₂] at h1 h2
-  rw [dot.map_smul₂, dot.map_smul₂, dot.map_smul₂] at h1 h2
-  rw [R.perpY₃] at h1
-  rw [R.perpB₃] at h2
-  rw [show dot Y₃.val Y₃.val = 216 by with_unfolding_all rfl] at h1
-  rw [show dot B₃.val B₃.val = 108 by with_unfolding_all rfl] at h2
-  rw [show dot Y₃.val B₃.val = 108 by with_unfolding_all rfl] at h1
-  rw [show dot B₃.val Y₃.val = 108 by with_unfolding_all rfl] at h2
-  simp_all
-  have ha : a = a' := by
-    linear_combination h1 / 108 + -1 * h2 / 108
-  have hb : b = b' := by
-    linear_combination -1 * h1 / 108 + h2 / 54
+  simp only [dot.map_add₂, dot.map_smul₂, R.perpY₃, R.perpB₃,
+    show dot Y₃.val Y₃.val = 216 by with_unfolding_all rfl,
+    show dot B₃.val B₃.val = 108 by with_unfolding_all rfl,
+    show dot Y₃.val B₃.val = 108 by with_unfolding_all rfl,
+    show dot B₃.val Y₃.val = 108 by with_unfolding_all rfl,
+    mul_zero, add_zero] at h1 h2
+  have ha : a = a' := by linarith
+  have hb : b = b' := by linarith
   rw [ha, hb] at h
-  have h1 := add_left_cancel h
-  have h1i : c • R.val + (- c') • R.val = 0 := by
-    rw [h1]
-    rw [← Module.add_smul]
-    simp
-  rw [← Module.add_smul] at h1i
-  have hR : ∃ i, R.val i ≠ 0 := Function.ne_iff.mp hR'
-  obtain ⟨i, hi⟩ := hR
-  have h2 := congrArg (fun S => S i) h1i
-  change _ = 0 at h2
-  simp only [HSMul.hSMul, ACCSystemCharges.chargesModule_smul, mul_eq_zero] at h2
-  have hc : c + -c' = 0 := by
-    cases h2 <;> rename_i h2
-    exact h2
-    exact (hi h2).elim
-  have hc : c = c' := by
-    linear_combination hc
-  rw [ha, hb, hc]
-  simp
+  exact ⟨ha, hb, smul_left_injective ℚ hR' (add_left_cancel h)⟩
 
 set_option backward.isDefEq.respectTransparency false in
 lemma planeY₃B₃_quad (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
@@ -97,7 +69,9 @@ lemma planeY₃B₃_quad (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
     + 2 * b * quadBiLin B₃.val R.val + c * quadBiLin R.val R.val) := by
   rw [planeY₃B₃_val]
   rw [accQuad, BiLinearSymm.toHomogeneousQuad_add]
-  erw [lineY₃B₃Charges_quad]
+  rw [← lineY₃B₃Charges_val, ← accQuad]
+  rw [lineY₃B₃Charges_quad]
+  rw [lineY₃B₃Charges_val, accQuad]
   rw [quadBiLin.toHomogeneousQuad.map_smul]
   rw [quadBiLin.map_add₁, quadBiLin.map_smul₁, quadBiLin.map_smul₁]
   rw [quadBiLin.map_smul₂, quadBiLin.map_smul₂]
@@ -110,9 +84,12 @@ lemma planeY₃B₃_cubic (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
     (3 * a * cubeTriLin R.val R.val Y₃.val
     + 3 * b * cubeTriLin R.val R.val B₃.val + c * cubeTriLin R.val R.val R.val) := by
   rw [planeY₃B₃_val]
-  rw [accCube, TriLinearSymm.toCubic_add]
-  erw [lineY₃B₃Charges_cubic]
-  erw [lineY₃B₃_doublePoint (c • R.1) a b]
+  rw [accCube, TriLinearSymm.toCubic_add, ← accCube]
+  rw [← lineY₃B₃Charges_val]
+  rw [lineY₃B₃Charges_cubic]
+  rw [TriLinearSymm.map_smul₃, lineY₃B₃Charges_val, ← lineY₃B₃_val]
+  rw [lineY₃B₃_doublePoint]
+  rw [lineY₃B₃_val, accCube]
   rw [cubeTriLin.toCubic.map_smul]
   rw [cubeTriLin.map_smul₁, cubeTriLin.map_smul₂]
   rw [cubeTriLin.map_add₃, cubeTriLin.map_smul₃, cubeTriLin.map_smul₃]

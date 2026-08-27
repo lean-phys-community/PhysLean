@@ -6,8 +6,8 @@ Authors: Kenny Lau, Joseph Tooby-Smith
 module
 
 public import Physlib.Meta.TODO.Basic
-public import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
-public import Mathlib.Topology.Algebra.Module.PointwiseConvergence
+public import Mathlib.Analysis.Distribution.TemperedDistribution
+public import Mathlib.MeasureTheory.Measure.CharacteristicFunction.Basic
 /-!
 
 # Distributions
@@ -26,6 +26,11 @@ functions from `E` to `F`. We give a more precise definition of distributions be
 - `E →d[𝕜] F` is the type of distributions from `E` to `F`.
 - `Distribution.derivative` and `Distribution.fourierTransform` allow us to make sense of these
   operations that might not make sense a priori on general functions.
+- `Distribution.toTemperedDistribution` converts a Physlib distribution to a Mathlib
+  tempered distribution.
+- `Distribution.ofFiniteMeasure` is the scalar distribution associated to a finite measure.
+- `Distribution.ofFiniteMeasure_eq_iff` says that finite measures are determined by their
+  associated complex scalar distributions.
 
 ## iii. Table of Content
 
@@ -45,6 +50,7 @@ functions from `E` to `F`. We give a more precise definition of distributions be
 @[expose] public section
 
 open SchwartzMap NNReal
+open scoped ENNReal SchwartzMap FourierTransform
 noncomputable section
 
 /-!
@@ -87,6 +93,9 @@ where `E` is a normed vector space over `ℝ` and `F` is a normed vector space o
 
 -/
 
+/- Need the `Physlib` namespace to prevent conflict with Mathlib's distributions. -/
+namespace Physlib
+
 /-- An `F`-valued distribution on `E` (where `E` is a normed vector space over `ℝ` and `F` is a
 normed vector space over `𝕜`) is a continuous linear map `𝓢(E, 𝕜) →L[𝕜] F` where `𝒮(E, 𝕜)` is
 the Schwartz space of smooth functions `E → 𝕜` with rapidly decreasing iterated derivatives. This
@@ -118,7 +127,6 @@ on the size of `u` applied to `η`.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The construction of a distribution from the following data:
 1. We take a finite set `s` of pairs `(k, n) ∈ ℕ × ℕ` that will be explained later.
 2. We take a linear map `u` that evaluates the given Schwartz function `η`. At this stage we don't
@@ -139,7 +147,7 @@ def ofLinear (s : Finset (ℕ × ℕ)) (u : 𝓢(E, 𝕜) →ₗ[𝕜] F)
     refine hη.trans <| mul_le_mul_of_nonneg_left ((le_seminorm 𝕜 k n η x).trans ?_) hC
     rw [Seminorm.finset_sup_apply]
     refine (NNReal.coe_le_coe (r₁ := ⟨SchwartzMap.seminorm 𝕜 k n η, apply_nonneg _ _⟩)).2 ?_
-    convert s.le_sup hkn
+    exact s.le_sup hkn
       (f := fun kn : ℕ × ℕ ↦ (⟨SchwartzMap.seminorm 𝕜 kn.1 kn.2 η, apply_nonneg _ _⟩ : ℝ≥0))
 
 @[simp] lemma ofLinear_apply (s : Finset (ℕ × ℕ)) (u : 𝓢(E, 𝕜) →ₗ[𝕜] F)
@@ -214,7 +222,7 @@ def fderivD [FiniteDimensional ℝ E] : (E →d[𝕜] F) →ₗ[𝕜] (E →d[�
       ext x
       simp only [map_add, ContinuousLinearEquiv.neg_apply,
         LinearMap.coe_toContinuousLinearMap', LinearMap.coe_mk, AddHom.coe_mk,
-        ContinuousLinearMap.add_apply]
+        add_apply]
     map_smul' a η := by
       ext x
       simp
@@ -227,7 +235,7 @@ def fderivD [FiniteDimensional ℝ E] : (E →d[𝕜] F) →ₗ[𝕜] (E →d[�
   }
   map_add' u₁ u₂ := by
     ext η
-    simp only [ContinuousLinearMap.add_apply, ContinuousLinearEquiv.neg_apply, neg_add_rev,
+    simp only [add_apply, ContinuousLinearEquiv.neg_apply, neg_add_rev,
       ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk,
       LinearMap.coe_toContinuousLinearMap']
     abel
@@ -239,7 +247,7 @@ lemma fderivD_apply [FiniteDimensional ℝ E] (u : E →d[𝕜] F) (η : 𝓢(E,
     fderivD 𝕜 u η v = - u (SchwartzMap.evalCLM (𝕜 := 𝕜) E 𝕜 v (SchwartzMap.fderivCLM 𝕜 E 𝕜 η)) := by
   rfl
 
-TODO "01-09-25-JTS" "For distributions, prove that the derivative fderivD commutes with
+TODO "For distributions, prove that the derivative fderivD commutes with
   integrals and sums. This may require defining the integral of families of distributions
   although it is expected this will follow from the definition of a distribution."
 
@@ -277,10 +285,47 @@ end Complex
 
 /-!
 
+### D.1. Bridge to Mathlib tempered distributions
+
+Mathlib's tempered distributions use the pointwise convergence topology on the same underlying
+continuous linear maps. The following construction converts Physlib distributions to that API.
+
+-/
+section TemperedDistribution
+
+variable [NormedSpace ℝ E] [NormedSpace ℂ F]
+
+/-- The Mathlib tempered distribution associated to a Physlib distribution. -/
+def toTemperedDistribution (u : E →d[ℂ] F) : 𝓢'(E, F) :=
+  ContinuousLinearMap.toPointwiseConvergenceCLM _ _ _ _ u
+
+@[simp]
+lemma toTemperedDistribution_apply (u : E →d[ℂ] F) (η : 𝓢(E, ℂ)) :
+    u.toTemperedDistribution η = u η :=
+  rfl
+
+end TemperedDistribution
+
+section TemperedDistributionFourier
+
+variable [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E]
+  [NormedSpace ℂ F]
+
+/-- Conversion to Mathlib tempered distributions commutes with the Fourier transform. -/
+@[simp]
+lemma toTemperedDistribution_fourierTransform (u : E →d[ℂ] F) :
+    (u.fourierTransform E F).toTemperedDistribution = 𝓕 u.toTemperedDistribution :=
+  rfl
+
+end TemperedDistributionFourier
+
+/-!
+
 ## E. Specific distributions
 
 We now define specific distributions, which are used throughout physics. In particular, we define:
 - The constant distribution.
+- Distributions associated to finite measures.
 - The dirac delta distribution.
 - The heaviside step function.
 
@@ -302,7 +347,6 @@ variable (E : Type) [NormedAddCommGroup E]
   [NormedSpace 𝕜 F] [SMulCommClass ℝ 𝕜 F]
   [MeasureSpace E] [BorelSpace E] [SecondCountableTopology E]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The constant distribution `E →d[𝕜] F`, for a given `c : F` this corresponds
   to the integral `∫ x, η x • c ∂MeasureTheory.volume`. -/
 def const [hμ : Measure.HasTemperateGrowth (volume (α := E))] (c : F) : E →d[𝕜] F := by
@@ -363,18 +407,15 @@ lemma fderivD_const [hμ : Measure.IsAddHaarMeasure (volume (α := E))]
     fderivD ℝ (const ℝ E c) = 0 := by
   ext η v
   rw [fderivD_apply, const_apply]
-  simp only [ContinuousLinearMap.zero_apply, neg_eq_zero]
+  simp only [zero_apply, neg_eq_zero]
   trans -∫ (x : E), η x • (fderiv ℝ (fun y => c) x) v ∂volume
   swap
   · simp
   rw [integral_smul_fderiv_eq_neg_fderiv_smul_of_integrable]
   simp only [evalCLM_apply_apply, fderivCLM_apply, neg_neg]
-  · apply MeasureTheory.Integrable.smul_const
-    change Integrable (SchwartzMap.evalCLM (𝕜 := ℝ) E ℝ v (SchwartzMap.fderivCLM ℝ E ℝ η)) volume
-    exact integrable ((SchwartzMap.evalCLM ℝ E ℝ v) ((fderivCLM ℝ) E ℝ η))
+  · exact (integrable ((SchwartzMap.evalCLM ℝ E ℝ v) ((fderivCLM ℝ) E ℝ η))).smul_const c
   · simp
-  · apply MeasureTheory.Integrable.smul_const
-    exact integrable η
+  · exact (integrable η).smul_const c
   · fun_prop
   · simp
 
@@ -383,7 +424,144 @@ end constant
 
 /-!
 
-### E.2. The dirac delta distribution
+### E.2. Distributions associated to finite measures
+
+Every finite measure has temperate growth, so integrating Schwartz maps against it defines a
+scalar distribution.
+
+-/
+section finiteMeasure
+
+open MeasureTheory
+
+variable [NormedSpace ℝ E] [MeasurableSpace E] [BorelSpace E] [SecondCountableTopology E]
+
+/-- The scalar distribution associated to a finite measure, acting on a Schwartz map by
+integration. -/
+def ofFiniteMeasure (μ : Measure E) [IsFiniteMeasure μ] : E →d[𝕜] 𝕜 :=
+  integralCLM 𝕜 μ
+
+@[simp]
+lemma ofFiniteMeasure_apply (μ : Measure E) [IsFiniteMeasure μ] (η : 𝓢(E, 𝕜)) :
+    ofFiniteMeasure 𝕜 μ η = ∫ x, η x ∂μ :=
+  rfl
+
+/-- The finite-measure distribution agrees with Mathlib's tempered distribution associated to the
+same measure. -/
+@[simp]
+lemma toTemperedDistribution_ofFiniteMeasure (μ : Measure E) [IsFiniteMeasure μ] :
+    (ofFiniteMeasure ℂ μ).toTemperedDistribution = μ.toTemperedDistribution :=
+  rfl
+
+omit [NormedAddCommGroup E] [NormedSpace ℝ E] [BorelSpace E]
+  [SecondCountableTopology E] in
+private lemma lipschitzWith_integral_of_le {μ ρ : Measure E} (hμρ : μ ≤ ρ) :
+    LipschitzWith 1 (fun f : Lp ℂ 1 ρ => ∫ x, f x ∂μ) := by
+  refine LipschitzWith.of_dist_le_mul fun f g => ?_
+  rw [dist_eq_norm, dist_eq_norm, NNReal.coe_one, one_mul]
+  have hfμ : Integrable (fun x => f x) μ :=
+    memLp_one_iff_integrable.mp ((Lp.memLp f).mono_measure hμρ)
+  have hgμ : Integrable (fun x => g x) μ :=
+    memLp_one_iff_integrable.mp ((Lp.memLp g).mono_measure hμρ)
+  have hfg_ae : (fun x => (f - g : Lp ℂ 1 ρ) x) =ᵐ[ρ] fun x => f x - g x :=
+    Lp.coeFn_sub f g
+  have hfg_top : eLpNorm (fun x => f x - g x) 1 ρ ≠ ∞ := by
+    rw [← eLpNorm_congr_ae hfg_ae]
+    exact (Lp.memLp (f - g)).eLpNorm_ne_top
+  calc
+    ‖∫ x, f x ∂μ - ∫ x, g x ∂μ‖
+        = ‖∫ x, (f x - g x) ∂μ‖ := by rw [integral_sub hfμ hgμ]
+    _ ≤ (∫⁻ x, ‖f x - g x‖ₑ ∂μ).toReal := by
+      simpa only [ofReal_norm, eLpNorm_one_eq_lintegral_enorm] using
+        MeasureTheory.norm_integral_le_lintegral_norm (μ := μ) (fun x => f x - g x)
+    _ ≤ (eLpNorm (fun x => f x - g x) 1 ρ).toReal := by
+      refine ENNReal.toReal_mono hfg_top ?_
+      simpa [eLpNorm_one_eq_lintegral_enorm] using
+        eLpNorm_mono_measure (p := (1 : ℝ≥0∞)) (fun x => f x - g x) hμρ
+    _ = ‖f - g‖ := by rw [Lp.norm_def, eLpNorm_congr_ae hfg_ae]
+
+private lemma integral_boundedContinuous_eq_of_forall_schwartz_integral_eq
+    [FiniteDimensional ℝ E] {μ ν : Measure E} [IsFiniteMeasure μ] [IsFiniteMeasure ν]
+    (h : ∀ η : 𝓢(E, ℂ), ∫ x, η x ∂μ = ∫ x, η x ∂ν)
+    (f : BoundedContinuousFunction E ℂ) :
+    ∫ x, f x ∂μ = ∫ x, f x ∂ν := by
+  let ρ : Measure E := μ + ν
+  have : IsFiniteMeasure ρ := inferInstance
+  have : ρ.HasTemperateGrowth := inferInstance
+  let L : 𝓢(E, ℂ) →L[ℝ] Lp ℂ 1 ρ :=
+    SchwartzMap.toLpCLM ℝ ℂ 1 ρ
+  let toL1 : BoundedContinuousFunction E ℂ →L[ℝ] Lp ℂ 1 ρ :=
+    BoundedContinuousFunction.toLp 1 ρ ℝ
+  let S : Set (Lp ℂ 1 ρ) := {u | ∫ x, u x ∂μ = ∫ x, u x ∂ν}
+  have hS_closed : IsClosed S :=
+    isClosed_eq
+      (lipschitzWith_integral_of_le (μ := μ) (ρ := ρ)
+        (Measure.le_add_right le_rfl)).continuous
+      (lipschitzWith_integral_of_le (μ := ν) (ρ := ρ)
+        (Measure.le_add_left le_rfl)).continuous
+  have h_range_subset : Set.range L ⊆ S := by
+    rintro u ⟨η, rfl⟩
+    dsimp [S, L]
+    have hηρ : (L η : E → ℂ) =ᵐ[ρ] η := by
+      simpa [L] using SchwartzMap.coeFn_toLp η (1 : ℝ≥0∞) ρ
+    have hημ : (L η : E → ℂ) =ᵐ[μ] η :=
+      (Measure.absolutelyContinuous_of_le (Measure.le_add_right le_rfl)) hηρ
+    have hην : (L η : E → ℂ) =ᵐ[ν] η :=
+      (Measure.absolutelyContinuous_of_le (Measure.le_add_left le_rfl)) hηρ
+    calc
+      ∫ x, (L η : E → ℂ) x ∂μ = ∫ x, η x ∂μ := integral_congr_ae hημ
+      _ = ∫ x, η x ∂ν := h η
+      _ = ∫ x, (L η : E → ℂ) x ∂ν := (integral_congr_ae hην).symm
+  have hS_univ : Set.univ ⊆ S := by
+    rw [← (SchwartzMap.denseRange_toLpCLM (E := E) (F := ℂ) (p := (1 : ℝ≥0∞))
+      (μ := ρ) ENNReal.one_ne_top).closure_range]
+    exact hS_closed.closure_subset_iff.mpr h_range_subset
+  have hfS : toL1 f ∈ S := hS_univ trivial
+  dsimp [S, toL1] at hfS
+  have hfρ : (toL1 f : E → ℂ) =ᵐ[ρ] f := by
+    simpa [toL1] using BoundedContinuousFunction.coeFn_toLp (1 : ℝ≥0∞) ρ ℝ f
+  have hfμ : (toL1 f : E → ℂ) =ᵐ[μ] f :=
+    (Measure.absolutelyContinuous_of_le (Measure.le_add_right le_rfl)) hfρ
+  have hfν : (toL1 f : E → ℂ) =ᵐ[ν] f :=
+    (Measure.absolutelyContinuous_of_le (Measure.le_add_left le_rfl)) hfρ
+  calc
+    ∫ x, f x ∂μ = ∫ x, (toL1 f : E → ℂ) x ∂μ := (integral_congr_ae hfμ).symm
+    _ = ∫ x, (toL1 f : E → ℂ) x ∂ν := hfS
+    _ = ∫ x, f x ∂ν := integral_congr_ae hfν
+
+end finiteMeasure
+
+section finiteMeasureExt
+
+open MeasureTheory
+
+private lemma measure_eq_of_forall_schwartz_integral_eq
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [MeasurableSpace E]
+    [BorelSpace E] [SecondCountableTopology E] [FiniteDimensional ℝ E]
+    {μ ν : Measure E} [IsFiniteMeasure μ] [IsFiniteMeasure ν]
+    (h : ∀ η : 𝓢(E, ℂ), ∫ x, η x ∂μ = ∫ x, η x ∂ν) :
+    μ = ν := by
+  refine Measure.ext_of_charFunDual (funext fun L => ?_)
+  rw [charFunDual_apply, charFunDual_apply]
+  exact integral_boundedContinuous_eq_of_forall_schwartz_integral_eq h
+    (BoundedContinuousFunction.probCharDual L)
+
+/-- The complex scalar distribution associated to a finite measure determines the measure. -/
+lemma ofFiniteMeasure_eq_iff
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [MeasurableSpace E]
+    [BorelSpace E] [SecondCountableTopology E] [FiniteDimensional ℝ E]
+    {μ ν : Measure E} [IsFiniteMeasure μ] [IsFiniteMeasure ν] :
+    ofFiniteMeasure ℂ μ = ofFiniteMeasure ℂ ν ↔ μ = ν := by
+  refine ⟨fun hdist => measure_eq_of_forall_schwartz_integral_eq fun η => ?_, ?_⟩
+  · rw [← ofFiniteMeasure_apply (𝕜 := ℂ) μ η, ← ofFiniteMeasure_apply (𝕜 := ℂ) ν η, hdist]
+  · rintro rfl
+    rfl
+
+end finiteMeasureExt
+
+/-!
+
+### E.3. The dirac delta distribution
 
 The dirac delta distribution centered at `a : E` is the distribution which takes
 `η` to `η a`. We also define `diracDelta'` which takes in an element of `v` of `F` and
@@ -420,7 +598,7 @@ def diracDelta' (a : E) (v : F) : E →d[𝕜] F :=
 end DiracDelta
 /-!
 
-### E.3. The heviside step function
+### E.4. The heaviside step function
 
 The heaviside step function on `EuclideanSpace ℝ (Fin d.succ)` is the distribution
 from `EuclideanSpace ℝ (Fin d.succ)` to `ℝ` which takes a `η` to the integral of `η` in the
@@ -429,7 +607,6 @@ upper-half plane (determined by the last coordinate in `EuclideanSpace ℝ (Fin 
 -/
 open MeasureTheory
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The Heaviside step distribution defined on `(EuclideanSpace ℝ (Fin d.succ)) `
   equal to `1` in the positive `z`-direction and `0` in the negative `z`-direction. -/
 def heavisideStep (d : ℕ) : (EuclideanSpace ℝ (Fin d.succ)) →d[ℝ] ℝ := by
@@ -447,7 +624,7 @@ def heavisideStep (d : ℕ) : (EuclideanSpace ℝ (Fin d.succ)) →d[ℝ] ℝ :=
   · intro a η
     simp only [smul_apply, RingHom.id_apply]
     rw [MeasureTheory.integral_smul]
-  haveI hμ : (volume (α := EuclideanSpace ℝ (Fin d.succ))).HasTemperateGrowth := by
+  have hμ : (volume (α := EuclideanSpace ℝ (Fin d.succ))).HasTemperateGrowth := by
     infer_instance
   rcases hμ.exists_integrable with ⟨n, h⟩
   let m := (n, 0)
@@ -477,3 +654,4 @@ lemma heavisideStep_apply (d : ℕ) (η : 𝓢(EuclideanSpace ℝ (Fin d.succ), 
   rfl
 
 end Distribution
+end Physlib

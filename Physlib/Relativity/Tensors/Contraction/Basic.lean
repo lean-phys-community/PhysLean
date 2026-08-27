@@ -10,28 +10,75 @@ public import Physlib.Relativity.Tensors.Contraction.Pure
 
 # Contractions on tensors
 
+## i. Overview
+
+This file defines tensor contraction for an arbitrary `TensorSpecies`.
+
+The colors of a tensor record the type of each index. A pair of positions can be
+contracted when their colors are dual, expressed by a proof
+`S.τ (c i) = c j`, where `S.τ` is the color involution in the tensor species.
+For a tensor with colors `c : Fin (n + 1 + 1) → C`, contraction at positions
+`i` and `j` produces a tensor with two fewer indices and colors
+`c ∘ Fin.succSuccAbove i j`.
+
+The construction is first made on pure tensors in
+`Physlib.Relativity.Tensors.Contraction.Pure`. There, `Pure.dropPair` removes the
+two contracted factors from the remaining pure tensor, `Pure.contrPCoeff`
+computes the scalar contraction of the two removed factors using `S.contr`, and
+`Pure.contrP` multiplies that scalar by the dropped tensor. This file extends the
+operation linearly to arbitrary tensors via `contrT`.
+
+## ii. Key results
+
+- `TensorSpecies.Tensor.contrT` is the linear contraction map on tensors.
+- `TensorSpecies.Tensor.contrT_pure` identifies `contrT` on pure tensors with
+  `Pure.contrP`.
+- `TensorSpecies.Tensor.contrT_equivariant` says contraction commutes with the
+  symmetry-group action.
+- `TensorSpecies.Tensor.contrT_permT`, `TensorSpecies.Tensor.contrT_symm`, and
+  `TensorSpecies.Tensor.contrT_comm` describe the interaction of contraction with
+  reindexing, swapping the contracted pair, and performing two contractions.
+
+## iii. Related files
+
+- `Physlib.Relativity.Tensors.Contraction.SuccSuccAbove` contains the finite-index
+  maps used to drop two positions.
+- `Physlib.Relativity.Tensors.Contraction.Pure` defines `Pure.dropPair`,
+  `Pure.contrPCoeff`, `Pure.contrP`, and the multilinear map used to define
+  `contrT`.
+- `Physlib.Relativity.Tensors.Contraction.Products` proves compatibility between
+  contractions and tensor products.
+
+## iv. Table of contents
+
+- A. Tensor contraction
+
+## v. References
+
+There are no known references for the material in this module.
+
 -/
 
 @[expose] public section
 
-open IndexNotation
-open CategoryTheory
-open MonoidalCategory
-
 namespace TensorSpecies
-open OverColor
+open Module
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G] {S : TensorSpecies k C G}
+variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Basis (basisIdx c) k (V c)}
+    {S : TensorSpecies k C G V basisIdx rep b}
 
 namespace Tensor
-
+open Fin
 /-!
 
-## contrT
+## A. Tensor contraction
 
 -/
 
-open Pure
+open _root_.TensorSpecies.Tensor.Pure
 
 lemma contrT_decide {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
     (hx : S.τ (c i) = c j) (hij : i ≠ j := by decide) :
@@ -44,7 +91,7 @@ lemma contrT_decide {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)
   with the `j`th index. -/
 noncomputable def contrT (n : ℕ) {c : Fin (n + 1 + 1) → C} (i j : Fin (n + 1 + 1))
       (hij : i ≠ j ∧ S.τ (c i) = c j) :
-    Tensor S c →ₗ[k] Tensor S (c ∘ dropPairEmb i j) :=
+    Tensor S c →ₗ[k] Tensor S (c ∘ succSuccAbove i j) :=
   PiTensorProduct.lift (Pure.contrPMultilinear i j hij)
 
 lemma contrT_congr {n : ℕ} {c : Fin (n + 1 + 1) → C}
@@ -64,7 +111,6 @@ lemma contrT_pure {n : ℕ} {c : Fin (n + 1 + 1) → C} (i j : Fin (n + 1 + 1))
   simp only [contrT, Pure.toTensor]
   change _ = Pure.contrPMultilinear i j hij p
   conv_rhs => rw [← PiTensorProduct.lift.tprod]
-  rfl
 
 @[simp]
 lemma contrT_equivariant {n : ℕ} {c : Fin (n + 1 + 1) → C}
@@ -83,19 +129,17 @@ lemma contrT_equivariant {n : ℕ} {c : Fin (n + 1 + 1) → C}
   · intro p q hp
     simp [P, hp]
   · intro p r hr hp
-    simp [P, hp, hr, Tensor.actionT_add]
+    simp [P, hp, hr]
 
 lemma contrT_permT {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin (n1 + 1 + 1) → C}
     (i j : Fin (n1 + 1 + 1)) (hij : i ≠ j ∧ S.τ (c1 i) = (c1 j))
     (σ : Fin (n1 + 1 + 1) → Fin (n + 1 + 1))
-    (hσ : PermCond c c1 σ) (t : Tensor S c) :
-    contrT n1 i j hij (permT σ hσ t) = permT (dropPairOfMap i j hij.1 σ hσ.1)
-      (permCond_dropPairOfMap i j hij.1 σ hσ)
+    (hσ : IsReindexing c c1 σ) (t : Tensor S c) :
+    contrT n1 i j hij (permT σ hσ t) = permT _ (hσ.succSuccAbove i j hij.1)
       (contrT n (σ i) (σ j) (by simp [hσ.2, hij, hσ.1.injective.eq_iff]) t) := by
   let P (t : Tensor S c) : Prop := contrT n1 i j hij (permT σ hσ t) =
-      permT (dropPairOfMap i j hij.1 σ hσ.1)
-        (permCond_dropPairOfMap i j hij.1 σ hσ)
+      permT _ (hσ.succSuccAbove i j hij.1)
         (contrT n (σ i) (σ j) (by simp [hσ.2, hij, hσ.1.injective.eq_iff]) t)
   change P t
   apply induction_on_pure
@@ -129,25 +173,25 @@ lemma contrT_symm {n : ℕ} {c : Fin (n + 1 + 1) → C}
 lemma contrT_comm {n : ℕ} {c : Fin (n + 1 + 1 + 1 + 1) → C}
     (i1 j1 : Fin (n + 1 + 1 + 1 + 1)) (i2 j2 : Fin (n + 1 + 1))
     (hij1 : i1 ≠ j1 ∧ S.τ (c i1) = (c j1))
-    (hij2 : i2 ≠ j2 ∧ S.τ (c (dropPairEmb i1 j1 i2)) = (c (dropPairEmb i1 j1 j2)))
+    (hij2 : i2 ≠ j2 ∧ S.τ (c (succSuccAbove i1 j1 i2)) = (c (succSuccAbove i1 j1 j2)))
     (t : Tensor S c) :
-    let i2' := (dropPairEmb i1 j1 i2);
-    let j2' := (dropPairEmb i1 j1 j2);
+    let i2' := (succSuccAbove i1 j1 i2);
+    let j2' := (succSuccAbove i1 j1 j2);
     have hi2j2' : i2' ≠ j2' := by simp [i2', j2', hij2];
-    let i1' := (dropPairEmbPre i2' j2' hi2j2' i1 (by simp [i2', j2']));
-    let j1' := (dropPairEmbPre i2' j2' hi2j2' j1 (by simp [i2', j2']));
+    let i1' := (predPredAbove i2' j2' hi2j2' i1 (by simp [i2', j2']));
+    let j1' := (predPredAbove i2' j2' hi2j2' j1 (by simp [i2', j2']));
     contrT n i2 j2 hij2 (contrT (n + 1 + 1) i1 j1 hij1 t) =
-    permT id (permCond_dropPairEmb_comm i1 j1 i2 j2 hij1.left hij2.left)
+    permT id (IsReindexing.succSuccAbove_comm i1 j1 i2 j2 hij1.left hij2.left)
       (contrT n i1' j1' (by simp [i1', j1', i2', j2', hij1])
       (contrT (n + 1 + 1) i2' j2' (by simp [i2', j2', hij2]) t)) := by
-  let i2' := (dropPairEmb i1 j1 i2);
-  let j2' := (dropPairEmb i1 j1 j2);
-  let i1' := (dropPairEmbPre i2' j2' (by simp [i2', j2', hij2]) i1
+  let i2' := (succSuccAbove i1 j1 i2);
+  let j2' := (succSuccAbove i1 j1 j2);
+  let i1' := (predPredAbove i2' j2' (by simp [i2', j2', hij2]) i1
     (by simp [i2', j2']));
-  let j1' := (dropPairEmbPre i2' j2' (by simp [i2', j2', hij2]) j1
+  let j1' := (predPredAbove i2' j2' (by simp [i2', j2', hij2]) j1
     (by simp [i2', j2']));
   let P (t : Tensor S c) : Prop := contrT n i2 j2 hij2 (contrT (n + 1 + 1) i1 j1 hij1 t) =
-      permT id (permCond_dropPairEmb_comm i1 j1 i2 j2 hij1.left hij2.left)
+      permT id (IsReindexing.succSuccAbove_comm i1 j1 i2 j2 hij1.left hij2.left)
         (contrT n i1' j1' (by simp [i1', j1', i2', j2', hij1])
         (contrT (n + 1 + 1) i2' j2' (by simp [i2', j2', hij2]) t))
   change P t

@@ -15,14 +15,12 @@ public import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Basic
 -/
 
 @[expose] public section
-open Module IndexNotation
+
+open Module
 open Matrix
 open MatrixGroups
 open Complex
 open TensorProduct
-open IndexNotation
-open CategoryTheory
-open OverColor.Discrete
 noncomputable section
 
 namespace PauliMatrix
@@ -42,6 +40,7 @@ and properties thereof.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The equivalence between the type of indices of a [.up, .upL, .upR] tensor and
   `(Fin 1 ⊕ Fin 3) × Fin 2 × Fin 2`. -/
 def indexEquiv : ComponentIdx (S := complexLorentzTensor) ![.up, .upL, .upR] ≃
@@ -115,14 +114,22 @@ scoped[PauliMatrix] notation "σ^^^" => toTensor pauliMatrix
 
 set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_basis_expand : σ^^^ =
-    Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => 0 | 1 => 0 | 2 => 0)
-    + Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => 0 | 1 => 1 | 2 => 1)
-    + Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => 1 | 1 => 0 | 2 => 1)
-    + Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => 1 | 1 => 1 | 2 => 0)
-    - I • Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => 2 | 1 => 0 | 2 => 1)
-    + I • Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => 2 | 1 => 1 | 2 => 0)
-    + Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => 3 | 1 => 0 | 2 => 0)
-    - Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => 3 | 1 => 1 | 2 => 1) := by
+    Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (0 : Fin 4) | 1 => (0 : Fin 2) | 2 => (0 : Fin 2))
+    + Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (0 : Fin 4) | 1 => (1 : Fin 2) | 2 => (1 : Fin 2))
+    + Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (1 : Fin 4) | 1 => (0 : Fin 2) | 2 => (1 : Fin 2))
+    + Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (1 : Fin 4) | 1 => (1 : Fin 2) | 2 => (0 : Fin 2))
+    - I • Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (2 : Fin 4) | 1 => (0 : Fin 2) | 2 => (1 : Fin 2))
+    + I • Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (2 : Fin 4) | 1 => (1 : Fin 2) | 2 => (0 : Fin 2))
+    + Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (3 : Fin 4) | 1 => (0 : Fin 2) | 2 => (0 : Fin 2))
+    - Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (3 : Fin 4) | 1 => (1 : Fin 2) | 2 => (1 : Fin 2)) := by
   apply toTensor (self := tensorial).symm.injective
   simp [toTensor_symm_basis]
   funext μ α β
@@ -137,7 +144,6 @@ lemma toTensor_basis_expand : σ^^^ =
     simp [pauliMatrix]
 
 open Lorentz in
-set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_eq_asConsTensor :
     σ^^^ = fromConstTriple (S := complexLorentzTensor)
       (c1 := Color.up) (c2 := Color.upL) (c3 := Color.upR) PauliMatrix.asConsTensor := by
@@ -151,47 +157,21 @@ lemma toTensor_eq_asConsTensor :
   rw [show complexContrBasis (Sum.inr 0) = complexContrBasisFin4 1 by {simp}]
   rw [show complexContrBasis (Sum.inr 1) = complexContrBasisFin4 2 by {simp}]
   rw [show complexContrBasis (Sum.inr 2) = complexContrBasisFin4 3 by {simp}]
-  conv_lhs =>
-    enter [1, 1, 1, 1, 1, 1, 1]
-    rw [← basis_up_eq, ← basis_upL_eq, ← basis_upR_eq]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 1, 1, 1, 1, 1, 2]
-    rw [← basis_up_eq, ← basis_upL_eq, ← basis_upR_eq]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 1, 1, 1, 1, 2]
-    rw [← basis_up_eq, ← basis_upL_eq, ← basis_upR_eq]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 1, 1, 1, 2]
-    rw [← basis_up_eq, ← basis_upL_eq, ← basis_upR_eq]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 1, 1, 2]
-    rw [← basis_up_eq, ← basis_upL_eq, ← basis_upR_eq]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 1, 2]
-    rw [← basis_up_eq, ← basis_upL_eq, ← basis_upR_eq]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 2]
-    rw [← basis_up_eq, ← basis_upL_eq, ← basis_upR_eq]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [2]
-    rw [← basis_up_eq, ← basis_upL_eq, ← basis_upR_eq]
-    rw [fromTripleT_apply_basis]
+  simp only [fromTripleT_apply_basis]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_eq_ofRat : σ^^^ = ofRat (fun b =>
-    if b 0 = 0 ∧ b 1 = b 2 then ⟨1, 0⟩ else
-    if b 0 = 1 ∧ b 1 ≠ b 2 then ⟨1, 0⟩ else
-    if b 0 = 2 ∧ b 1 = 0 ∧ b 2 = 1 then ⟨0, -1⟩ else
-    if b 0 = 2 ∧ b 1 = 1 ∧ b 2 = 0 then ⟨0, 1⟩ else
-    if b 0 = 3 ∧ b 1 = 0 ∧ b 2 = 0 then ⟨1, 0⟩ else
-    if b 0 = 3 ∧ b 1 = 3 ∧ b 2 = 3 then ⟨-1, 0⟩ else 0) := by
+    if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, -1⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, 1⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨-1, 0⟩ else 0) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [toTensor_basis_expand]
@@ -226,21 +206,21 @@ lemma toTensor_smul_eq_self (Λ : SL(2,ℂ)) : Λ • σ^^^ = σ^^^ := by
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ_μ^α^{dot β}`. -/
 abbrev pauliCo : ℂT[.down, .upL, .upR] :=
-  permT id (PermCond.auto) {η' | μ ν ⊗ σ^^^ | ν α β}ᵀ
+  permT id (IsReindexing.auto) {η' | μ ν ⊗ σ^^^ | ν α β}ᵀ
 
 @[inherit_doc pauliCo]
 scoped[PauliMatrix] notation "σ_^^" => PauliMatrix.pauliCo
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ_μ_{dot β}_α`. -/
 abbrev pauliCoDown : ℂT[.down, .downR, .downL] :=
-  permT id (PermCond.auto) {σ_^^ | μ α β ⊗ εR' | β β' ⊗ εL' | α α' }ᵀ
+  permT id (IsReindexing.auto) {σ_^^ | μ α β ⊗ εR' | β β' ⊗ εL' | α α' }ᵀ
 
 @[inherit_doc pauliCoDown]
 scoped[PauliMatrix] notation "σ___" => PauliMatrix.pauliCoDown
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ^μ_{dot β}_α`. -/
 abbrev pauliContrDown : ℂT[.up, .downR, .downL] :=
-    permT id (PermCond.auto) {σ^^^ | μ α β ⊗ εR' | β β' ⊗ εL' | α α'}ᵀ
+    permT id (IsReindexing.auto) {σ^^^ | μ α β ⊗ εR' | β β' ⊗ εL' | α α'}ᵀ
 
 @[inherit_doc pauliContrDown]
 scoped[PauliMatrix] notation "σ^__" => PauliMatrix.pauliContrDown
@@ -251,19 +231,23 @@ scoped[PauliMatrix] notation "σ^__" => PauliMatrix.pauliContrDown
 -/
 open Lorentz
 
+set_option backward.isDefEq.respectTransparency false in
 lemma pauliCo_eq_ofRat : pauliCo = ofRat (fun b =>
-    if b 0 = 0 ∧ b 1 = b 2 then ⟨1, 0⟩ else
-    if b 0 = 1 ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
-    if b 0 = 2 ∧ b 1 = 0 ∧ b 2 = 1 then ⟨0, 1⟩ else
-    if b 0 = 2 ∧ b 1 = 1 ∧ b 2 = 0 then ⟨0, -1⟩ else
-    if b 0 = 3 ∧ b 1 = 0 ∧ b 2 = 0 then ⟨-1, 0⟩ else
-    if b 0 = 3 ∧ b 1 = 1 ∧ b 2 = 1 then ⟨1, 0⟩ else ⟨0, 0⟩) := by
+    if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, 1⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, -1⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨-1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨1, 0⟩ else ⟨0, 0⟩) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [pauliCo]
   rw [permT_basis_repr_symm_apply]
   rw [contrT_basis_repr_apply]
-  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     enter [2, x]
     rw [contr_basis_ratComplexNum]
@@ -277,31 +261,35 @@ lemma pauliCo_eq_ofRat : pauliCo = ofRat (fun b =>
   revert b
   decide +kernel
 
+set_option backward.isDefEq.respectTransparency false in
 lemma pauliCoDown_eq_ofRat : pauliCoDown = ofRat (fun b =>
-    if b 0 = 0 ∧ b 1 = b 2 then ⟨1, 0⟩ else
-    if b 0 = 1 ∧ b 1 ≠ b 2 then ⟨1, 0⟩ else
-    if b 0 = 2 ∧ b 1 = 0 ∧ b 2 = 1 then ⟨0, -1⟩ else
-    if b 0 = 2 ∧ b 1 = 1 ∧ b 2 = 0 then ⟨0, 1⟩ else
-    if b 0 = 3 ∧ b 1 = 1 ∧ b 2 = 1 then ⟨-1, 0⟩ else
-    if b 0 = 3 ∧ b 1 = 0 ∧ b 2 = 0 then ⟨1, 0⟩ else ⟨0, 0⟩) := by
+    if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, -1⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, 1⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨-1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨1, 0⟩ else ⟨0, 0⟩) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [pauliCoDown]
   rw [permT_basis_repr_symm_apply]
   rw [contrT_basis_repr_apply]
-  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     enter [2, x]
     rw [contr_basis_ratComplexNum]
     rw [prodT_basis_repr_apply]
     rw [contrT_basis_repr_apply]
     simp only [coMetric_eq_ofRat, ofRat_basis_repr_apply,
-      altLeftMetric_eq_ofRat]
+      dualLeftMetric_eq_ofRat]
     enter [1, 1, 2, y]
     rw [contr_basis_ratComplexNum]
     rw [prodT_basis_repr_apply]
     simp only [coMetric_eq_ofRat, ofRat_basis_repr_apply, pauliCo_eq_ofRat,
-      altRightMetric_eq_ofRat]
+      dualRightMetric_eq_ofRat]
     rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
     rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
   conv_lhs =>
@@ -315,31 +303,35 @@ lemma pauliCoDown_eq_ofRat : pauliCoDown = ofRat (fun b =>
   revert b
   decide +kernel
 
+set_option backward.isDefEq.respectTransparency false in
 lemma pauliContrDown_ofRat : pauliContrDown = ofRat (fun b =>
-    if b 0 = 0 ∧ b 1 = b 2 then ⟨1, 0⟩ else
-    if b 0 = 1 ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
-    if b 0 = 2 ∧ b 1 = 0 ∧ b 2 = 1 then ⟨0, 1⟩ else
-    if b 0 = 2 ∧ b 1 = 1 ∧ b 2 = 0 then ⟨0, -1⟩ else
-    if b 0 = 3 ∧ b 1 = 1 ∧ b 2 = 1 then ⟨1, 0⟩ else
-    if b 0 = 3 ∧ b 1 = 0 ∧ b 2 = 0 then ⟨-1, 0⟩ else 0) := by
+    if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, 1⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, -1⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨-1, 0⟩ else 0) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [pauliContrDown]
   rw [permT_basis_repr_symm_apply]
   rw [contrT_basis_repr_apply]
-  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     enter [2, x]
     rw [contr_basis_ratComplexNum]
     rw [prodT_basis_repr_apply]
     rw [contrT_basis_repr_apply]
     simp only [coMetric_eq_ofRat, ofRat_basis_repr_apply,
-      altLeftMetric_eq_ofRat]
+      dualLeftMetric_eq_ofRat]
     enter [1, 1, 2, y]
     rw [contr_basis_ratComplexNum]
     rw [prodT_basis_repr_apply]
     simp only [coMetric_eq_ofRat,ofRat_basis_repr_apply, toTensor_eq_ofRat,
-      altRightMetric_eq_ofRat]
+      dualRightMetric_eq_ofRat]
     rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
     rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
   conv_lhs =>
@@ -363,9 +355,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `pauliCo` is invariant under the action of `SL(2,ℂ)`. -/
 lemma smul_pauliCo (g : SL(2,ℂ)) : g • pauliCo = pauliCo := by
   rw [← permT_equivariant, ← contrT_equivariant, ← prodT_equivariant]
-  simp only [Tensorial.self_toTensor_apply]
   rw [toTensor_smul_eq_self, actionT_coMetric]
-  rfl
 
 set_option backward.isDefEq.respectTransparency false in
 set_option maxRecDepth 2000 in
@@ -373,17 +363,13 @@ set_option maxRecDepth 2000 in
 lemma smul_pauliCoDown (g : SL(2,ℂ)) : g • pauliCoDown = pauliCoDown := by
   rw [← permT_equivariant, ← contrT_equivariant, ← prodT_equivariant,
     ← contrT_equivariant, ← prodT_equivariant]
-  simp only [Tensorial.self_toTensor_apply]
-  rw [smul_pauliCo, actionT_altLeftMetric, actionT_altRightMetric]
-  rfl
+  rw [smul_pauliCo, actionT_dualLeftMetric, actionT_dualRightMetric]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `pauliContrDown` is invariant under the action of `SL(2,ℂ)`. -/
 lemma smul_pauliContrDown (g : SL(2,ℂ)) : g • pauliContrDown = pauliContrDown := by
   rw [← permT_equivariant, ← contrT_equivariant, ← prodT_equivariant,
     ← contrT_equivariant, ← prodT_equivariant]
-  simp only [Tensorial.self_toTensor_apply]
-  rw [toTensor_smul_eq_self, actionT_altLeftMetric, actionT_altRightMetric]
-  rfl
+  rw [toTensor_smul_eq_self, actionT_dualLeftMetric, actionT_dualRightMetric]
 
 end PauliMatrix

@@ -287,7 +287,7 @@ lemma inLineEqToSol_proj (T : InLineEqSol) : inLineEqToSol (inLineEqProj T) = T.
 /-- Given an element of `inQuad × ℚ × ℚ × ℚ`, a solution to the ACCs. -/
 def inQuadToSol : InQuad × ℚ × ℚ × ℚ → MSSMACC.Sols := fun (R, a₁, a₂, a₃) =>
   AnomalyFreeMk' (lineCube R.val.val a₁ a₂ a₃)
-    (by erw [planeY₃B₃_quad, R.prop.1, R.prop.2.1, R.prop.2.2]; simp)
+    (by rw [lineCube, planeY₃B₃_quad, R.prop.1, R.prop.2.1, R.prop.2.2]; simp)
       (lineCube_cube R.val.val a₁ a₂ a₃)
 
 lemma inQuadToSol_smul (R : InQuad) (c₁ c₂ c₃ d : ℚ) :
@@ -308,6 +308,7 @@ def inQuadProj (T : InQuadSol) : InQuad × ℚ × ℚ × ℚ :=
   - cubeTriLin T.val.val T.val.val Y₃.val
     * (dot Y₃.val T.val.val - 2 * dot B₃.val T.val.val)))
 
+set_option backward.isDefEq.respectTransparency false in
 lemma inQuadToSol_proj (T : InQuadSol) : inQuadToSol (inQuadProj T) = T.val := by
   rw [inQuadProj, inQuadToSol_smul]
   apply ACCSystem.Sols.ext
@@ -346,6 +347,7 @@ def inQuadCubeProj (T : InQuadCubeSol) : InQuadCube × ℚ × ℚ × ℚ :=
   (dot Y₃.val B₃.val)⁻¹ * (2 * dot B₃.val T.val.val - dot Y₃.val T.val.val),
   (dot Y₃.val B₃.val)⁻¹ * 1)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma inQuadCubeToSol_proj (T : InQuadCubeSol) :
     inQuadCubeToSol (inQuadCubeProj T) = T.val := by
   rw [inQuadCubeProj, inQuadCubeToSol_smul]

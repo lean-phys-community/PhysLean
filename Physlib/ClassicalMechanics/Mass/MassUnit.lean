@@ -63,29 +63,34 @@ lemma div_eq_val (x y : MassUnit) :
 lemma div_ne_zero (x y : MassUnit) : ¬ x / y = (0 : ℝ≥0) := by
   rw [div_eq_val]
   refine coe_ne_zero.mp ?_
-  simp
+  simp [toReal]
 
 @[simp]
 lemma div_pos (x y : MassUnit) : (0 : ℝ≥0) < x/ y := by
   apply lt_of_le_of_ne
-  · exact zero_le (x / y)
+  · exact zero_le
   · exact Ne.symm (div_ne_zero x y)
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma div_self (x : MassUnit) :
     x / x = (1 : ℝ≥0) := by
   simp [div_eq_val, x.val_ne_zero]
+  rfl
 
 lemma div_symm (x y : MassUnit) :
     x / y = (y / x)⁻¹ := NNReal.eq <| by
-  rw [div_eq_val, inv_eq_one_div, div_eq_val]
-  simp
+  show x.val / y.val = (y.val / x.val)⁻¹
+  rw [inv_div]
+
+/-- The unit-ratio cocycle at `ℝ≥0` (the un-coerced form of `div_mul_div_coe`). -/
+lemma div_mul_div (x y z : MassUnit) : (x / y) * (y / z) = x / z := NNReal.eq <| by
+  show x.val / y.val * (y.val / z.val) = x.val / z.val
+  rw [div_mul_div_comm, mul_comm x.val y.val, mul_div_mul_left _ _ y.val_ne_zero]
 
 @[simp]
 lemma div_mul_div_coe (x y z : MassUnit) :
-    (x / y : ℝ) * (y /z : ℝ) = x /z := by
-  simp [div_eq_val]
+    (x / y : ℝ) * (y / z : ℝ) = x / z := by
+  simp [div_eq_val, toReal]
   field_simp
 
 /-!
@@ -102,13 +107,12 @@ def scale (r : ℝ) (x : MassUnit) (hr : 0 < r := by norm_num) : MassUnit :=
 lemma scale_div_self (x : MassUnit) (r : ℝ) (hr : 0 < r) :
     scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
   simp [scale, div_eq_val]
+  rfl
 
 @[simp]
 lemma self_div_scale (x : MassUnit) (r : ℝ) (hr : 0 < r) :
     x / scale r x hr = (⟨1/r, _root_.div_nonneg (by simp) (le_of_lt hr)⟩ : ℝ≥0) := by
   simp [scale, div_eq_val]
-  ext
-  simp only [coe_mk]
   field_simp
 
 @[simp]
@@ -119,8 +123,8 @@ lemma scale_one (x : MassUnit) : scale 1 x = x := by
 lemma scale_div_scale (x1 x2 : MassUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :
     scale r1 x1 hr1 / scale r2 x2 hr2 = (⟨r1, le_of_lt hr1⟩ / ⟨r2, le_of_lt hr2⟩) * (x1 / x2) := by
   refine NNReal.eq ?_
-  simp [scale, div_eq_val]
-  field_simp
+  show r1 * x1.val / (r2 * x2.val) = r1 / r2 * (x1.val / x2.val)
+  rw [div_mul_div_comm]
 
 @[simp]
 lemma scale_scale (x : MassUnit) (r1 r2 : ℝ) (hr1 : 0 < r1) (hr2 : 0 < r2) :
@@ -187,12 +191,15 @@ noncomputable def nominalSolarMasses : MassUnit := scale (1.988416e30) kilograms
 -/
 
 lemma pounds_div_ounces : pounds / ounces = (16 : ℝ≥0) := NNReal.eq <| by
-  simp [pounds, ounces]; norm_num
+  simp [pounds, ounces]
+  show (0.45359237 : ℝ) / 0.028349523125 = ((16 : ℝ≥0) : ℝ)
+  push_cast
+  norm_num
 
 lemma shortTons_div_kilograms : shortTons / kilograms = (907.18474 : ℝ≥0) := NNReal.eq <| by
-  simp [shortTons, pounds]; norm_num
+  simp [shortTons, pounds]; rw [toReal]; norm_num
 
 lemma longTons_div_kilograms : longTons / kilograms = (1016.0469088 : ℝ≥0) := NNReal.eq <| by
-  simp [longTons, pounds]; norm_num
+  simp [longTons, pounds]; rw [toReal]; norm_num
 
 end MassUnit

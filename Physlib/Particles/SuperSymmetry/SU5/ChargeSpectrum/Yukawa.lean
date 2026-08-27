@@ -142,7 +142,7 @@ lemma ofYukawaTermsNSum_subset_of_subset [DecidableEq 𝓩] {x y : ChargeSpectru
 
 variable [DecidableEq 𝓩]
 
-/-- For charges `x : Charges`, the proposition which states that the singlets
+/-- For a charge spectrum `x : ChargeSpectrum 𝓩`, the proposition which states that the singlets
   needed to regenerate the Yukawa couplings regenerate a dangerous coupling
   (in the superpotential) with up-to `n` insertions of the scalars.
 

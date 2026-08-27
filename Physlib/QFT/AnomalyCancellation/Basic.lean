@@ -41,7 +41,6 @@ Related to these are the different types of spaces of charges:
 ## iii. Table of contents
 
 - A. The module of charges
-  - A.1. A constructor for `ACCSystemCharges`
 - B. The module of charges
   - B.1. The `ℚ`-module structure on the type `Charges`
   - B.2. The finiteness of the `ℚ`-module structure on `Charges`
@@ -100,21 +99,6 @@ the representations present in the theory where `χ : ACCSystemCharges`.
 structure ACCSystemCharges where
   /-- The number of charges. -/
   numberCharges : ℕ
-
-/-!
-
-### A.1. A constructor for `ACCSystemCharges`
-
-We provide a constructor `ACCSystemChargesMk` for `ACCSystemCharges` given the number of charges.
-
--/
-
-TODO "NCRC5" "Replace `ACCSystemChargesMk` with `⟨n⟩` notation everywhere. "
-/--
-  Creates an `ACCSystemCharges` object with the specified number of charges.
--/
-def ACCSystemChargesMk (n : ℕ) : ACCSystemCharges where
-  numberCharges := n
 
 namespace ACCSystemCharges
 
@@ -243,7 +227,7 @@ instance linSolsAddCommMonoid (χ : ACCSystemLinear) :
   zero_add S := LinSols.ext (χ.chargesAddCommMonoid.zero_add _)
   add_zero S := LinSols.ext (χ.chargesAddCommMonoid.add_zero _)
   nsmul n S := ⟨n • S.val, fun _ ↦ by simp [S.linearSol _]⟩
-  nsmul_zero n := by ext; simp only [zero_nsmul]; rfl
+  nsmul_zero n := LinSols.ext (χ.chargesAddCommMonoid.nsmul_zero _)
   nsmul_succ n S := LinSols.ext (χ.chargesAddCommMonoid.nsmul_succ _ _)
 
 /-- An instance providing the operations and properties for `LinSols` to form a
@@ -362,11 +346,8 @@ def quadSolsInclLinSols (χ : ACCSystemQuad) : χ.QuadSols →[ℚ] χ.LinSols w
   map_smul' _ _ := rfl
 
 lemma quadSolsInclLinSols_injective (χ : ACCSystemQuad) :
-    Function.Injective χ.quadSolsInclLinSols := by
-  intro S T h
-  ext
-  simpa [ACCSystemQuad.quadSolsInclLinSols] using
-    congrArg (fun X => X.val) h
+    Function.Injective χ.quadSolsInclLinSols :=
+  fun _ _ h => QuadSols.ext (congrArg (fun X => X.val) h)
 
 /-!
 
@@ -398,12 +379,9 @@ def quadSolsIncl (χ : ACCSystemQuad) : χ.QuadSols →[ℚ] χ.Charges :=
   MulActionHom.comp χ.linSolsIncl.toMulActionHom χ.quadSolsInclLinSols
 
 lemma quadSolsIncl_injective (χ : ACCSystemQuad) :
-    Function.Injective χ.quadSolsIncl := by
-  intro S T h
-  have h' : χ.quadSolsInclLinSols S = χ.quadSolsInclLinSols T := by
-    apply ACCSystemLinear.linSolsIncl_injective (χ := χ.toACCSystemLinear)
-    simpa [ACCSystemQuad.quadSolsIncl, MulActionHom.comp_apply] using h
-  exact quadSolsInclLinSols_injective χ h'
+    Function.Injective χ.quadSolsIncl :=
+  fun _ _ h => quadSolsInclLinSols_injective χ
+    (ACCSystemLinear.linSolsIncl_injective χ.toACCSystemLinear h)
 
 end ACCSystemQuad
 
@@ -502,12 +480,8 @@ def solsInclQuadSols (χ : ACCSystem) : χ.Sols →[ℚ] χ.QuadSols where
   map_smul' _ _ := rfl
 
 lemma solsInclQuadSols_injective (χ : ACCSystem) :
-    Function.Injective χ.solsInclQuadSols := by
-  intro S T h
-  apply Sols.ext
-  have hv : (χ.solsInclQuadSols S).val = (χ.solsInclQuadSols T).val :=
-    congrArg (fun X => X.val) h
-  simpa [ACCSystem.solsInclQuadSols] using hv
+    Function.Injective χ.solsInclQuadSols :=
+  fun _ _ h => Sols.ext (congrArg (fun X => X.val) h)
 
 /-!
 
@@ -519,12 +493,9 @@ def solsInclLinSols (χ : ACCSystem) : χ.Sols →[ℚ] χ.LinSols :=
   MulActionHom.comp χ.quadSolsInclLinSols χ.solsInclQuadSols
 
 lemma solsInclLinSols_injective (χ : ACCSystem) :
-    Function.Injective χ.solsInclLinSols := by
-  intro S T h
-  have h' : χ.solsInclQuadSols S = χ.solsInclQuadSols T := by
-    apply ACCSystemQuad.quadSolsInclLinSols_injective (χ := χ.toACCSystemQuad)
-    simpa [ACCSystem.solsInclLinSols, MulActionHom.comp_apply] using h
-  exact solsInclQuadSols_injective χ h'
+    Function.Injective χ.solsInclLinSols :=
+  fun _ _ h => solsInclQuadSols_injective χ
+    (ACCSystemQuad.quadSolsInclLinSols_injective χ.toACCSystemQuad h)
 
 /-!
 
@@ -537,12 +508,9 @@ def solsIncl (χ : ACCSystem) : χ.Sols →[ℚ] χ.Charges :=
   MulActionHom.comp χ.quadSolsIncl χ.solsInclQuadSols
 
 lemma solsIncl_injective (χ : ACCSystem) :
-    Function.Injective χ.solsIncl := by
-  intro S T h
-  have h' : χ.solsInclQuadSols S = χ.solsInclQuadSols T := by
-    apply ACCSystemQuad.quadSolsIncl_injective (χ := χ.toACCSystemQuad)
-    simpa [ACCSystem.solsIncl, MulActionHom.comp_apply] using h
-  exact (solsInclQuadSols_injective χ) h'
+    Function.Injective χ.solsIncl :=
+  fun _ _ h => solsInclQuadSols_injective χ
+    (ACCSystemQuad.quadSolsIncl_injective χ.toACCSystemQuad h)
 
 /-!
 
@@ -595,9 +563,9 @@ formalize this derivation in Lean, and instead take the resulting homogeneous fo
 
 -/
 
-TODO "6VZMW" "Anomaly cancellation conditions can be derived formally from the gauge group
+TODO "Anomaly cancellation conditions can be derived formally from the gauge group
   and fermionic representations using e.g. topological invariants. Include such a
   definition."
 
-TODO "6VZM3" "Anomaly cancellation conditions can be defined using algebraic varieties.
+TODO "Anomaly cancellation conditions can be defined using algebraic varieties.
   Link such an approach to the approach here."

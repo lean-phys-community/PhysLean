@@ -1,0 +1,65 @@
+version: v0.1
+
+Title: Simple pendulum
+
+Overview: |
+    A simple pendulum is a bob on a rigid massless rod of length ℓ, pinned at a pivot and swinging
+    in a vertical plane under gravity g. Its configuration is the angle of the rod from the downward
+    vertical, taken modulo a full turn, so the configuration space is a circle; the position of the
+    bob in the plane is (ℓ sin θ, −ℓ cos θ). The motion is governed by θ̈ + (g/ℓ) sin θ = 0. For
+    small amplitudes it is harmonic with period 2π√(ℓ/g); for librations (amplitudes below the
+    inverted position) the period grows with the amplitude and is given by a complete elliptic
+    integral. This API records the configuration space with its manifold structure and its
+    embedding into physical space, together with the lifted Lagrangian and equation of motion,
+    the equivalence of that equation with the vanishing of the variational gradient of the
+    action, the conservation of energy, the equilibria with the separatrix energy and the
+    below/above-threshold energy bounds, and the invariance of the lifted dynamics under
+    shifting the angle by whole turns; the small-angle limit and the period follow in later
+    modules.
+
+ParentAPIs:
+  - "Space (Physlib/SpaceAndTime/Space)"
+  - "Configuration space for pendulum (Physlib/ClassicalMechanics/Pendulum)"
+
+References:
+  - Landau & Lifshitz, Mechanics, 3rd Edition, Chapter 1 (The Equations of motion), Section 5 (The Lagrangian for a system of particles).
+  - Landau & Lifshitz, Mechanics, 3rd Edition, Chapter 3 (Integration of the equations of motion), Section 11 (Motion in one dimension).
+  - Landau & Lifshitz, Mechanics, 3rd Edition, Chapter 5 (Small oscillations), Section 21 (Free oscillations in one dimension).
+
+Requirements:
+
+  - description: The key data structure, the configuration space of the simple pendulum, is defined as the angle of the rod from the downward vertical modulo a full turn.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace, SimplePendulum.ConfigurationSpace.circleHomeomorph)
+
+  - description: The API contains the structure of a manifold on the configuration space.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace.instChartedSpace, SimplePendulum.ConfigurationSpace.instIsManifold)
+
+  - description: The API contains the angular lift from the real line to the configuration space, periodic with period 2π.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace.ofAngle, SimplePendulum.ConfigurationSpace.ofAngle_periodic, SimplePendulum.ConfigurationSpace.ofAngle_eq_iff)
+
+  - description: The API contains a map from the configuration space to `Space`, giving the position of the bob in real space, together with the rod-length constraint.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace.toSpace, SimplePendulum.ConfigurationSpace.toSpace_ofAngle, SimplePendulum.ConfigurationSpace.toSpace_norm)
+
+  - description: The API shall contain the definition of a trajectory based on the configuration space.
+    done: false
+    location: N/A
+
+  - description: The API contains the Lagrangian of the simple pendulum and its equation of motion.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Basic.lean (SimplePendulum.lagrangian, SimplePendulum.torque, SimplePendulum.EquationOfMotion, SimplePendulum.equationOfMotion_iff_scalar)
+
+  - description: The API contains the equivalence of the equation of motion with the vanishing of the variational gradient of the action, and energy conservation.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Basic.lean (SimplePendulum.equationOfMotion_iff_gradLagrangian_zero, SimplePendulum.energy_conservation_of_equationOfMotion)
+
+  - description: The API contains the equilibria of the pendulum as solutions, together with the separatrix energy and the below/above-threshold energy bounds.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Equilibria.lean (SimplePendulum.equationOfMotion_const_zero, SimplePendulum.equationOfMotion_const_pi, SimplePendulum.isSolution_const_zero, SimplePendulum.isSolution_const_pi, SimplePendulum.separatrixEnergy, SimplePendulum.neg_one_lt_cos_of_energy_lt, SimplePendulum.deriv_ne_zero_of_energy_gt)
+
+  - description: The API contains the invariance of the lifted dynamics under shifting the angle by whole turns.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/LiftInvariance.lean (SimplePendulum.equationOfMotion_add_int_mul_two_pi, SimplePendulum.energy_add_int_mul_two_pi, SimplePendulum.isSolution_add_int_mul_two_pi)

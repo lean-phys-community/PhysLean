@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
+public import Mathlib.Analysis.Calculus.ContDiff.Bounds
 /-!
 
 ## The multiple of a Schwartz map by `x`
@@ -20,7 +21,7 @@ open SchwartzMap NNReal
 noncomputable section
 
 variable (𝕜 : Type) {E F : Type} [RCLike 𝕜] [NormedAddCommGroup E] [NormedAddCommGroup F]
-
+namespace Physlib
 namespace Distribution
 
 variable [NormedSpace ℝ E]
@@ -31,46 +32,17 @@ lemma norm_iteratedFDeriv_ofRealCLM {x} (i : ℕ) :
     ‖iteratedFDeriv ℝ i (RCLike.ofRealCLM (K := 𝕜)) x‖ =
       if i = 0 then |x| else if i = 1 then 1 else 0 := by
   match i with
-  | 0 =>
-    simp [iteratedFDeriv_zero_eq_comp]
-  | .succ i =>
-    induction i with
-    | zero =>
-      simp [iteratedFDeriv_succ_eq_comp_right]
-      rw [@ContinuousLinearMap.norm_def]
-      apply ContinuousLinearMap.opNorm_eq_of_bounds
-      · simp
-      · intro x
-        simp only [fderiv_eq_smul_deriv, Real.norm_eq_abs, one_mul]
-        rw [← @RCLike.ofRealCLM_apply]
-        simp [- RCLike.ofRealCLM_apply, norm_smul]
-        simp
-      · intro N hN h
-        have h1 := h 1
-        rw [← RCLike.ofRealCLM_apply] at h1
-        simp [- RCLike.ofRealCLM_apply] at h1
-        simpa using h1
-    | succ i ih =>
-      rw [iteratedFDeriv_succ_eq_comp_right]
-      simp only [Nat.succ_eq_add_one, ContinuousLinearMap.fderiv, Function.comp_apply,
-        LinearIsometryEquiv.norm_map, Nat.add_eq_zero_iff, one_ne_zero, and_false, and_self,
-        ↓reduceIte, Nat.add_eq_right]
-      rw [iteratedFDeriv_succ_eq_comp_right]
-      conv_lhs =>
-        enter [1, 2, 3, y]
-        rw [fderiv_const_apply _]
-      conv_lhs =>
-        enter [1, 2]
-        change iteratedFDeriv ℝ i 0
-      simp only [Nat.succ_eq_add_one, Function.comp_apply, LinearIsometryEquiv.norm_map]
-      have h1 : iteratedFDeriv ℝ i (0 : ℝ → ℝ →L[ℝ] ℝ →L[ℝ] 𝕜) x = 0 := by
-        change iteratedFDeriv ℝ i (fun x => 0) x = 0
-        rw [iteratedFDeriv_fun_zero]
-        rfl
-      rw [h1]
-      exact ContinuousMultilinearMap.opNorm_zero
+  | 0 => simp
+  | 1 =>
+    rw [norm_iteratedFDeriv_one, RCLike.ofRealCLM.fderiv]
+    simp
+  | (n + 2) =>
+    have h : fderiv ℝ ⇑(RCLike.ofRealCLM (K := 𝕜)) = fun _ => RCLike.ofRealCLM := by
+      ext1 y
+      exact RCLike.ofRealCLM.fderiv
+    rw [← norm_iteratedFDeriv_fderiv, h, iteratedFDeriv_const_of_ne n.succ_ne_zero]
+    simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The continuous linear map `𝓢(ℝ, 𝕜) →L[𝕜] 𝓢(ℝ, 𝕜)` taking a Schwartz map
   `η` to `x * η`. -/
 def powOneMul : 𝓢(ℝ, 𝕜) →L[𝕜] 𝓢(ℝ, 𝕜) := by
@@ -81,7 +53,6 @@ def powOneMul : 𝓢(ℝ, 𝕜) →L[𝕜] 𝓢(ℝ, 𝕜) := by
     simp only [smul_apply, smul_eq_mul, RingHom.id_apply]
     ring
   · intro ψ
-    simp only
     apply ContDiff.mul
     · change ContDiff ℝ _ RCLike.ofRealCLM
       fun_prop
@@ -166,3 +137,4 @@ lemma powOneMul_apply (ψ : 𝓢(ℝ, 𝕜)) (x : ℝ) :
     powOneMul 𝕜 ψ x = x * ψ x := rfl
 
 end Distribution
+end Physlib

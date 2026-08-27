@@ -68,7 +68,7 @@ lemma bosonicProjF_of_mem_bosonic (a : 𝓕.FieldOpFreeAlgebra) (h : a ∈ stati
   change p a h
   apply Submodule.span_induction
   · intro x hx
-    simp only [Set.mem_setOf_eq] at hx
+    simp only [Set.mem_ofPred_eq] at hx
     obtain ⟨φs, rfl, h⟩ := hx
     simp [p, bosonicProjF_ofCrAnListF, h]
   · simp only [map_zero, p]
@@ -86,7 +86,7 @@ lemma bosonicProjF_of_mem_fermionic (a : 𝓕.FieldOpFreeAlgebra)
   change p a h
   apply Submodule.span_induction
   · intro x hx
-    simp only [Set.mem_setOf_eq] at hx
+    simp only [Set.mem_ofPred_eq] at hx
     obtain ⟨φs, rfl, h⟩ := hx
     simp [p, bosonicProjF_ofCrAnListF, h]
   · simp [p]
@@ -142,7 +142,7 @@ lemma fermionicProjF_of_mem_fermionic (a : 𝓕.FieldOpFreeAlgebra)
   change p a h
   apply Submodule.span_induction
   · intro x hx
-    simp only [Set.mem_setOf_eq] at hx
+    simp only [Set.mem_ofPred_eq] at hx
     obtain ⟨φs, rfl, h⟩ := hx
     simp [p, fermionicProjF_ofCrAnListF, h]
   · simp only [map_zero, p]
@@ -159,7 +159,7 @@ lemma fermionicProjF_of_mem_bosonic (a : 𝓕.FieldOpFreeAlgebra)
   change p a h
   apply Submodule.span_induction
   · intro x hx
-    simp only [Set.mem_setOf_eq] at hx
+    simp only [Set.mem_ofPred_eq] at hx
     obtain ⟨φs, rfl, h⟩ := hx
     simp [p, fermionicProjF_ofCrAnListF, h]
   · simp [p]
@@ -228,10 +228,11 @@ lemma directSum_eq_bosonic_plus_fermionic
     simp only [C]
     match i with
     | bosonic =>
-      simp only [DirectSum.of_eq_same, left_eq_add]
+      simp only [DirectSum.of_eq_same]
       rw [DirectSum.of_eq_of_ne]
       simp only [map_zero]
-      simp
+      grind
+      grind
     | fermionic =>
       simp only [DirectSum.of_eq_same]
       rw [DirectSum.of_eq_of_ne]
@@ -242,7 +243,6 @@ lemma directSum_eq_bosonic_plus_fermionic
     conv_lhs => rw [hx, hy]
     abel
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For a field specification `𝓕`, the algebra `𝓕.FieldOpFreeAlgebra` is graded by `FieldStatistic`.
   Those `ofCrAnListF φs` for which `φs` has an overall `bosonic` statistic
   (i.e. `𝓕 |>ₛ φs = bosonic`) span `bosonic`
@@ -254,7 +254,7 @@ instance fieldOpFreeAlgebraGrade :
   one_mem := by
     simp only [statisticSubmodule]
     refine Submodule.mem_span.mpr fun p a => a ?_
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     use []
     simp only [ofCrAnListF_nil, ofList_empty, true_and]
     rfl
@@ -264,7 +264,7 @@ instance fieldOpFreeAlgebraGrade :
     change p a2 h2
     apply Submodule.span_induction (p := p)
     · intro x hx
-      simp only [Set.mem_setOf_eq] at hx
+      simp only [Set.mem_ofPred_eq] at hx
       obtain ⟨φs, rfl, h⟩ := hx
       simp only [p]
       let p (a1 : 𝓕.FieldOpFreeAlgebra) (hx : a1 ∈ statisticSubmodule f1) : Prop :=
@@ -276,7 +276,7 @@ instance fieldOpFreeAlgebraGrade :
         simp only [p]
         rw [← ofCrAnListF_append]
         refine Submodule.mem_span.mpr fun p a => a ?_
-        simp only [Set.mem_setOf_eq]
+        simp only [Set.mem_ofPred_eq]
         use φs' ++ φs
         simp only [ofList_append, h', h, true_and]
         cases f1 <;> cases f2 <;> rfl

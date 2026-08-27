@@ -16,6 +16,7 @@ We define specific instances of pressure.
 -/
 
 @[expose] public section
+
 open Dimension
 open NNReal
 
@@ -23,7 +24,7 @@ open NNReal
 abbrev DimPressure : Type := Dimensionful (WithDim (M𝓭 * L𝓭⁻¹ * T𝓭⁻¹ * T𝓭⁻¹) ℝ)
 
 namespace DimPressure
-open UnitChoices Dimensionful CarriesDimension
+open LTMCTUnitChoices Dimensionful CarriesDimension
 
 /-- The dimensional pressure corresponding to 1 pascal, Pa. -/
 noncomputable def pascal : DimPressure := toDimensionful SI ⟨1⟩
@@ -43,6 +44,6 @@ noncomputable def torr : DimPressure := (1/760 : ℝ≥0) • standardAtmosphere
 /-- The dimensional pressure corresponding to 1 pound per square inch. -/
 noncomputable def psi : DimPressure := toDimensionful ({SI with
   mass := MassUnit.pounds,
-  length := LengthUnit.inches} : UnitChoices) ⟨1⟩
+  length := LengthUnit.inches} : LTMCTUnitChoices) ⟨1⟩
 
 end DimPressure

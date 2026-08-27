@@ -65,29 +65,34 @@ lemma div_eq_val (x y : TimeUnit) :
 lemma div_ne_zero (x y : TimeUnit) : ¬ x / y = (0 : ℝ≥0) := by
   rw [div_eq_val]
   refine coe_ne_zero.mp ?_
-  simp
+  simp [toReal]
 
 @[simp]
 lemma div_pos (x y : TimeUnit) : (0 : ℝ≥0) < x/ y := by
   apply lt_of_le_of_ne
-  · exact zero_le (x / y)
+  · exact zero_le
   · exact Ne.symm (div_ne_zero x y)
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma div_self (x : TimeUnit) :
     x / x = (1 : ℝ≥0) := by
   simp [div_eq_val, x.val_ne_zero]
+  rfl
 
 lemma div_symm (x y : TimeUnit) :
     x / y = (y / x)⁻¹ := NNReal.eq <| by
-  rw [div_eq_val, inv_eq_one_div, div_eq_val]
-  simp
+  show x.val / y.val = (y.val / x.val)⁻¹
+  rw [inv_div]
+
+/-- The unit-ratio cocycle at `ℝ≥0` (the un-coerced form of `div_mul_div_coe`). -/
+lemma div_mul_div (x y z : TimeUnit) : (x / y) * (y / z) = x / z := NNReal.eq <| by
+  show x.val / y.val * (y.val / z.val) = x.val / z.val
+  rw [div_mul_div_comm, mul_comm x.val y.val, mul_div_mul_left _ _ y.val_ne_zero]
 
 @[simp]
 lemma div_mul_div_coe (x y z : TimeUnit) :
-    (x / y : ℝ) * (y /z : ℝ) = x /z := by
-  simp [div_eq_val]
+    (x / y : ℝ) * (y / z : ℝ) = x / z := by
+  simp [div_eq_val, toReal]
   field_simp
 
 /-!
@@ -104,6 +109,7 @@ def scale (r : ℝ) (x : TimeUnit) (hr : 0 < r := by norm_num) : TimeUnit :=
 lemma scale_div_self (x : TimeUnit) (r : ℝ) (hr : 0 < r) :
     scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
   simp [scale, div_eq_val]
+  rfl
 
 @[simp]
 lemma scale_one (x : TimeUnit) : scale 1 x = x := by
@@ -113,15 +119,13 @@ lemma scale_one (x : TimeUnit) : scale 1 x = x := by
 lemma scale_div_scale (x1 x2 : TimeUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :
     scale r1 x1 hr1 / scale r2 x2 hr2 = (⟨r1, le_of_lt hr1⟩ / ⟨r2, le_of_lt hr2⟩) * (x1 / x2) := by
   refine NNReal.eq ?_
-  simp [scale, div_eq_val]
-  field_simp
+  show r1 * x1.val / (r2 * x2.val) = r1 / r2 * (x1.val / x2.val)
+  rw [div_mul_div_comm]
 
 @[simp]
 lemma self_div_scale (x : TimeUnit) (r : ℝ) (hr : 0 < r) :
     x / scale r x hr = (⟨1/r, _root_.div_nonneg (by simp) (le_of_lt hr)⟩ : ℝ≥0) := by
   simp [scale, div_eq_val]
-  ext
-  simp only [coe_mk]
   field_simp
 
 @[simp]
@@ -183,26 +187,40 @@ noncomputable def weeks : TimeUnit := scale (7 * 24 * 60 * 60) seconds
 
 -/
 
-lemma minutes_div_seconds : minutes / seconds = (60 : ℝ≥0) := NNReal.eq <| by simp [minutes]
+lemma minutes_div_seconds : minutes / seconds = (60 : ℝ≥0) := NNReal.eq <| by
+  simp [minutes]; rw [toReal]
 
 lemma hours_div_seconds : hours / seconds = (3600 : ℝ≥0) := NNReal.eq <| by
-  simp [hours]; norm_num
+  simp [hours]; rw [toReal]; norm_num
 
 lemma days_div_seconds : days / seconds = (86400 : ℝ≥0) := NNReal.eq <| by
-  simp [days]; norm_num
+  simp [days]; rw [toReal]; norm_num
 
 lemma weeks_div_seconds : weeks / seconds = (604800 : ℝ≥0) := NNReal.eq <| by
-  simp [weeks]; norm_num
+  simp [weeks]; rw [toReal]; norm_num
 
 lemma days_div_minutes : days / minutes = (1440 : ℝ≥0) := NNReal.eq <| by
-  simp [days, minutes]; norm_num
+  simp [days, minutes]
+  show (24 * 60 * 60 : ℝ) / 60 = ((1440 : ℝ≥0) : ℝ)
+  push_cast
+  norm_num
 
 lemma weeks_div_minutes : weeks / minutes = (10080 : ℝ≥0) := NNReal.eq <| by
-  simp [weeks, minutes]; norm_num
+  simp [weeks, minutes]
+  show (7 * 24 * 60 * 60 : ℝ) / 60 = ((10080 : ℝ≥0) : ℝ)
+  push_cast
+  norm_num
 
-lemma days_div_hours : days / hours = (24 : ℝ≥0) := NNReal.eq <| by simp [hours, days]; norm_num
+lemma days_div_hours : days / hours = (24 : ℝ≥0) := NNReal.eq <| by
+  simp [hours, days]
+  show (24 * 60 * 60 : ℝ) / (60 * 60) = ((24 : ℝ≥0) : ℝ)
+  push_cast
+  norm_num
 
 lemma weeks_div_hours : weeks / hours = (168 : ℝ≥0) := NNReal.eq <| by
-  simp [weeks, hours]; norm_num
+  simp [weeks, hours]
+  show (7 * 24 * 60 * 60 : ℝ) / (60 * 60) = ((168 : ℝ≥0) : ℝ)
+  push_cast
+  norm_num
 
 end TimeUnit

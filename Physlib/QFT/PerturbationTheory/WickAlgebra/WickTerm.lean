@@ -36,7 +36,6 @@ noncomputable section
 def wickTerm {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length) : 𝓕.WickAlgebra :=
   φsΛ.sign • φsΛ.timeContract * 𝓝(ofFieldOpList [φsΛ]ᵘᶜ)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For the empty list `[]` of `𝓕.FieldOp`, the `wickTerm` of the Wick contraction
   corresponding to the empty set `∅` (the only Wick contraction of `[]`) is `1`. -/
 @[simp]

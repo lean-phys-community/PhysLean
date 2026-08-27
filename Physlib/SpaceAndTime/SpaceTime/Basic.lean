@@ -6,9 +6,10 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.SpeedOfLight
-public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Tensorial
 public import Physlib.SpaceAndTime.Space.Integrals.Basic
 public import Physlib.SpaceAndTime.Time.Basic
+public import Physlib.Meta.Informal.Basic
 /-!
 # Spacetime
 
@@ -73,7 +74,7 @@ noncomputable section
 
 -/
 
-TODO "6V2DR" "SpaceTime should be refactored into a structure, or similar, to prevent casting."
+TODO "SpaceTime should be refactored into a structure, or similar, to prevent casting."
 
 /-- `SpaceTime d` corresponds to `d+1` dimensional space-time.
   This is equipped with an instance of the action of a Lorentz group,
@@ -300,24 +301,20 @@ def toTimeAndSpace {d : ℕ} (c : SpeedOfLight := 1) : SpaceTime d ≃L[ℝ] Tim
 
 @[simp]
 lemma toTimeAndSpace_symm_apply_time_space {d : ℕ} {c : SpeedOfLight} (x : SpaceTime d) :
-    (toTimeAndSpace c).symm (x.time c, x.space) = x := by
-  apply (toTimeAndSpace c).left_inv
+    (toTimeAndSpace c).symm (x.time c, x.space) = x :=
+  (toTimeAndSpace c).left_inv x
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma space_toTimeAndSpace_symm {d : ℕ} {c : SpeedOfLight} (t : Time) (s : Space d) :
     ((toTimeAndSpace c).symm (t, s)).space = s := by
-  simp only [space, toTimeAndSpace]
-  ext i
-  simp
+  simp [space, toTimeAndSpace]
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma time_toTimeAndSpace_symm {d : ℕ} {c : SpeedOfLight} (t : Time) (s : Space d) :
     ((toTimeAndSpace c).symm (t, s)).time c = t := by
-  simp only [time, toTimeAndSpace]
-  ext
-  simp
+  simp [time, toTimeAndSpace]
 
 @[simp]
 lemma toTimeAndSpace_symm_apply_inl {d : ℕ} {c : SpeedOfLight} (t : Time) (s : Space d) :
@@ -333,7 +330,6 @@ lemma toTimeAndSpace_symm_apply_inr {d : ℕ} {c : SpeedOfLight} (t : Time) (x :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTimeAndSpace_fderiv {d : ℕ} {c : SpeedOfLight} (x : SpaceTime d) :
     fderiv ℝ (toTimeAndSpace c) x = (toTimeAndSpace c).toContinuousLinearMap := by
@@ -345,7 +341,6 @@ lemma toTimeAndSpace_fderiv {d : ℕ} {c : SpeedOfLight} (x : SpaceTime d) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTimeAndSpace_symm_fderiv {d : ℕ} {c : SpeedOfLight} (x : Time × Space d) :
     fderiv ℝ (toTimeAndSpace c).symm x = (toTimeAndSpace c).symm.toContinuousLinearMap := by
@@ -360,13 +355,10 @@ set_option backward.isDefEq.respectTransparency false in
 lemma toTimeAndSpace_basis_inr {d : ℕ} {c : SpeedOfLight} (i : Fin d) :
     toTimeAndSpace c (Lorentz.Vector.basis (Sum.inr i))
     = (0, Space.basis i) := by
-  simp only [toTimeAndSpace, time, LinearMap.coe_mk,
-    AddHom.coe_mk, LinearEquiv.coe_toContinuousLinearEquiv', LinearEquiv.coe_mk, Prod.mk.injEq]
-  rw [Lorentz.Vector.timeComponent_basis_sum_inr]
-  constructor
-  · simp
-  ext j
-  simp [Space.basis_apply, space]
+  refine Prod.ext ?_ ?_
+  · simp [toTimeAndSpace, time]
+  · ext j
+    simp [toTimeAndSpace, space, Space.basis_apply]
 
 /-!
 
@@ -377,20 +369,15 @@ lemma toTimeAndSpace_basis_inr {d : ℕ} {c : SpeedOfLight} (i : Fin d) :
 set_option backward.isDefEq.respectTransparency false in
 lemma toTimeAndSpace_basis_inl {d : ℕ} {c : SpeedOfLight} :
     toTimeAndSpace (d := d) c (Lorentz.Vector.basis (Sum.inl 0)) = (⟨1/c.val⟩, 0) := by
-  simp only [toTimeAndSpace, time, LinearMap.coe_mk,
-    AddHom.coe_mk, LinearEquiv.coe_toContinuousLinearEquiv', LinearEquiv.coe_mk, Prod.mk.injEq]
-  rw [Lorentz.Vector.timeComponent_basis_sum_inl]
-  constructor
-  · simp
-  ext j
-  simp [space]
+  refine Prod.ext ?_ ?_
+  · simp [toTimeAndSpace, time]
+  · ext j
+    simp [toTimeAndSpace, space]
 
 lemma toTimeAndSpace_basis_inl' {d : ℕ} {c : SpeedOfLight} :
     toTimeAndSpace (d := d) c (Lorentz.Vector.basis (Sum.inl 0)) = (1/c.val) • (1, 0) := by
   rw [toTimeAndSpace_basis_inl]
-  simp only [one_div, Prod.smul_mk, smul_zero, Prod.mk.injEq, and_true]
-  congr
-  simp
+  simp [Prod.ext_iff, Time.ext_iff, Time.smul_real_val, Time.one_val]
 
 /-!
 
@@ -416,19 +403,15 @@ lemma timeSpaceBasis_apply_inl {d : ℕ} (c : SpeedOfLight) :
     timeSpaceBasis (d := d) c (Sum.inl 0) = c.val • Lorentz.Vector.basis (Sum.inl 0) := by
   simp [timeSpaceBasis]
   apply (toTimeAndSpace (d := d) c).injective
-  simp only [ContinuousLinearEquiv.apply_symm_apply, Fin.isValue, map_smul]
-  rw [@toTimeAndSpace_basis_inl]
-  simp only [one_div, Prod.smul_mk, smul_zero, Prod.mk.injEq, and_true]
-  ext
-  simp
+  simp only [ContinuousLinearEquiv.apply_symm_apply, map_smul, toTimeAndSpace_basis_inl]
+  ext <;> simp
 
 @[simp]
 lemma timeSpaceBasis_apply_inr {d : ℕ} (c : SpeedOfLight) (i : Fin d) :
     timeSpaceBasis (d := d) c (Sum.inr i) = Lorentz.Vector.basis (Sum.inr i) := by
   simp [timeSpaceBasis]
   apply (toTimeAndSpace (d := d) c).injective
-  simp only [ContinuousLinearEquiv.apply_symm_apply]
-  rw [toTimeAndSpace_basis_inr]
+  simp only [ContinuousLinearEquiv.apply_symm_apply, toTimeAndSpace_basis_inr]
 
 /-!
 
@@ -436,6 +419,7 @@ lemma timeSpaceBasis_apply_inr {d : ℕ} (c : SpeedOfLight) (i : Fin d) :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The equivalence on of `SpaceTime` taking `(1, 0, 0, ...)` to
 of `(c, 0, 0, ....)` and keeping all other components the same. -/
 def timeSpaceBasisEquiv {d : ℕ} (c : SpeedOfLight) :
@@ -516,16 +500,8 @@ lemma det_timeSpaceBasisEquiv {d : ℕ} (c : SpeedOfLight) :
   · simp only [ContinuousLinearEquiv.toLinearEquiv_symm, LinearMap.det_conj]
   have h1 : e.toLinearMap ∘ₗ (timeSpaceBasisEquiv (d := d) c).toLinearMap ∘ₗ
     e.symm.toLinearMap = (c.val • LinearMap.id).prodMap LinearMap.id := by
-    apply LinearMap.ext
-    intro tx
-    simp [e, timeSpaceBasisEquiv, toTimeAndSpace]
-    apply And.intro
-    · ext
-      simp
-    · ext i
-      simp [space]
-  rw [h1]
-  rw [LinearMap.det_prodMap]
+    ext tx <;> simp [e, timeSpaceBasisEquiv, toTimeAndSpace, space]
+  rw [h1, LinearMap.det_prodMap]
   simp
 
 /-!
@@ -534,23 +510,20 @@ lemma det_timeSpaceBasisEquiv {d : ℕ} (c : SpeedOfLight) :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma timeSpaceBasis_eq_map_basis {d : ℕ} (c : SpeedOfLight) :
     timeSpaceBasis (d := d) c =
     Module.Basis.map (Lorentz.Vector.basis (d := d)) (timeSpaceBasisEquiv c).toLinearEquiv := by
-  ext μ
+  ext1 μ
   match μ with
   | Sum.inl 0 =>
     simp [timeSpaceBasisEquiv]
     funext ν
-    match ν with
-    | Sum.inl 0 => simp
-    | Sum.inr i => simp
+    rcases ν with _ | j <;> simp [Fin.fin_one_eq_zero]
   | Sum.inr i =>
     simp [timeSpaceBasisEquiv]
     funext ν
-    match ν with
-    | Sum.inl 0 => simp
-    | Sum.inr j => simp
+    rcases ν with _ | j <;> simp [Fin.fin_one_eq_zero]
 
 /-!
 
@@ -558,7 +531,6 @@ lemma timeSpaceBasis_eq_map_basis {d : ℕ} (c : SpeedOfLight) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma timeSpaceBasis_addHaar {d : ℕ} (c : SpeedOfLight := 1) :
     (timeSpaceBasis (d := d) c).addHaar = (ENNReal.ofReal (c⁻¹)) • volume := by
   rw [timeSpaceBasis_eq_map_basis c, ← Module.Basis.map_addHaar]
@@ -583,16 +555,13 @@ lemma timeSpaceBasis_addHaar {d : ℕ} (c : SpeedOfLight := 1) :
 -/
 
 open MeasureTheory
-set_option backward.isDefEq.respectTransparency false in
 lemma toTimeAndSpace_symm_measurePreserving {d : ℕ} (c : SpeedOfLight) :
     MeasurePreserving (toTimeAndSpace c).symm (volume.prod (volume (α := Space d)))
     (ENNReal.ofReal c⁻¹ • volume) := by
-  have h : volume (α := SpaceTime d) = Lorentz.Vector.basis.addHaar := rfl
   refine { measurable := ?_, map_eq := ?_ }
   · fun_prop
   rw [Space.volume_eq_addHaar, Time.volume_eq_basis_addHaar, ← Module.Basis.prod_addHaar,
-    Module.Basis.map_addHaar]
-  rw [← timeSpaceBasis_addHaar c]
+    Module.Basis.map_addHaar, ← timeSpaceBasis_addHaar c]
   rfl
 
 /-!
@@ -601,7 +570,6 @@ lemma toTimeAndSpace_symm_measurePreserving {d : ℕ} (c : SpeedOfLight) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma spaceTime_integral_eq_time_space_integral {M} [NormedAddCommGroup M]
     [NormedSpace ℝ M] {d : ℕ} (c : SpeedOfLight)
     (f : SpaceTime d → M) :
@@ -611,20 +579,8 @@ lemma spaceTime_integral_eq_time_space_integral {M} [NormedAddCommGroup M]
   have h1 : ∫ tx : Time × Space d, f ((toTimeAndSpace c).symm tx) ∂(volume.prod volume)
     = ∫ x : SpaceTime d, f x ∂((ENNReal.ofReal (c⁻¹)) • volume) := by
     apply MeasureTheory.MeasurePreserving.integral_comp
-    · refine { measurable := ?_, map_eq := ?_ }
-      · fun_prop
-      have hs : volume (α := Space d) = Space.basis.toBasis.addHaar := by
-        exact Space.volume_eq_addHaar
-      have ht : volume (α := Time) = Time.basis.toBasis.addHaar := by
-        exact Time.volume_eq_basis_addHaar
-      rw [hs, ht]
-      rw [← Module.Basis.prod_addHaar]
-      rw [Module.Basis.map_addHaar]
-      rw [← timeSpaceBasis_addHaar c]
-      congr
-    · refine Measurable.measurableEmbedding ?_ ?_
-      · fun_prop
-      · exact ContinuousLinearEquiv.injective (toTimeAndSpace c).symm
+    · exact toTimeAndSpace_symm_measurePreserving c
+    · exact (toTimeAndSpace c).symm.toHomeomorph.measurableEmbedding
   rw [h1]
   simp
 
@@ -639,9 +595,7 @@ lemma spaceTime_integrable_iff_space_time_integrable {M} [NormedAddCommGroup M]
     · simp
   apply MeasureTheory.MeasurePreserving.integrable_comp_emb
   · exact toTimeAndSpace_symm_measurePreserving c
-  · refine Measurable.measurableEmbedding ?_ ?_
-    · fun_prop
-    · exact ContinuousLinearEquiv.injective (toTimeAndSpace c).symm
+  · exact (toTimeAndSpace c).symm.toHomeomorph.measurableEmbedding
 
 lemma spaceTime_integral_eq_time_integral_space_integral {M} [NormedAddCommGroup M]
     [NormedSpace ℝ M] {d : ℕ} (c : SpeedOfLight)
@@ -650,8 +604,7 @@ lemma spaceTime_integral_eq_time_integral_space_integral {M} [NormedAddCommGroup
     ∫ x : SpaceTime d, f x =
     c.val • ∫ t : Time, ∫ x : Space d, f ((toTimeAndSpace c).symm (t, x)) := by
   rw [spaceTime_integral_eq_time_space_integral, MeasureTheory.integral_prod]
-  rw [spaceTime_integrable_iff_space_time_integrable] at h
-  exact h
+  exact (spaceTime_integrable_iff_space_time_integrable c f).mp h
 
 lemma spaceTime_integral_eq_space_integral_time_integral {M} [NormedAddCommGroup M]
     [NormedSpace ℝ M] {d : ℕ} (c : SpeedOfLight)
@@ -660,8 +613,7 @@ lemma spaceTime_integral_eq_space_integral_time_integral {M} [NormedAddCommGroup
     ∫ x : SpaceTime d, f x =
     c.val • ∫ x : Space d, ∫ t : Time, f ((toTimeAndSpace c).symm (t, x)) := by
   rw [spaceTime_integral_eq_time_space_integral, MeasureTheory.integral_prod_symm]
-  rw [spaceTime_integrable_iff_space_time_integrable] at h
-  exact h
+  exact (spaceTime_integrable_iff_space_time_integrable c f).mp h
 
 end SpaceTime
 

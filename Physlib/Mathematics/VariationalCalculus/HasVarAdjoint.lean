@@ -92,8 +92,8 @@ lemma comp {F : (Y → V) → (Z → W)} {G : (X → U) → (Y → V)} {F' G'}
   test_fun_preserving _ hφ := hF.test_fun_preserving _ (hG.test_fun_preserving _ hφ)
   test_fun_preserving' _ hφ := hG.test_fun_preserving' _ (hF.test_fun_preserving' _ hφ)
   adjoint φ ψ hφ hψ := by
-    rw [hF.adjoint _ _ (hG.test_fun_preserving φ hφ) hψ]
-    rw [hG.adjoint _ _ hφ (hF.test_fun_preserving' _ hψ)]
+    rw [hF.adjoint _ _ (hG.test_fun_preserving φ hφ) hψ,
+      hG.adjoint _ _ hφ (hF.test_fun_preserving' _ hψ)]
   ext' := IsLocalizedFunctionTransform.fun_comp hG.ext' hF.ext'
 
 lemma congr_fun {F G : (X → U) → (Y → V)} {F' : (Y → V) → (X → U)}
@@ -133,10 +133,7 @@ lemma unique_on_test_functions {F : (X → U) → (Y → V)} {F' G' : (Y → V) 
   rw [← sub_eq_iff_eq_add]
   change (F' - G') φ = 0
   apply fundamental_theorem_of_variational_calculus (@volume X _)
-  · simp
-    apply IsTestFunction.sub
-    · exact F'_preserve_test φ hφ
-    · exact G'_preserve_test φ hφ
+  · exact (F'_preserve_test φ hφ).sub (G'_preserve_test φ hφ)
   · intro ψ hψ
     simp [inner_sub_left']
     rw [MeasureTheory.integral_sub]
@@ -147,14 +144,8 @@ lemma unique_on_test_functions {F : (X → U) → (Y → V)} {F' G' : (Y → V) 
         enter [1, 2, a]
         rw [← inner_conj_symm']
       simp[← F'_adjoint ψ φ hψ hφ,G'_adjoint ψ φ hψ hφ]
-    · apply IsTestFunction.integrable
-      apply IsTestFunction.inner
-      · exact F'_preserve_test φ hφ
-      · exact hψ
-    · apply IsTestFunction.integrable
-      apply IsTestFunction.inner
-      · exact G'_preserve_test φ hφ
-      · exact hψ
+    · exact ((F'_preserve_test φ hφ).inner hψ).integrable _
+    · exact ((G'_preserve_test φ hφ).inner hψ).integrable _
 
 /-- Variational adjoint is unique only when applied to smooth functions. -/
 lemma unique
@@ -171,20 +162,14 @@ lemma unique
 
   obtain ⟨K, cK, hK⟩ := hF.ext' {x} (isCompact_singleton)
   obtain ⟨L, cL, hL⟩ := hG.ext' {x} (isCompact_singleton)
-  -- have hK : x ∈ {x} K := by
-  -- exact? Set.mem_singleton x
   have hnonempty : Set.Nonempty ({0} ∪ (K ∪ L)) := by simp
 
-  -- prepare test function that is one on `D ∪ D'`
+  -- prepare test function that is one on `K ∪ L`
   let r := sSup ((fun x => ‖x‖) '' ({0} ∪ (K ∪ L)))
-  have : 0 ≤ r := by
-    obtain ⟨x, h1, h2, h3⟩ := IsCompact.exists_sSup_image_eq_and_ge (s := {0} ∪ (K ∪ L))
-      (IsCompact.union (by simp) (IsCompact.union cK cL)) hnonempty
-      (f := fun x => ‖x‖) (by fun_prop)
-    unfold r
-    apply le_of_le_of_eq (b := ‖x‖)
-    · exact norm_nonneg x
-    · rw [← h2]
+  obtain ⟨y₀, -, hr, hsup⟩ := IsCompact.exists_sSup_image_eq_and_ge (s := {0} ∪ (K ∪ L))
+    (IsCompact.union (by simp) (IsCompact.union cK cL)) hnonempty
+    (f := fun x => ‖x‖) (by fun_prop)
+  have hr0 : 0 ≤ r := le_of_le_of_eq (norm_nonneg y₀) hr.symm
 
   let φ : ContDiffBump (0 : Y) := {
     rIn := r + 1,
@@ -193,59 +178,36 @@ lemma unique
     rIn_lt_rOut := by linarith}
 
   -- few properties about `φ`
-  let φ' := fun x => φ.toFun x
-  have hφ : IsTestFunction (fun x : Y => φ x) := by
-    constructor
-    apply ContDiffBump.contDiff
-    apply ContDiffBump.hasCompactSupport
+  have hφ : IsTestFunction (fun x : Y => φ x) :=
+    ⟨ContDiffBump.contDiff φ, ContDiffBump.hasCompactSupport φ⟩
   have hφ' : ∀ x, x ∈ K ∪ L → x ∈ Metric.closedBall 0 φ.rIn := by
     intro x hx
-    simp [φ, r, -Set.singleton_union]
-    obtain ⟨y, h1, h2, h3⟩ := IsCompact.exists_sSup_image_eq_and_ge (s := {0} ∪ (K ∪ L))
-      (IsCompact.union (by simp) (IsCompact.union cK cL)) hnonempty
-      (f := fun x => ‖x‖) (by fun_prop)
-    rw [h2]
-    have h3' := h3 x (by simp[hx])
-    apply le_trans h3'
-    simp
+    simp only [φ, Metric.mem_closedBall, dist_zero_right]
+    have hxr : ‖x‖ ≤ r := le_of_le_of_eq (hsup x (by simp [hx])) hr.symm
+    linarith
 
   let ψ := fun x => φ x • f x
   have hψ : IsTestFunction (fun x : Y => ψ x) := by fun_prop
-  have hψK : ∀ x ∈ K, f x = ψ x := by
-    intros x hx; unfold ψ
-    rw[ContDiffBump.one_of_mem_closedBall]
-    · simp
-    · apply hφ'; simp [hx]
-  have hψL : ∀ x ∈ L, f x = ψ x := by
-    intros x hx; unfold ψ
-    rw[ContDiffBump.one_of_mem_closedBall]
-    · simp
-    · apply hφ'; simp [hx]
-
-  simp only [hK f ψ hψK x rfl, hL f ψ hψL x rfl, unique_on_test_functions hF hG ψ hψ]
+  have hψeq : ∀ x ∈ K ∪ L, f x = ψ x := fun x hx => by
+    rw [show ψ x = φ x • f x from rfl, ContDiffBump.one_of_mem_closedBall φ (hφ' x hx), one_smul]
+  simp only [hK f ψ (fun z hz => hψeq z (by simp [hz])) x rfl,
+    hL f ψ (fun z hz => hψeq z (by simp [hz])) x rfl,
+    unique_on_test_functions hF hG ψ hψ]
 
 lemma neg {F : (X → U) → (X → V)} {F' : (X → V) → (X → U)}
     (hF : HasVarAdjoint F F') :
     HasVarAdjoint (fun φ x => - F φ x) (fun φ x => - F' φ x) where
-  test_fun_preserving _ hφ := by
-    have := hF.test_fun_preserving _ hφ
-    fun_prop
-  test_fun_preserving' _ hφ := by
-    have := hF.test_fun_preserving' _ hφ
-    fun_prop
-  adjoint _ _ _ _ := by
-    simp [integral_neg]
-    rw[hF.adjoint _ _ (by assumption) (by assumption)]
+  test_fun_preserving _ hφ := (hF.test_fun_preserving _ hφ).neg
+  test_fun_preserving' _ hφ := (hF.test_fun_preserving' _ hφ).neg
+  adjoint φ ψ hφ hψ := by
+    simpa [integral_neg] using hF.adjoint _ _ hφ hψ
   ext' := IsLocalizedFunctionTransform.neg hF.ext'
   -- ext := IsLocalizedFunctionTransform.neg hF.ext
 
 lemma of_neg {F : (X → U) → (X → V)} {F' : (X → V) → (X → U)}
     (hF : HasVarAdjoint (fun φ x => - F φ x) (fun φ x => - F' φ x)) :
     HasVarAdjoint F F' := by
-  have hF : F = (fun φ x => - - F φ x) := by simp
-  have hF' : F' = (fun φ x => - - F' φ x) := by simp
-  rw [hF, hF']
-  (expose_names; exact neg hF_1)
+  simpa using neg hF
 
 section OnFiniteMeasures
 
@@ -256,36 +218,19 @@ variable
 lemma add {F G : (X → U) → (X → V)} {F' G' : (X → V) → (X → U)}
     (hF : HasVarAdjoint F F') (hG : HasVarAdjoint G G') :
     HasVarAdjoint (fun φ x => F φ x + G φ x) (fun φ x => F' φ x + G' φ x) where
-  test_fun_preserving _ hφ := by
-    have := hF.test_fun_preserving _ hφ
-    have := hG.test_fun_preserving _ hφ
-    fun_prop
-  test_fun_preserving' _ hφ := by
-    have := hF.test_fun_preserving' _ hφ
-    have := hG.test_fun_preserving' _ hφ
-    fun_prop
-  adjoint _ _ _ _ := by
-    simp[inner_add_left',inner_add_right']
-    rw[MeasureTheory.integral_add]
-    rw[MeasureTheory.integral_add]
-    rw[hF.adjoint _ _ (by assumption) (by assumption)]
-    rw[hG.adjoint _ _ (by assumption) (by assumption)]
-    · apply IsTestFunction.integrable
-      apply IsTestFunction.inner
-      · (expose_names; exact h)
-      · (expose_names; exact hF.test_fun_preserving' x_1 h_1)
-    · apply IsTestFunction.integrable
-      apply IsTestFunction.inner
-      · (expose_names; exact h)
-      · (expose_names; exact hG.test_fun_preserving' x_1 h_1)
-    · apply IsTestFunction.integrable
-      apply IsTestFunction.inner
-      · (expose_names; exact hF.test_fun_preserving x h)
-      · (expose_names; exact h_1)
-    · apply IsTestFunction.integrable
-      apply IsTestFunction.inner
-      · (expose_names; exact hG.test_fun_preserving x h)
-      · (expose_names; exact h_1)
+  test_fun_preserving _ hφ :=
+    (hF.test_fun_preserving _ hφ).add (hG.test_fun_preserving _ hφ)
+  test_fun_preserving' _ hφ :=
+    (hF.test_fun_preserving' _ hφ).add (hG.test_fun_preserving' _ hφ)
+  adjoint φ ψ hφ hψ := by
+    have hFφ := hF.test_fun_preserving φ hφ
+    have hGφ := hG.test_fun_preserving φ hφ
+    have hFψ := hF.test_fun_preserving' ψ hψ
+    have hGψ := hG.test_fun_preserving' ψ hψ
+    simp only [inner_add_left', inner_add_right']
+    rw [integral_add ((hFφ.inner hψ).integrable _) ((hGφ.inner hψ).integrable _),
+      integral_add ((hφ.inner hFψ).integrable _) ((hφ.inner hGψ).integrable _),
+      hF.adjoint _ _ hφ hψ, hG.adjoint _ _ hφ hψ]
   ext' := IsLocalizedFunctionTransform.add hF.ext' hG.ext'
   -- ext := IsLocalizedFunctionTransform.add hF.ext hG.ext
 
@@ -315,51 +260,36 @@ lemma sum {ι : Type} [Fintype ι] {F : ι → (X → U) → (X → V)} {F' : ι
 lemma sub {F G : (X → U) → (X → V)} {F' G' : (X → V) → (X → U)}
     (hF : HasVarAdjoint F F') (hG : HasVarAdjoint G G') :
     HasVarAdjoint (fun φ x => F φ x - G φ x) (fun φ x => F' φ x - G' φ x) := by
-  simp [sub_eq_add_neg]
-  apply add hF (neg hG)
+  simpa [sub_eq_add_neg] using add hF (neg hG)
 
 end OnFiniteMeasures
 
-set_option backward.isDefEq.respectTransparency false in
 lemma mul_left {F : (X → U) → (X → ℝ)} {ψ : X → ℝ} {F' : (X → ℝ) → (X → U)}
     (hF : HasVarAdjoint F F') (hψ : ContDiff ℝ ∞ ψ) :
     HasVarAdjoint (fun φ x => ψ x * F φ x) (fun φ x => F' (fun x => ψ x * φ x) x) where
-  test_fun_preserving φ hφ := by
-    have := hF.test_fun_preserving _ hφ
-    fun_prop
-  test_fun_preserving' φ hφ := by
-    apply hF.test_fun_preserving'
-    fun_prop
+  test_fun_preserving φ hφ := IsTestFunction.mul_left hψ (hF.test_fun_preserving _ hφ)
+  test_fun_preserving' φ hφ := hF.test_fun_preserving' _ (IsTestFunction.mul_left hψ hφ)
   adjoint φ ψ' hφ hψ' := by
     rw [← hF.adjoint]
     · congr; funext x; simp; ring
     · exact hφ
-    · apply IsTestFunction.mul_left
-      · exact hψ
-      · exact hψ'
+    · exact IsTestFunction.mul_left hψ hψ'
   ext' := by
     intro K cK
     obtain ⟨L,cL,h⟩ := hF.ext' K cK
     exact ⟨L,cL,by intro _ _ hφ _ _; apply h <;> simp_all⟩
   -- ext := IsLocalizedFunctionTransform.mul_left hF.ext
 
-set_option backward.isDefEq.respectTransparency false in
 lemma mul_right {F : (X → U) → (X → ℝ)} {ψ : X → ℝ} {F' : (X → ℝ) → (X → U)}
     (hF : HasVarAdjoint F F') (hψ : ContDiff ℝ ∞ ψ) :
     HasVarAdjoint (fun φ x => F φ x * ψ x) (fun φ x => F' (fun x => φ x * ψ x) x) where
-  test_fun_preserving φ hφ := by
-    have := hF.test_fun_preserving _ hφ
-    fun_prop
-  test_fun_preserving' φ hφ := by
-    apply hF.test_fun_preserving'
-    fun_prop
+  test_fun_preserving φ hφ := IsTestFunction.mul_right (hF.test_fun_preserving _ hφ) hψ
+  test_fun_preserving' φ hφ := hF.test_fun_preserving' _ (IsTestFunction.mul_right hφ hψ)
   adjoint φ ψ' hφ hψ' := by
     rw [← hF.adjoint]
     · congr; funext x; simp; ring
     · exact hφ
-    · apply IsTestFunction.mul_right
-      · exact hψ'
-      · exact hψ
+    · exact IsTestFunction.mul_right hψ' hψ
   ext' := by
     intro K cK
     obtain ⟨L,cL,h⟩ := hF.ext' K cK
@@ -369,12 +299,8 @@ lemma mul_right {F : (X → U) → (X → ℝ)} {ψ : X → ℝ} {F' : (X → �
 lemma smul_left {F : (X → U) → (X → V)} {ψ : X → ℝ} {F' : (X → V) → (X → U)}
     (hF : HasVarAdjoint F F') (hψ : ContDiff ℝ ∞ ψ) :
     HasVarAdjoint (fun φ x => ψ x • F φ x) (fun φ x => F' (fun x' => ψ x' • φ x') x) where
-  test_fun_preserving φ hφ := by
-    have := hF.test_fun_preserving φ hφ
-    fun_prop
-  test_fun_preserving' φ hφ := by
-    apply hF.test_fun_preserving' _ _
-    fun_prop
+  test_fun_preserving φ hφ := IsTestFunction.smul_left hψ (hF.test_fun_preserving φ hφ)
+  test_fun_preserving' φ hφ := hF.test_fun_preserving' _ (IsTestFunction.smul_left hψ hφ)
   adjoint φ ψ hφ hψ := by
     simp_rw[inner_smul_left', ← inner_smul_right']
     rw [hF.adjoint]
@@ -389,23 +315,8 @@ lemma smul_left {F : (X → U) → (X → V)} {ψ : X → ℝ} {F' : (X → V) �
 
 lemma smul_right {F : (X → U) → (X → V)} {ψ : X → ℝ} {F' : (X → V) → (X → U)}
     (hF : HasVarAdjoint F F') (hψ : ContDiff ℝ ∞ ψ) :
-    HasVarAdjoint (fun φ x => ψ x • F φ x) (fun φ x => F' (fun x' => ψ x' • φ x') x) where
-  test_fun_preserving φ hφ := by
-    have := hF.test_fun_preserving φ hφ
-    fun_prop
-  test_fun_preserving' φ hφ := by
-    apply hF.test_fun_preserving' _ _
-    fun_prop
-  adjoint φ ψ hφ hψ := by
-    simp_rw[inner_smul_left', ← inner_smul_right']
-    rw [hF.adjoint]
-    · rfl
-    · exact hφ
-    · simp; fun_prop
-  ext' := by
-    intro K cK
-    obtain ⟨L,cL,h⟩ := hF.ext' K cK
-    exact ⟨L,cL,by intro _ _ hφ _ _; apply h <;> simp_all⟩
+    HasVarAdjoint (fun φ x => ψ x • F φ x) (fun φ x => F' (fun x' => ψ x' • φ x') x) :=
+  smul_left hF hψ
   -- ext := IsLocalizedFunctionTransform.smul_left hF.ext
 
 attribute [fun_prop] LinearIsometryEquiv.contDiff
@@ -415,15 +326,12 @@ lemma clm_apply
     [CompleteSpace U] [CompleteSpace V] (f : X → (U →L[ℝ] V))
     (hf : ContDiff ℝ ∞ f) :
     HasVarAdjoint (fun (φ : X → U) x => f x (φ x)) (fun ψ x => _root_.adjoint ℝ (f x) (ψ x)) where
-  test_fun_preserving φ hφ := by
-    apply IsTestFunction.family_linearMap_comp
-    · exact hφ
-    · exact hf
+  test_fun_preserving φ hφ := IsTestFunction.family_linearMap_comp hφ hf
   test_fun_preserving' φ hφ := by
     conv =>
       enter [1, x]
       rw [adjoint_eq_clm_adjoint]
-    simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+    simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
     apply IsTestFunction.comp_left
     · constructor
       · apply ContDiff.clm_apply
@@ -453,17 +361,10 @@ lemma clm_apply
 
 protected lemma deriv :
     HasVarAdjoint (fun φ : ℝ → U => deriv φ) (fun φ x => - deriv φ x) where
-  test_fun_preserving _ hφ := by
-    have ⟨h,h'⟩ := hφ
-    constructor
-    · fun_prop
-    · exact HasCompactSupport.deriv h'
-  test_fun_preserving' _ hφ := by
-    have ⟨h,h'⟩ := hφ
-    constructor
-    · fun_prop
-    · apply HasCompactSupport.neg
-      apply HasCompactSupport.deriv h'
+  test_fun_preserving _ hφ :=
+    ⟨by fun_prop, HasCompactSupport.deriv hφ.supp⟩
+  test_fun_preserving' _ hφ :=
+    ⟨by fun_prop, (HasCompactSupport.deriv hφ.supp).neg⟩
   adjoint φ ψ hφ hψ := by
     trans ∫ (x : ℝ), ⟪deriv φ x, ψ x⟫_ℝ
     · congr
@@ -487,9 +388,7 @@ protected lemma deriv :
       exact (hφ.differentiable x).inner' (hψ.differentiable x)
     · fun_prop
     · apply IsTestFunction.integrable (hφ.inner hψ)
-  ext' := by
-    apply IsLocalizedFunctionTransform.neg
-    apply IsLocalizedFunctionTransform.deriv
+  ext' := IsLocalizedFunctionTransform.neg IsLocalizedFunctionTransform.deriv
   -- ext := IsLocalizedFunctionTransform.deriv
 
 lemma fderiv_apply {dx}
@@ -498,9 +397,7 @@ lemma fderiv_apply {dx}
     HasVarAdjoint (fun φ : X → U => (fderiv ℝ φ · dx)) (fun φ x => - fderiv ℝ φ x dx) where
   test_fun_preserving φ hφ := by fun_prop
   test_fun_preserving' φ hφ := by fun_prop
-  ext' := by
-    apply IsLocalizedFunctionTransform.neg
-    apply IsLocalizedFunctionTransform.fderiv
+  ext' := IsLocalizedFunctionTransform.neg IsLocalizedFunctionTransform.fderiv
   adjoint φ ψ hφ hψ := by
     rw [← sub_eq_zero]
     rw [← integral_sub]
@@ -543,39 +440,32 @@ lemma adjFDeriv_apply
     use (Metric.cthickening 1 K)
     constructor
     · exact IsCompact.cthickening cK
-    · intro φ φ' hφ
-      have h : ∀ x ∈ K, φ =ᶠ[nhds x] φ' := by
-        intro x hx
+    · intro φ φ' hφ x hx
+      dsimp[divergence]; congr 4
+      have heq : φ =ᶠ[nhds x] φ' := by
         apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-        refine mem_interior_iff_mem_nhds.mp ?_
-        rw [@mem_interior]
-        use Metric.thickening 1 K
-        simp only [subset_refl, true_and]
-        apply And.intro
-        · exact Metric.isOpen_thickening
-        · rw [@Metric.mem_thickening_iff_exists_edist_lt]
-          use x
-          simpa using hx
-        · intro x hx
-          have hx' : x ∈ Metric.cthickening 1 K := Metric.thickening_subset_cthickening 1 K hx
-          exact hφ x hx'
-      intro x hx; dsimp[divergence]; congr 4
-      rw [Filter.EventuallyEq.fderiv_eq (h x hx)]
+        · exact Metric.isOpen_thickening.mem_nhds
+            (Metric.self_subset_thickening one_pos K hx)
+        · intro y hy
+          exact hφ y (Metric.thickening_subset_cthickening 1 K hy)
+      rw [Filter.EventuallyEq.fderiv_eq heq]
   adjoint φ ψ hφ hψ := by
     obtain ⟨s, ⟨bX⟩⟩ := Basis.exists_basis ℝ X
-    haveI : Fintype s := FiniteDimensional.fintypeBasisIndex bX
+    have : Fintype s := FiniteDimensional.fintypeBasisIndex bX
     let f (i : s) : X →ₗ[ℝ] ℝ := {
       toFun := (bX.repr · i)
       map_add' := by simp
-      map_smul' := by simp
-
-    }
+      map_smul' := by simp }
     let f' (i : s) : X →L[ℝ] ℝ := (f i).toContinuousLinearMap
+    have hfψ : ∀ i, IsTestFunction fun y => f' i (ψ y) := fun i =>
+      IsTestFunction.comp_left hψ (by simp) (by fun_prop)
+    have hinner : IsTestFunction fun y => ⟪dy, φ y⟫_ℝ :=
+      IsTestFunction.inner_left (by fun_prop) hφ
     calc _ = ∫ (y : X), ⟪dy, fderiv ℝ φ y (ψ y)⟫_ℝ := by
             congr
             funext y
-            have h1 := DifferentiableAt.hasAdjFDerivAt (hφ.differentiable y)
-            rw [h1.hasAdjoint_fderiv.adjoint_inner_left]
+            rw [(DifferentiableAt.hasAdjFDerivAt
+              (hφ.differentiable y)).hasAdjoint_fderiv.adjoint_inner_left]
         _ = ∑ i, ∫ (y : X), bX.repr (ψ y) i * fderiv ℝ (fun y' => ⟪dy, φ y' ⟫_ℝ) y (bX i) := by
             have h (y : X) : ψ y = ∑ i, bX.repr (ψ y) i • bX i := by
               exact Eq.symm (Basis.sum_equivFun bX (ψ y))
@@ -583,7 +473,7 @@ lemma adjFDeriv_apply
               enter [2, y]
               rw [h]
               simp only [map_sum, map_smul, inner_sum']
-            rw [MeasureTheory.integral_finset_sum]
+            rw [MeasureTheory.integral_finsetSum]
             congr
             funext i
             congr
@@ -591,7 +481,7 @@ lemma adjFDeriv_apply
             simp [inner_smul_right']
             left
             rw [fderiv_inner_apply']
-            simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.zero_apply,
+            simp only [fderiv_fun_const, Pi.zero_apply, _root_.zero_apply,
               inner_zero_left', add_zero]
             · fun_prop
             · exact hφ.differentiable y
@@ -599,11 +489,7 @@ lemma adjFDeriv_apply
               apply IsTestFunction.integrable
               simp [inner_smul_right']
               apply IsTestFunction.mul_right
-              · change IsTestFunction fun x => f' i (ψ x)
-                apply IsTestFunction.comp_left
-                · exact hψ
-                · simp
-                · fun_prop
+              · exact hfψ i
               · fun_prop
         _ = ∑ i, ∫ (y : X), - fderiv ℝ (fun y' => bX.repr (ψ y') i) y (bX i) * ⟪dy, φ y⟫_ℝ := by
             congr; funext i
@@ -611,40 +497,16 @@ lemma adjFDeriv_apply
             · simp[integral_neg]
             · apply IsTestFunction.integrable
               apply IsTestFunction.mul_left
-              · apply IsTestFunction.smooth
-                apply IsTestFunction.fderiv_apply
-                change IsTestFunction fun y => f' i (ψ y)
-                apply IsTestFunction.comp_left
-                · exact hψ
-                · simp
-                · fun_prop
-              · apply IsTestFunction.inner_left
-                · fun_prop
-                · exact hφ
+              · exact ((hfψ i).fderiv_apply (bX i)).smooth
+              · exact hinner
             · apply IsTestFunction.integrable
               apply IsTestFunction.mul_left
-              · apply IsTestFunction.smooth
-                change IsTestFunction fun y => f' i (ψ y)
-                apply IsTestFunction.comp_left
-                · exact hψ
-                · simp
-                · fun_prop
-              · apply IsTestFunction.fderiv_apply
-                apply IsTestFunction.comp_left
-                · exact hφ
-                · simp
-                · fun_prop
+              · exact (hfψ i).smooth
+              · exact hinner.fderiv_apply (bX i)
             · apply IsTestFunction.integrable
               apply IsTestFunction.mul_left
-              · apply IsTestFunction.smooth
-                change IsTestFunction fun y => f' i (ψ y)
-                apply IsTestFunction.comp_left
-                · exact hψ
-                · simp
-                · fun_prop
-              · apply IsTestFunction.inner_left
-                · fun_prop
-                · exact hφ
+              · exact (hfψ i).smooth
+              · exact hinner
             · intro _ _
               apply Differentiable.differentiableAt
               change Differentiable ℝ fun y => f' i (ψ y)
@@ -653,24 +515,15 @@ lemma adjFDeriv_apply
               apply Differentiable.differentiableAt
               fun_prop
         _ = ∫ (y : X), - (∑ i, fderiv ℝ (fun y' => bX.repr (ψ y') i) y (bX i)) * ⟪dy, φ y⟫_ℝ := by
-            rw [← MeasureTheory.integral_finset_sum]
+            rw [← MeasureTheory.integral_finsetSum]
             · congr
               funext y
               simp [Finset.sum_mul]
             · intro i _
               apply IsTestFunction.integrable
               apply IsTestFunction.mul_left
-              · apply IsTestFunction.smooth
-                apply IsTestFunction.neg
-                apply IsTestFunction.fderiv_apply
-                change IsTestFunction fun y => f' i (ψ y)
-                apply IsTestFunction.comp_left
-                · exact hψ
-                · simp
-                · fun_prop
-              · apply IsTestFunction.inner_left
-                · fun_prop
-                · exact hφ
+              · exact (((hfψ i).fderiv_apply (bX i)).neg).smooth
+              · exact hinner
         _ = _ := by
             congr
             funext y
@@ -683,7 +536,7 @@ lemma adjFDeriv_apply
             trans (fderiv ℝ (f' i ∘ ψ) y) (bX i)
             · rfl
             rw [fderiv_comp]
-            simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp',
+            simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp,
               Function.comp_apply]
             simp [f',f]
             · exact ContinuousLinearMap.differentiableAt _
@@ -691,7 +544,6 @@ lemma adjFDeriv_apply
             · exact real_inner_comm' (φ y) dy
   -- ext := IsLocalizedFunctionTransform.adjFDeriv
 
-set_option backward.isDefEq.respectTransparency false in
 protected lemma gradient {d} :
     HasVarAdjoint (fun φ : Space d → ℝ => gradient φ)
     (fun φ x => - Space.div (Space.basis.repr ∘ φ) x) := by
@@ -702,15 +554,12 @@ protected lemma gradient {d} :
       rw [divergence_eq_space_div]
       simp only [smul_eq_mul, mul_one]
       exact hφ.differentiable
-    · apply IsLocalizedFunctionTransform.neg
-
-      apply IsLocalizedFunctionTransform.div_comp_repr
+    · exact IsLocalizedFunctionTransform.neg IsLocalizedFunctionTransform.div_comp_repr
   · intro φ hφ
     funext x
     rw [gradient_eq_adjFDeriv]
     apply hφ.differentiable x
 
-set_option backward.isDefEq.respectTransparency false in
 lemma grad {d} : HasVarAdjoint (fun (φ : Space d → ℝ) x => Space.grad φ x)
     (fun ψ x => - Space.div ψ x) := by
   let f : Space d → Space d →L[ℝ] EuclideanSpace ℝ (Fin d) := fun x =>
@@ -718,15 +567,13 @@ lemma grad {d} : HasVarAdjoint (fun (φ : Space d → ℝ) x => Space.grad φ x)
   have h1 := clm_apply f (by fun_prop)
   simp [f] at h1
   have hx : (_root_.adjoint ℝ (⇑Space.basis.repr)) = (Space.basis (d := d)).repr.symm := by
-    refine HasAdjoint.adjoint ?_
-    refine { adjoint_inner_left := ?_ }
-    intro x y
+    refine HasAdjoint.adjoint ⟨fun x y => ?_⟩
     rw [real_inner_comm, ← Space.basis_repr_inner_eq, real_inner_comm]
   simp [hx] at h1
   have h2 := HasVarAdjoint.comp h1 (HasVarAdjoint.gradient (d := d))
-  convert h2 using 1
+  convert! h2 using 1
   · funext x t
-    rw [Space.grad_eq_gradiant]
+    rw [Space.grad_eq_gradient]
     simp
 
 lemma div {d} : HasVarAdjoint (fun (φ : Space d → EuclideanSpace ℝ (Fin d)) x => Space.div φ x)
@@ -746,14 +593,11 @@ lemma prod
     HasVarAdjoint
       (fun φ x => (F φ x, G φ x))
       (fun φ x => F' (fun x' => (φ x').1) x + G' (fun x' => (φ x').2) x) where
-  test_fun_preserving _ hφ := by
-    have := hF.test_fun_preserving _ hφ
-    have := hG.test_fun_preserving _ hφ
-    fun_prop
-  test_fun_preserving' y hφ := by
-    have := hF.test_fun_preserving' (fun x => (y x).1) (by fun_prop)
-    have := hG.test_fun_preserving' (fun x => (y x).2) (by fun_prop)
-    fun_prop
+  test_fun_preserving _ hφ :=
+    IsTestFunction.prodMk (hF.test_fun_preserving _ hφ) (hG.test_fun_preserving _ hφ)
+  test_fun_preserving' y hφ :=
+    (hF.test_fun_preserving' _ (IsTestFunction.prod_fst hφ)).add
+      (hG.test_fun_preserving' _ (IsTestFunction.prod_snd hφ))
   adjoint φ ψ hφ hψ := by
     have := hF.test_fun_preserving _ hφ
     have := hG.test_fun_preserving _ hφ
@@ -789,12 +633,8 @@ lemma fst {F'} {F : (X → U) → (X → W×V)}
     HasVarAdjoint
       (fun φ x => (F φ x).1)
       (fun φ x => F' (fun x' => (φ x', 0)) x) where
-  test_fun_preserving _ hφ := by
-    apply IsTestFunction.prod_fst
-    exact hF.test_fun_preserving _ hφ
-  test_fun_preserving' y hφ := by
-    apply hF.test_fun_preserving'
-    fun_prop
+  test_fun_preserving _ hφ := IsTestFunction.prod_fst (hF.test_fun_preserving _ hφ)
+  test_fun_preserving' y hφ := hF.test_fun_preserving' _ (by fun_prop)
   adjoint φ ψ hφ hψ := by
     calc _ = ∫ (y : X), ⟪F φ y, (ψ y, 0)⟫_ℝ := by simp
         _ = ∫ (y : X), ⟪φ y, F' (fun y => (ψ y, 0)) y⟫_ℝ := hF.adjoint _ _ hφ (by fun_prop)
@@ -815,12 +655,8 @@ lemma snd {F'} {F : (X → U) → (X → W×V)}
     HasVarAdjoint
       (fun φ x => (F φ x).2)
       (fun φ x => F' (fun x' => (0, φ x')) x) where
-  test_fun_preserving _ hφ := by
-    apply IsTestFunction.prod_snd
-    exact hF.test_fun_preserving _ hφ
-  test_fun_preserving' y hφ := by
-    apply hF.test_fun_preserving' _
-    fun_prop
+  test_fun_preserving _ hφ := IsTestFunction.prod_snd (hF.test_fun_preserving _ hφ)
+  test_fun_preserving' y hφ := hF.test_fun_preserving' _ (by fun_prop)
   adjoint φ ψ hφ hψ := by
     calc _ = ∫ (y : X), ⟪F φ y, (0, ψ y)⟫_ℝ := by simp
         _ = ∫ (y : X), ⟪φ y, F' (fun y => (0, ψ y)) y⟫_ℝ := hF.adjoint _ _ hφ (by fun_prop)

@@ -105,6 +105,7 @@ layout: default
 
 unsafe def main (args  : List String) : IO UInt32 := do
   let _ ← noImports
+  Lean.enableInitializersExecution
   let statString ← CoreM.withImportModules #[`Physlib] (getStats).run'
   println! statString
   if "mkHTML" ∈ args then

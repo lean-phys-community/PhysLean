@@ -59,7 +59,11 @@ inductive FieldLabel
   | fiveBarMatter
   | fiveMatter
   | tenMatter
-deriving DecidableEq, Fintype
+deriving DecidableEq
+
+instance : Fintype FieldLabel where
+  elems := {.fiveBarHu, .fiveHu, .fiveBarHd, .fiveHd, .fiveBarMatter, .fiveMatter, .tenMatter}
+  complete := fun x => by cases x <;> decide
 
 /-!
 

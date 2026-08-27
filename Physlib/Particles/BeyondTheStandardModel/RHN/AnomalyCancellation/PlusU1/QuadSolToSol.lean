@@ -29,17 +29,15 @@ open BigOperators
 
 variable {n : ℕ}
 /-- A helper function for what follows. -/
-@[simp]
 def α₁ (S : (PlusU1 n).QuadSols) : ℚ := - 3 * cubeTriLin S.val S.val (BL n).val
 
 /-- A helper function for what follows. -/
-@[simp]
 def α₂ (S : (PlusU1 n).QuadSols) : ℚ := accCube S.val
 
 lemma cube_α₁_α₂_zero (S : (PlusU1 n).QuadSols) (a b : ℚ) (h1 : α₁ S = 0) (h2 : α₂ S = 0) :
     accCube (BL.addQuad S a b).val = 0 := by
   erw [BL.add_AFL_cube]
-  simp_all
+  simp_all [α₁, α₂]
 
 lemma α₂_AF (S : (PlusU1 n).Sols) : α₂ S.toQuadSols = 0 := S.2
 
@@ -75,7 +73,6 @@ def special (S : (PlusU1 n).QuadSols) (a b : ℚ) (h1 : α₁ S = 0) (h2 : α₂
     (PlusU1 n).Sols :=
   quadToAF (BL.addQuad S a b) (cube_α₁_α₂_zero S a b h1 h2)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma special_on_AF (S : (PlusU1 n).Sols) (h1 : α₁ S.1 = 0) :
     special S.1 1 0 h1 (α₂_AF S) = S := by
   apply ACCSystem.Sols.ext
@@ -105,7 +102,7 @@ def quadSolToSolInv {n : ℕ} : (PlusU1 n).Sols → (PlusU1 n).QuadSols × ℚ �
 
 lemma quadSolToSolInv_1 (S : (PlusU1 n).Sols) :
     (quadSolToSolInv S).1 = S.1 := by
-  simp only [quadSolToSolInv, α₁, BL_val, SMνACCs.cubeTriLin_toFun_apply_apply, Fin.isValue,
+  simp only [quadSolToSolInv, α₁, BL_val,
     neg_mul, neg_eq_zero, mul_eq_zero, OfNat.ofNat_ne_zero, false_or]
   split <;> rfl
 

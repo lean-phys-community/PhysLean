@@ -20,8 +20,9 @@ open Lean
 
 unsafe def main (_ : List String) : IO Unit := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   println! "Checking sorryful results."
-  let env ← importModules (loadExts := true) #[`Physlib] {} 0
+  let env ← importModules (loadExts := true) #[`Physlib, `QuantumInfo] {} 0
   let fileName := ""
   let options : Options := {}
   let ctx : Core.Context := {fileName, options, fileMap := default }
