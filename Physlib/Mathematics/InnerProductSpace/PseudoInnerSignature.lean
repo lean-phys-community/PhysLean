@@ -12,29 +12,23 @@ public import Mathlib.LinearAlgebra.QuadraticForm.Signature
 /-!
 # Index of a pseudo-inner product, and stability of the signature
 
-The index of a pseudo-inner product is `QuadraticForm.sigNeg` of its quadratic form: the largest
-dimension of a subspace on which the form is negative definite. Index `0` is the Riemannian case,
-index `1` the Lorentzian one.
+The index is `QuadraticForm.sigNeg` of the associated quadratic form: the largest dimension of a
+subspace on which the form is negative definite. Index `0` is the Riemannian case, index `1` the
+Lorentzian one.
 
-The main result is that the signature cannot jump under perturbation. It is what makes local
-constancy of the index of a pseudo-Riemannian metric a theorem rather than a hypothesis, so that
-constructing a metric — Minkowski, Schwarzschild, FLRW — carries no signature-constancy
-obligation.
+`ContinuousLinearMap.eventually_sigNeg_eq` shows the signature cannot jump, which is what makes
+local constancy of the index of a pseudo-Riemannian metric a theorem rather than a hypothesis.
+The argument is classical: maximal definite subspaces for `b` stay definite for nearby `c`, so
+`sigPos` and `sigNeg` can only grow, while `QuadraticForm.sigPos_add_sigNeg_add_radical` caps
+their sum. No symmetry is used.
 
 ## Main results
 
 * `ContinuousLinearMap.eventually_forall_pos`, `eventually_forall_neg`: definiteness on a fixed
   subspace is an open condition on the form.
-* `ContinuousLinearMap.eventually_sigNeg_eq`: on a finite-dimensional real normed space, `sigPos`,
-  `sigNeg` and triviality of the radical are locally constant. No symmetry is assumed.
+* `ContinuousLinearMap.eventually_sigNeg_eq`: `sigPos`, `sigNeg` and triviality of the radical are
+  locally constant.
 * `PseudoInnerProductSpace.index`, `index_dual_eq`, `index_eq_zero_of_innerProductSpace`.
-
-## Implementation notes
-
-The proof is classical: maximal definite subspaces for `b` remain definite for nearby `c`, so
-`sigPos` and `sigNeg` can only grow, while `QuadraticForm.sigPos_add_sigNeg_add_radical` caps
-their sum at `finrank`. Openness of definiteness comes from compactness of the unit sphere of a
-finite-dimensional subspace.
 
 ## Tags
 

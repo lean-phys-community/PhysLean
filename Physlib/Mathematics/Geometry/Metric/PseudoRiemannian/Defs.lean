@@ -11,23 +11,24 @@ public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Basic
 # Pseudo-Riemannian manifolds
 
 A pseudo-Riemannian metric on `M` is a pseudo-Riemannian structure on its tangent bundle, so this
-file only specializes: the fibrewise algebra is in
-`Physlib.Mathematics.InnerProductSpace.PseudoInner` and the smoothness theory in
-`Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Basic`, both for arbitrary vector bundles.
-
-To say "let `M` be a pseudo-Riemannian manifold", write
+file only specializes `Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Basic`. To say "let
+`M` be a pseudo-Riemannian manifold", write
 ```
 variable [∀ x : M, PseudoInnerProductSpace (TangentSpace I x)]
   [IsContMDiffPseudoRiemannianBundle I n E (TangentSpace I : M → Type _)]
 ```
-the analogue of Mathlib's `[RiemannianBundle (TangentSpace I : M → Type _)]` together with
-`[IsContMDiffRiemannianBundle I n E (TangentSpace I : M → Type _)]`, which imply it. No
-`ofCoreOfTopology` detour is needed here, because an indefinite form does not determine a norm.
+Mathlib's `[RiemannianBundle (TangentSpace I : M → Type _)]` with
+`[IsContMDiffRiemannianBundle I n E (TangentSpace I : M → Type _)]` implies this. No
+`ofCoreOfTopology` detour is needed, since an indefinite form determines no norm.
+
+The musical isomorphisms are inherited: at `x` they are
+`PseudoInnerProductSpace.flatEquiv (TangentSpace I x)` and `sharpEquiv (TangentSpace I x)`, with
+inverse metric `dualPseudoInnerSL (TangentSpace I x)`. The `TangentSpace` instances below are what
+make them apply.
 
 ## Main definitions
 
-* `PseudoRiemannianMetric I n M`: bundled `C^n` metric data on `M`; use it to construct the
-  hypotheses above, and state theorems with the typeclasses.
+* `PseudoRiemannianMetric I n M`: metric data on `M`; theorems are stated with the typeclasses.
 * `PseudoRiemannian.index I x`: the index of the metric at `x`.
 
 ## Main results
@@ -35,16 +36,9 @@ the analogue of Mathlib's `[RiemannianBundle (TangentSpace I : M → Type _)]` t
 * `PseudoRiemannian.isLocallyConstant_index` and `index_eq_of_preconnectedSpace`: signature
   constancy is a theorem, so no metric carries it as data.
 
-## Implementation notes
-
-The musical isomorphisms are inherited: at `x` they are
-`PseudoInnerProductSpace.flatEquiv (TangentSpace I x)` and `sharpEquiv (TangentSpace I x)`, with
-the inverse metric `dualPseudoInnerSL (TangentSpace I x)`. The `TangentSpace` instances below are
-what make them apply.
-
 ## Acknowledgements
 
-The design follows a proposal of Sébastien Gouëzel on Zulip, see [Zulip](https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/The.20future.20of.20pseudo-Riemannian.20manifolds/with/619509253).
+The design follows Sébastien Gouëzel's proposal on Zulip, see [Zulip](https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/The.20future.20of.20pseudo-Riemannian.20manifolds/with/619509253).
 
 ## Tags
 
@@ -79,11 +73,8 @@ instance TangentSpace.instFiniteDimensional [FiniteDimensional ℝ E] :
 end TangentSpaceInstances
 
 /-- A `C^n` pseudo-Riemannian metric on `M`: the tangent-bundle case of
-`Bundle.ContMDiffPseudoRiemannianMetric`, as Mathlib's Riemannian metrics on `M` are the
-tangent-bundle case of `Bundle.ContMDiffRiemannianMetric`.
-
-This is data: use it to produce the `PseudoInnerProductSpace` and
-`IsContMDiffPseudoRiemannianBundle` instances that theorems should be stated with. -/
+`Bundle.ContMDiffPseudoRiemannianMetric`. Use it to produce the instances that theorems are
+stated with. -/
 abbrev PseudoRiemannianMetric {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     {H : Type*} [TopologicalSpace H] (I : ModelWithCorners ℝ E H) (n : WithTop ℕ∞)
     (M : Type*) [TopologicalSpace M] [ChartedSpace H M] [IsManifold I 1 M] :=
@@ -98,9 +89,8 @@ variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
   [∀ x : M, PseudoInnerProductSpace (TangentSpace I x)]
 
 variable (I) in
-/-- The index of the metric at `x`: the largest dimension of a subspace of `TₓM` on which it is
-negative definite. Index `0` is Riemannian, index `1` Lorentzian in the "mostly plus"
-convention. -/
+/-- The index of the metric at `x`. Index `0` is Riemannian, index `1` Lorentzian in the "mostly
+plus" convention. -/
 noncomputable def index (x : M) : ℕ := PseudoInnerProductSpace.index (TangentSpace I x)
 
 variable [IsManifold I 1 M] [FiniteDimensional ℝ E]

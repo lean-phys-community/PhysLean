@@ -11,10 +11,8 @@ public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
 # Riemannian manifolds as the index-zero pseudo-Riemannian manifolds
 
 Riemannian geometry is a special case of the pseudo-Riemannian development, not a parallel one:
-`InnerProductSpace.toPseudoInnerProductSpace` and
-`Bundle.IsContMDiffRiemannianBundle.toIsContMDiffPseudoRiemannianBundle` are instances, so
-Mathlib's Riemannian hypotheses already discharge the pseudo-Riemannian ones. This file records
-the invariant that separates the two cases.
+Mathlib's Riemannian hypotheses already discharge the pseudo-Riemannian ones, as the `example`
+below checks. This file records the invariant separating the two cases.
 
 ## Main definitions
 

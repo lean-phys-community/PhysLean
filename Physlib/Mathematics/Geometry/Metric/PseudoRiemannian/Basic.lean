@@ -12,16 +12,12 @@ public import Mathlib.Topology.LocallyConstant.Basic
 /-!
 # Pseudo-Riemannian vector bundles
 
-A real vector bundle whose fibres carry a `PseudoInnerProductSpace` structure is
-*pseudo-Riemannian* when that form varies smoothly with the base point. This is the exact
-analogue of Mathlib's `Bundle.IsContMDiffRiemannianBundle`, and is implied by it:
+A vector bundle whose fibres carry a `PseudoInnerProductSpace` is *pseudo-Riemannian* when that
+form varies smoothly with the base point: the exact analogue of Mathlib's
+`Bundle.IsContMDiffRiemannianBundle`, and implied by it, because
 `InnerProductSpace.toPseudoInnerProductSpace` and
-`Bundle.IsContMDiffRiemannianBundle.toIsContMDiffPseudoRiemannianBundle` are both instances, so a
-Riemannian bundle satisfies the pseudo-Riemannian hypotheses with no work from the user.
-
-Fibres are only required to be topological vector spaces, so the same API serves normal bundles,
-gauge bundles (the Killing form on `Ad P` is indefinite for a non-compact structure group) and
-spinor bundles, not just tangent bundles.
+`Bundle.IsContMDiffRiemannianBundle.toIsContMDiffPseudoRiemannianBundle` are instances. Fibres
+need only be topological vector spaces, so the API also serves normal, gauge and spinor bundles.
 
 The standard variable block is
 ```
@@ -32,9 +28,7 @@ variable
   {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
   {E : B → Type*} [TopologicalSpace (TotalSpace F E)]
   [∀ x, TopologicalSpace (E x)] [∀ x, AddCommGroup (E x)] [∀ x, Module ℝ (E x)]
-  [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
-  [∀ x, PseudoInnerProductSpace (E x)]
-  [FiberBundle F E] [VectorBundle ℝ F E]
+  [∀ x, PseudoInnerProductSpace (E x)] [FiberBundle F E] [VectorBundle ℝ F E]
   [IsManifold IB n B] [ContMDiffVectorBundle n F E IB]
   [IsContMDiffPseudoRiemannianBundle IB n F E]
 ```
@@ -42,21 +36,18 @@ variable
 ## Main definitions
 
 * `Bundle.IsContMDiffPseudoRiemannianBundle IB n F E`: the fibrewise form is `C^n`.
-* `Bundle.ContMDiffPseudoRiemannianMetric IB n F E`: bundled metric data, used to build instances.
-* `Bundle.index`: the fibrewise index.
+* `Bundle.ContMDiffPseudoRiemannianMetric IB n F E`: metric data, used to build instances.
 
 ## Main results
 
 * `Bundle.IsContMDiffRiemannianBundle.toIsContMDiffPseudoRiemannianBundle`: subsumption.
-* `ContMDiffWithinAt.pseudoInner_bundle` and `ContMDiffWithinAt.flatL_bundle`: the pairing of two
-  smooth sections is smooth, and index lowering preserves smoothness. These are the inputs to the
-  Koszul formula.
-* `Bundle.isLocallyConstant_index`: the index is locally constant, hence constant on connected
-  components.
+* `ContMDiffWithinAt.pseudoInner_bundle`, `ContMDiffWithinAt.flatL_bundle`: pairing two smooth
+  sections and lowering an index preserve smoothness — the inputs to the Koszul formula.
+* `Bundle.isLocallyConstant_index`: the fibrewise index is locally constant.
 
 ## Acknowledgements
 
-The design follows a proposal of Sébastien Gouëzel on Zulip, see [Zulip](https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/The.20future.20of.20pseudo-Riemannian.20manifolds/with/619509253).
+The design follows Sébastien Gouëzel's proposal on Zulip, see [Zulip](https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/The.20future.20of.20pseudo-Riemannian.20manifolds/with/619509253).
 
 ## Tags
 
@@ -81,7 +72,6 @@ variable
   {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
   {E : B → Type*} [TopologicalSpace (TotalSpace F E)]
   [∀ x, TopologicalSpace (E x)] [∀ x, AddCommGroup (E x)] [∀ x, Module ℝ (E x)]
-  [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
   [∀ x, PseudoInnerProductSpace (E x)]
   [FiberBundle F E] [VectorBundle ℝ F E]
 
@@ -96,7 +86,6 @@ class IsContMDiffPseudoRiemannianBundle : Prop where
       (fun b ↦ TotalSpace.mk' (F →L[ℝ] F →L[ℝ] ℝ) b (g b))
     ∧ ∀ (x : B) (v w : E x), pseudoInner v w = g x v w
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 lemma IsContMDiffPseudoRiemannianBundle.of_le
     [h : IsContMDiffPseudoRiemannianBundle IB n F E] (h' : n' ≤ n) :
     IsContMDiffPseudoRiemannianBundle IB n' F E := by
@@ -159,7 +148,6 @@ variable
   {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
   {E : B → Type*} [TopologicalSpace (TotalSpace F E)]
   [∀ x, TopologicalSpace (E x)] [∀ x, AddCommGroup (E x)] [∀ x, Module ℝ (E x)]
-  [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
   [∀ x, PseudoInnerProductSpace (E x)]
   [FiberBundle F E] [VectorBundle ℝ F E]
   {EM : Type*} [NormedAddCommGroup EM] [NormedSpace ℝ EM]
@@ -168,7 +156,6 @@ variable
   [h : IsContMDiffPseudoRiemannianBundle IB n F E]
   {b : M → B} {v w : ∀ x, E (b x)} {s : Set M} {x : M}
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- The pairing of two smooth maps into the fibres is smooth. -/
 lemma _root_.ContMDiffWithinAt.pseudoInner_bundle
     (hv : ContMDiffWithinAt IM (IB.prod 𝓘(ℝ, F)) n (fun m ↦ (v m : TotalSpace F E)) s x)
@@ -188,7 +175,6 @@ lemma _root_.ContMDiffWithinAt.pseudoInner_bundle
   simp only [contMDiffWithinAt_totalSpace] at key
   exact key.2
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- The pairing of two smooth maps into the fibres is smooth. -/
 lemma _root_.ContMDiffAt.pseudoInner_bundle
     (hv : ContMDiffAt IM (IB.prod 𝓘(ℝ, F)) n (fun m ↦ (v m : TotalSpace F E)) x)
@@ -196,7 +182,6 @@ lemma _root_.ContMDiffAt.pseudoInner_bundle
     ContMDiffAt IM 𝓘(ℝ) n (fun m ↦ pseudoInner (v m) (w m)) x :=
   ContMDiffWithinAt.pseudoInner_bundle hv hw
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- The pairing of two smooth maps into the fibres is smooth. -/
 lemma _root_.ContMDiffOn.pseudoInner_bundle
     (hv : ContMDiffOn IM (IB.prod 𝓘(ℝ, F)) n (fun m ↦ (v m : TotalSpace F E)) s)
@@ -204,7 +189,6 @@ lemma _root_.ContMDiffOn.pseudoInner_bundle
     ContMDiffOn IM 𝓘(ℝ) n (fun m ↦ pseudoInner (v m) (w m)) s :=
   fun x hx ↦ (hv x hx).pseudoInner_bundle (hw x hx)
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- The pairing of two smooth maps into the fibres is smooth. -/
 lemma _root_.ContMDiff.pseudoInner_bundle
     (hv : ContMDiff IM (IB.prod 𝓘(ℝ, F)) n (fun m ↦ (v m : TotalSpace F E)))
@@ -223,7 +207,6 @@ variable
   {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
   {E : B → Type*} [TopologicalSpace (TotalSpace F E)]
   [∀ x, TopologicalSpace (E x)] [∀ x, AddCommGroup (E x)] [∀ x, Module ℝ (E x)]
-  [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
   [∀ x, PseudoInnerProductSpace (E x)]
   [FiberBundle F E] [VectorBundle ℝ F E]
   {EM : Type*} [NormedAddCommGroup EM] [NormedSpace ℝ EM]
@@ -232,7 +215,6 @@ variable
   [h : IsContMDiffPseudoRiemannianBundle IB 1 F E]
   {b : M → B} {v w : ∀ x, E (b x)} {s : Set M} {x : M}
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- The pairing of two differentiable maps into the fibres is differentiable. -/
 lemma _root_.MDifferentiableWithinAt.pseudoInner_bundle
     (hv : MDifferentiableWithinAt IM (IB.prod 𝓘(ℝ, F)) (fun m ↦ (v m : TotalSpace F E)) s x)
@@ -253,7 +235,6 @@ lemma _root_.MDifferentiableWithinAt.pseudoInner_bundle
   simp only [mdifferentiableWithinAt_totalSpace] at key
   exact key.2
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- The pairing of two differentiable maps into the fibres is differentiable. -/
 lemma _root_.MDifferentiableAt.pseudoInner_bundle
     (hv : MDifferentiableAt IM (IB.prod 𝓘(ℝ, F)) (fun m ↦ (v m : TotalSpace F E)) x)
@@ -261,7 +242,6 @@ lemma _root_.MDifferentiableAt.pseudoInner_bundle
     MDifferentiableAt IM 𝓘(ℝ) (fun m ↦ pseudoInner (v m) (w m)) x :=
   MDifferentiableWithinAt.pseudoInner_bundle hv hw
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- The pairing of two differentiable maps into the fibres is differentiable. -/
 lemma _root_.MDifferentiableOn.pseudoInner_bundle
     (hv : MDifferentiableOn IM (IB.prod 𝓘(ℝ, F)) (fun m ↦ (v m : TotalSpace F E)) s)
@@ -269,7 +249,6 @@ lemma _root_.MDifferentiableOn.pseudoInner_bundle
     MDifferentiableOn IM 𝓘(ℝ) (fun m ↦ pseudoInner (v m) (w m)) s :=
   fun x hx ↦ (hv x hx).pseudoInner_bundle (hw x hx)
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- The pairing of two differentiable maps into the fibres is differentiable. -/
 lemma _root_.MDifferentiable.pseudoInner_bundle
     (hv : MDifferentiable IM (IB.prod 𝓘(ℝ, F)) (fun m ↦ (v m : TotalSpace F E)))
@@ -290,7 +269,6 @@ variable
   {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
   {E : B → Type*} [TopologicalSpace (TotalSpace F E)]
   [∀ x, TopologicalSpace (E x)] [∀ x, AddCommGroup (E x)] [∀ x, Module ℝ (E x)]
-  [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
   [∀ x, PseudoInnerProductSpace (E x)]
   [FiberBundle F E] [VectorBundle ℝ F E]
   {EM : Type*} [NormedAddCommGroup EM] [NormedSpace ℝ EM]
@@ -300,7 +278,6 @@ variable
   {b : M → B} {v : ∀ x, E (b x)} {s : Set M} {x : M}
 
 variable (IB n F E) in
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- Index lowering is a smooth section of `Hom(E, E⋆)`. -/
 lemma contMDiff_flatL :
     ContMDiff IB (IB.prod 𝓘(ℝ, F →L[ℝ] F →L[ℝ] ℝ)) n
@@ -311,7 +288,6 @@ lemma contMDiff_flatL :
     ext w w'; exact hg y w w'
   simpa only [hEq] using g_smooth
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- Index lowering sends smooth sections to smooth covector fields. -/
 lemma _root_.ContMDiffWithinAt.flatL_bundle
     (hv : ContMDiffWithinAt IM (IB.prod 𝓘(ℝ, F)) n (fun m ↦ (v m : TotalSpace F E)) s x) :
@@ -324,7 +300,6 @@ lemma _root_.ContMDiffWithinAt.flatL_bundle
   exact ContMDiffWithinAt.clm_bundle_apply (F₁ := F) (F₂ := F →L[ℝ] ℝ)
     (ContMDiffAt.comp_contMDiffWithinAt x (contMDiff_flatL IB n F E).contMDiffAt hb) hv
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- Index lowering sends smooth sections to smooth covector fields. -/
 lemma _root_.ContMDiffAt.flatL_bundle
     (hv : ContMDiffAt IM (IB.prod 𝓘(ℝ, F)) n (fun m ↦ (v m : TotalSpace F E)) x) :
@@ -333,7 +308,6 @@ lemma _root_.ContMDiffAt.flatL_bundle
         (PseudoInnerProductSpace.flatL (E (b m)) (v m))) x :=
   ContMDiffWithinAt.flatL_bundle hv
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- Index lowering sends smooth sections to smooth covector fields. -/
 lemma _root_.ContMDiffOn.flatL_bundle
     (hv : ContMDiffOn IM (IB.prod 𝓘(ℝ, F)) n (fun m ↦ (v m : TotalSpace F E)) s) :
@@ -342,7 +316,6 @@ lemma _root_.ContMDiffOn.flatL_bundle
         (PseudoInnerProductSpace.flatL (E (b m)) (v m))) s :=
   fun x hx ↦ (hv x hx).flatL_bundle
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)] in
 /-- Index lowering sends smooth sections to smooth covector fields. -/
 lemma _root_.ContMDiff.flatL_bundle
     (hv : ContMDiff IM (IB.prod 𝓘(ℝ, F)) n (fun m ↦ (v m : TotalSpace F E))) :
@@ -364,16 +337,14 @@ variable
   {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
   {E : B → Type*} [TopologicalSpace (TotalSpace F E)]
   [∀ x, TopologicalSpace (E x)] [∀ x, AddCommGroup (E x)] [∀ x, Module ℝ (E x)]
-  [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
   [FiberBundle F E] [VectorBundle ℝ F E]
 
 variable (IB n F E) in
-/-- A `C^n` pseudo-Riemannian metric along a vector bundle: a smooth family of symmetric
-nondegenerate bilinear forms on the fibres.
+/-- A `C^n` pseudo-Riemannian metric along a vector bundle, used to build instances via
+`toPseudoInnerProductSpace`.
 
-This is the data used to build instances; the fibrewise structure is produced by
-`toPseudoInnerProductSpace`. Unlike `Bundle.ContMDiffRiemannianMetric` there is no von Neumann
-boundedness field, because an indefinite form induces no norm. -/
+Unlike `Bundle.ContMDiffRiemannianMetric` there is no von Neumann boundedness field: it is needed
+there only to build a norm, and an indefinite form induces none. -/
 structure ContMDiffPseudoRiemannianMetric where
   /-- The fibrewise bilinear form. -/
   metric (b : B) : E b →L[ℝ] E b →L[ℝ] ℝ
@@ -416,16 +387,10 @@ variable
   {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
   {E : B → Type*} [TopologicalSpace (TotalSpace F E)]
   [∀ x, TopologicalSpace (E x)] [∀ x, AddCommGroup (E x)] [∀ x, Module ℝ (E x)]
-  [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
   [∀ x, PseudoInnerProductSpace (E x)]
   [FiberBundle F E] [VectorBundle ℝ F E]
 
-variable (E) in
-/-- The index of the fibrewise pseudo-inner product at a point of the base. -/
-noncomputable def index (x : B) : ℕ := PseudoInnerProductSpace.index (E x)
-
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
-  [∀ x, PseudoInnerProductSpace (E x)] in
+omit [∀ x, PseudoInnerProductSpace (E x)] in
 /-- Undoing a trivialization recovers the original vector. -/
 private lemma symm_continuousLinearEquivAt_apply {x₀ x : B}
     (hx : x ∈ (trivializationAt F E x₀).baseSet) (u : E x) :
@@ -433,10 +398,6 @@ private lemma symm_continuousLinearEquivAt_apply {x₀ x : B}
       (((trivializationAt F E x₀).continuousLinearEquivAt ℝ x hx).toLinearEquiv u) = u :=
   ((trivializationAt F E x₀).continuousLinearEquivAt ℝ x hx).symm_apply_apply u
 
-variable [∀ x, FiniteDimensional ℝ (E x)] [FiniteDimensional ℝ F]
-
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
-  [∀ x, FiniteDimensional ℝ (E x)] [FiniteDimensional ℝ F] in
 /-- Reading the fibrewise form in a local trivialization does not change its index. -/
 lemma index_eq_sigNeg_trivialization {x₀ x : B}
     (hx : x ∈ (trivializationAt F E x₀).baseSet)
@@ -445,27 +406,22 @@ lemma index_eq_sigNeg_trivialization {x₀ x : B}
     (G : F →L[ℝ] F →L[ℝ] ℝ)
     (hG : ∀ u u' : F, G u u' =
       g x ((trivializationAt F E x₀).symm x u) ((trivializationAt F E x₀).symm x u')) :
-    index E x = sigNeg G.toQuadraticForm := by
+    PseudoInnerProductSpace.index (E x) = sigNeg G.toQuadraticForm := by
   have hform : PseudoInnerProductSpace.toQuadraticForm (E x) = (g x).toQuadraticForm := by
     ext v
     simpa using hg x v v
-  rw [index, PseudoInnerProductSpace.index, hform]
+  rw [PseudoInnerProductSpace.index, hform]
   refine ContinuousLinearMap.sigNeg_toQuadraticForm_of_congr (g x) G
     ((trivializationAt F E x₀).continuousLinearEquivAt ℝ x hx).toLinearEquiv (fun u w ↦ ?_)
   rw [hG, symm_continuousLinearEquivAt_apply hx u, symm_continuousLinearEquivAt_apply hx w]
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
-  [∀ x, PseudoInnerProductSpace (E x)] [∀ x, FiniteDimensional ℝ (E x)]
-  [FiniteDimensional ℝ F] in
 /-- Reading the trivial line bundle in its (global) trivialization is the identity. -/
 private lemma trivial_linearMapAt_apply (x₀ x : B) (r : ℝ) :
     (trivializationAt ℝ (Bundle.Trivial B ℝ) x₀).linearMapAt ℝ x r = r := by
   rw [Trivialization.coe_linearMapAt_of_mem _ (by simp)]
   simp
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
-  [∀ x, PseudoInnerProductSpace (E x)] [∀ x, FiniteDimensional ℝ (E x)]
-  [FiniteDimensional ℝ F] in
+omit [∀ x, PseudoInnerProductSpace (E x)] in
 /-- The coordinate expression of the fibrewise form in the trivialization of the bundle of
 bilinear forms at `x₀` is the transport of the form along the trivialization of `E`. -/
 private lemma hom_trivialization_apply {x₀ x : B}
@@ -480,14 +436,14 @@ private lemma hom_trivialization_apply {x₀ x : B}
     (E₃ := Bundle.Trivial B ℝ) hx hx (by simp)]
   exact trivial_linearMapAt_apply x₀ x _
 
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
-  [∀ x, FiniteDimensional ℝ (E x)] in
+variable [FiniteDimensional ℝ F]
+
 /-- **The index is locally constant.**
 
 Sylvester's law of inertia fibrewise, transported to the model fibre by a local trivialization:
 the form varies continuously and is everywhere nondegenerate, so its signature cannot jump. -/
 theorem isLocallyConstant_index [h : IsContMDiffPseudoRiemannianBundle IB n F E] :
-    IsLocallyConstant (fun x ↦ index E x) := by
+    IsLocallyConstant (fun x ↦ PseudoInnerProductSpace.index (E x)) := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x₀
   obtain ⟨g, g_smooth, hg⟩ := h.exists_contMDiff
@@ -506,7 +462,8 @@ theorem isLocallyConstant_index [h : IsContMDiffPseudoRiemannianBundle IB n F E]
     exact (continuous_snd.comp_continuousOn hcomp).continuousAt
       (eh.open_baseSet.mem_nhds hx₀)
   -- On the base set of the trivialization, the index is that of the coordinate form.
-  have hbase : ∀ x ∈ eh.baseSet, index E x = sigNeg (Φ x).toQuadraticForm := by
+  have hbase : ∀ x ∈ eh.baseSet,
+      PseudoInnerProductSpace.index (E x) = sigNeg (Φ x).toQuadraticForm := by
     intro x hx
     rw [hom_trivializationAt_baseSet] at hx
     exact index_eq_sigNeg_trivialization hx.1 g hg (Φ x)
@@ -527,20 +484,6 @@ theorem isLocallyConstant_index [h : IsContMDiffPseudoRiemannianBundle IB n F E]
   filter_upwards [eh.open_baseSet.mem_nhds hx₀,
     hcontΦ (ContinuousLinearMap.eventually_sigNeg_eq hrad)] with x hx hsig
   rw [hbase x hx, hbase x₀ hx₀, hsig.2.2]
-
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
-  [∀ x, FiniteDimensional ℝ (E x)] in
-/-- On a preconnected base the index is constant. -/
-lemma index_eq_of_isPreconnected [IsContMDiffPseudoRiemannianBundle IB n F E] {s : Set B}
-    (hs : IsPreconnected s) {x y : B} (hx : x ∈ s) (hy : y ∈ s) : index E x = index E y :=
-  (isLocallyConstant_index (IB := IB) (n := n) (F := F)).apply_eq_of_isPreconnected hs hx hy
-
-omit [∀ x, IsTopologicalAddGroup (E x)] [∀ x, ContinuousSMul ℝ (E x)]
-  [∀ x, FiniteDimensional ℝ (E x)] in
-/-- On a preconnected base the index is constant. -/
-lemma index_eq_of_preconnectedSpace [PreconnectedSpace B]
-    [IsContMDiffPseudoRiemannianBundle IB n F E] (x y : B) : index E x = index E y :=
-  (isLocallyConstant_index (IB := IB) (n := n) (F := F)).apply_eq_of_preconnectedSpace x y
 
 end Index
 

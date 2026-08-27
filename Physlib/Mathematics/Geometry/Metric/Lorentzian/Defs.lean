@@ -10,12 +10,12 @@ public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
 /-!
 # Lorentzian manifolds
 
-A Lorentzian metric is a pseudo-Riemannian metric of index `1`. Since the index is locally
-constant (`PseudoRiemannian.isLocallyConstant_index`), on a connected manifold the condition need
-only be checked at one point; see `PseudoRiemannian.isLorentzian_of_index_eq_one`.
+A Lorentzian metric is a pseudo-Riemannian metric of index `1`. The index is locally constant, so
+on a connected manifold the condition need only be checked at one point; see
+`PseudoRiemannian.isLorentzian_of_index_eq_one`.
 
-We use the "mostly plus" convention: signature `(-, +, …, +)`, so index `1`. In the "mostly
-minus" convention the same metric has index `dim M - 1`.
+We use the "mostly plus" convention, signature `(-, +, …, +)`; in the "mostly minus" convention
+the same metric has index `dim M - 1`.
 
 ## Main definitions
 

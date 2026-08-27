@@ -13,39 +13,32 @@ public import Mathlib.Topology.Algebra.Module.FiniteDimension
 /-!
 # Pseudo-inner product spaces
 
-A `PseudoInnerProductSpace E` is a real topological vector space carrying a continuous symmetric
-nondegenerate bilinear form. Dropping positivity from `InnerProductSpace ℝ E` has a structural
-consequence: an indefinite form induces no norm, so it does not determine the topology of `E`.
-The class can therefore be attached to a space that already carries one — `TangentSpace I x`, or
-the fibres of a vector bundle — without creating a diamond.
+`PseudoInnerProductSpace E` equips a real topological vector space with a continuous symmetric
+nondegenerate bilinear form. Positivity is dropped, so the form induces no norm and leaves the
+topology of `E` free; the class can therefore be attached to a space that already carries one — a
+tangent space, a bundle fibre — without a diamond. Inheritance runs
+`InnerProductSpace ℝ E → PseudoInnerProductSpace E` and never the reverse.
 
-Inheritance runs `InnerProductSpace ℝ E → PseudoInnerProductSpace E` and never the other way; see
-`InnerProductSpace.toPseudoInnerProductSpace`.
+Nothing here mentions manifolds: the musical isomorphisms are linear algebra, so the same results
+serve tangent, normal and gauge bundles. Surjectivity of `♭` uses `[T2Space E]` and
+`[FiniteDimensional ℝ E]`, under which every linear map out of `E` is continuous; nondegeneracy
+alone does not give it in infinite dimensions.
 
 ## Main definitions
 
-* `PseudoInnerProductSpace E` and `pseudoInner v w`.
-* `PseudoInnerProductSpace.flatL`, `flatEquiv`, `sharpEquiv`, `sharpL`: the musical isomorphisms
-  `♭ : E ≃L[ℝ] E⋆` and `♯ : E⋆ ≃L[ℝ] E`.
+* `PseudoInnerProductSpace E`, `pseudoInner v w`, `PseudoInnerProductSpace.flatL`.
+* `PseudoInnerProductSpace.flatEquiv`, `sharpEquiv`, `sharpL`: `♭ : E ≃L[ℝ] E⋆` and its inverse.
 * `PseudoInnerProductSpace.dualPseudoInnerSL`: the induced form on `E⋆`, i.e. the inverse metric.
-
-## Implementation notes
-
-Nothing here mentions manifolds: the musical isomorphisms are linear algebra, proved once and
-reused for tangent, normal and gauge bundles alike. Surjectivity of `♭` uses `[T2Space E]` and
-`[FiniteDimensional ℝ E]`, under which every linear map out of `E` is continuous; in infinite
-dimensions nondegeneracy does not make `♭` surjective.
 
 ## Acknowledgements
 
-The design follows a proposal of Sébastien Gouëzel on Zulip: introduce a fibrewise class for a
-continuous nondegenerate bilinear form, register an instance from `InnerProductSpace`, and weaken
-`IsContMDiffRiemannianBundle` to it, so that Riemannian geometry is subsumed rather than
-duplicated. See [Zulip](https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/The.20future.20of.20pseudo-Riemannian.20manifolds/with/619509253).
+The design follows Sébastien Gouëzel's proposal on Zulip: a fibrewise class for the bilinear
+form, an instance from `InnerProductSpace`, and a weakening of `IsContMDiffRiemannianBundle` to
+it, so that Riemannian geometry is subsumed rather than duplicated. See [Zulip](https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/The.20future.20of.20pseudo-Riemannian.20manifolds/with/619509253).
 
 ## Tags
 
-pseudo-inner product, bilinear form, nondegenerate, musical isomorphism, index raising
+pseudo-inner product, nondegenerate bilinear form, musical isomorphism, index raising
 -/
 
 @[expose] public section
@@ -76,10 +69,7 @@ end ContinuousLinearMap
 /-! ## The class -/
 
 /-- A real topological vector space with a continuous symmetric nondegenerate bilinear form.
-
-Positivity is not assumed, so the form induces no norm and the topology of `E` is independent
-data. Every real inner product space is an instance, via
-`InnerProductSpace.toPseudoInnerProductSpace`. -/
+Positivity is not assumed, so the topology of `E` is independent data. -/
 class PseudoInnerProductSpace (E : Type*) [AddCommGroup E] [Module ℝ E] [TopologicalSpace E] where
   /-- The pseudo-inner product, as a continuous bilinear map. -/
   pseudoInnerSL : E →L[ℝ] E →L[ℝ] ℝ
@@ -100,8 +90,6 @@ namespace PseudoInnerProductSpace
 section Basic
 
 variable [PseudoInnerProductSpace E]
-
-lemma pseudoInnerSL_apply (v w : E) : pseudoInnerSL v w = pseudoInner v w := rfl
 
 lemma pseudoInner_comm (v w : E) : pseudoInner v w = pseudoInner w v :=
   pseudoInner_symm v w
@@ -143,10 +131,7 @@ section InnerProduct
 variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℝ F]
 
 /-- Every real inner product space is a pseudo-inner product space: positive definiteness is in
-particular nondegeneracy.
-
-Registering this globally is what makes pseudo-Riemannian results subsume the Riemannian ones
-instead of duplicating them. -/
+particular nondegeneracy. This instance is what makes the subsumption automatic. -/
 noncomputable instance (priority := 100) _root_.InnerProductSpace.toPseudoInnerProductSpace :
     PseudoInnerProductSpace F where
   pseudoInnerSL := innerSL ℝ
@@ -165,33 +150,20 @@ section Forms
 variable [PseudoInnerProductSpace E]
 
 variable (E) in
-/-- The pseudo-inner product as a `LinearMap.BilinForm`, forgetting continuity. -/
-noncomputable def toBilinForm : LinearMap.BilinForm ℝ E :=
-  (PseudoInnerProductSpace.pseudoInnerSL (E := E)).toBilinForm
-
-@[simp]
-lemma toBilinForm_apply (v w : E) : toBilinForm E v w = pseudoInner v w := rfl
-
-lemma toBilinForm_isSymm : (toBilinForm E).IsSymm :=
-  ⟨fun v w ↦ by simpa using (pseudoInner_comm v w)⟩
-
-lemma toBilinForm_nondegenerate : (toBilinForm E).Nondegenerate := by
-  constructor
-  · intro v hv
-    exact eq_zero_of_pseudoInner_eq_zero fun w ↦ by simpa using hv w
-  · intro w hw
-    exact eq_zero_of_pseudoInner_right_eq_zero fun v ↦ by simpa using hw v
-
-/-! ### Index lowering -/
-
-variable (E) in
-/-- Index lowering `♭ : v ↦ pseudoInner v ·`, as a continuous linear map `E →L[ℝ] E⋆`.
-
-Definitionally the pseudo-inner product itself; the name records the geometric role. -/
+/-- Index lowering `♭ : v ↦ pseudoInner v ·`. Definitionally the pseudo-inner product; this makes
+`E` explicit and records the geometric role. -/
 abbrev flatL : E →L[ℝ] (E →L[ℝ] ℝ) := PseudoInnerProductSpace.pseudoInnerSL
 
 @[simp]
 lemma flatL_apply (v w : E) : flatL E v w = pseudoInner v w := rfl
+
+lemma toBilinForm_isSymm : (flatL E).toBilinForm.IsSymm :=
+  ⟨fun v w ↦ by simpa using (pseudoInner_comm v w)⟩
+
+lemma toBilinForm_nondegenerate : (flatL E).toBilinForm.Nondegenerate := by
+  constructor
+  · exact fun v hv ↦ eq_zero_of_pseudoInner_eq_zero fun w ↦ by simpa using hv w
+  · exact fun w hw ↦ eq_zero_of_pseudoInner_right_eq_zero fun v ↦ by simpa using hw v
 
 lemma flatL_injective : Function.Injective (flatL E) := by
   rw [injective_iff_map_eq_zero]
@@ -201,8 +173,7 @@ lemma flatL_injective : Function.Injective (flatL E) := by
 
 variable (E) in
 /-- The quadratic form `v ↦ pseudoInner v v`. Its `QuadraticForm.sigNeg` is the index. -/
-noncomputable def toQuadraticForm : QuadraticForm ℝ E :=
-  (PseudoInnerProductSpace.pseudoInnerSL (E := E)).toQuadraticForm
+noncomputable def toQuadraticForm : QuadraticForm ℝ E := (flatL E).toQuadraticForm
 
 @[simp]
 lemma toQuadraticForm_apply (v : E) : toQuadraticForm E v = pseudoInner v v := rfl
@@ -280,9 +251,8 @@ lemma pseudoInner_sharpL_left (v : E) (ω : E →L[ℝ] ℝ) :
 /-! ### The induced form on the dual -/
 
 variable (E) in
-/-- The form induced on `E⋆` by raising both indices, `(ω₁, ω₂) ↦ ω₁ (ω₂♯)`.
-
-For a metric tensor this is the inverse metric `g^{ab}`. -/
+/-- The form induced on `E⋆` by raising both indices, `(ω₁, ω₂) ↦ ω₁ (ω₂♯)`; for a metric tensor,
+the inverse metric `g^{ab}`. -/
 noncomputable def dualPseudoInnerSL : (E →L[ℝ] ℝ) →L[ℝ] (E →L[ℝ] ℝ) →L[ℝ] ℝ :=
   LinearMap.toContinuousLinearMap (𝕜 := ℝ) (E := E →L[ℝ] ℝ) (F' := (E →L[ℝ] ℝ) →L[ℝ] ℝ)
     { toFun := fun ω : E →L[ℝ] ℝ ↦ ω.comp (sharpL E)
