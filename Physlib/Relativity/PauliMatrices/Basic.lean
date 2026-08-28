@@ -18,15 +18,7 @@ The pauli matrices are defined ultimately through
   The notation `σ` can be used as short hand.
 
 A tensorial structure is put on `Fin 1 ⊕ Fin 3 → Matrix (Fin 2) (Fin 2) ℂ` to allow the
-use of index notation. We then define the following notation:
-
-- `σ^^^` is the tensorial version of the Pauli matrices, which is a complex Lorentz tensor
-  of type `ℂT[.up, .upL, .upR]`.
-
-and the following abbreviations:
-- `σ_^^` is the Pauli matrices as a complex Lorentz tensor of type `ℂT[.down, .upL, .upR]`.
-- `σ___` is the Pauli matrices as a complex Lorentz tensor of type `ℂT[.down, .downR, .downL]`.
-- `σ^__` is the Pauli matrices as a complex Lorentz tensor of type `ℂT[.up, .downR, .downL]`.
+use of index notation.
 
 -/
 
