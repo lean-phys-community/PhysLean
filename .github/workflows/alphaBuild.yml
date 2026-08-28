@@ -34,12 +34,12 @@ jobs:
           lean --version
           lake --version
 
-      - name: build cache
+      - name: Mathlib build cache
         run: |
           lake exe cache get
 
       # PhyslibAlpha has its own cache in the bucket so we pull that one
-      - name: restore PhyslibAlpha's build cache
+      - name: PhyslibAlpha's build cache
         env:
           LAKE_CONFIG: ${{ github.workspace }}/lake-cache.toml
         run: |
