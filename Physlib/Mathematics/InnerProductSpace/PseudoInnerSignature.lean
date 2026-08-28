@@ -22,14 +22,21 @@ The argument is classical: maximal definite subspaces for `b` stay definite for 
 `sigPos` and `sigNeg` can only grow, while `QuadraticForm.sigPos_add_sigNeg_add_radical` caps
 their sum. No symmetry is used.
 
+## Main definitions
+
+* `PseudoInnerProductSpace.index` and `coindex`: the negative and positive inertia.
+
 ## Main results
 
+* `QuadraticForm.sigNeg_eq_of_negDef_of_posDef`: a splitting into a negative definite and a
+  positive definite part of complementary dimensions determines the whole signature.
 * `ContinuousLinearMap.eventually_forall_pos`, `eventually_forall_neg`: definiteness on a fixed
-  subspace is an open condition on the form.
+  subspace is an open condition on the form. `IsCoercive.of_posDef` is the unrestricted case.
 * `ContinuousLinearMap.eventually_sigNeg_eq`: `sigPos`, `sigNeg` and triviality of the radical are
   locally constant.
-* `PseudoInnerProductSpace.index`, `index_dual_eq`, `index_eq_zero_of_innerProductSpace`, and
-  `one_le_index_of_neg`, the criterion for a form to be genuinely indefinite.
+* `PseudoInnerProductSpace.index_eq_of_negDef_of_posDef` and `coindex_eq_of_negDef_of_posDef`
+  compute them from a splitting; `index_eq_zero_iff_posDef`, `index_dual_eq` and
+  `index_eq_zero_of_innerProductSpace` identify the Riemannian case.
 
 ## Tags
 
@@ -41,14 +48,60 @@ signature, index, inertia, Sylvester, nondegenerate, locally constant
 open Filter Module Metric Set QuadraticMap
 open scoped Topology
 
+/-! ## Determining a signature from a splitting
+
+`sigPos` and `sigNeg` are defined as maxima, so mathlib's API bounds them from below. For a
+nondegenerate form the two bounds are complementary, which pins both down. -/
+
+namespace QuadraticForm
+
+variable {𝕜 M : Type*} [Field 𝕜] [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜]
+  [AddCommGroup M] [Module 𝕜 M] [FiniteDimensional 𝕜 M] {Q : QuadraticForm 𝕜 M}
+  {V W : Submodule 𝕜 M}
+
+lemma sigPos_add_sigNeg_of_radical_eq_bot (hrad : Q.radical = ⊥) :
+    sigPos Q + sigNeg Q = finrank 𝕜 M := by
+  have h := QuadraticForm.sigPos_add_sigNeg_add_radical (Q := Q)
+  rwa [hrad, finrank_bot, Nat.add_zero] at h
+
+/-- **Sylvester's law of inertia, in the form used to read off a signature.** A form negative
+definite on `V` and positive definite on `W`, with `V` and `W` of complementary dimensions, has
+index exactly `finrank V`. Nondegeneracy is not assumed: it follows, see
+`radical_eq_bot_of_negDef_of_posDef`. -/
+theorem sigNeg_eq_of_negDef_of_posDef (hV : ((-Q).restrict V).PosDef)
+    (hW : (Q.restrict W).PosDef) (hdim : finrank 𝕜 V + finrank 𝕜 W = finrank 𝕜 M) :
+    sigNeg Q = finrank 𝕜 V := by
+  have h1 := le_sigNeg_of_negDef Q hV
+  have h2 := le_sigPos_of_posDef Q hW
+  have h3 := QuadraticForm.sigPos_add_sigNeg_add_radical (Q := Q)
+  omega
+
+theorem sigPos_eq_of_negDef_of_posDef (hV : ((-Q).restrict V).PosDef)
+    (hW : (Q.restrict W).PosDef) (hdim : finrank 𝕜 V + finrank 𝕜 W = finrank 𝕜 M) :
+    sigPos Q = finrank 𝕜 W := by
+  have h1 := le_sigNeg_of_negDef Q hV
+  have h2 := le_sigPos_of_posDef Q hW
+  have h3 := QuadraticForm.sigPos_add_sigNeg_add_radical (Q := Q)
+  omega
+
+/-- Such a splitting also forces the form to be nondegenerate. -/
+theorem radical_eq_bot_of_negDef_of_posDef (hV : ((-Q).restrict V).PosDef)
+    (hW : (Q.restrict W).PosDef) (hdim : finrank 𝕜 V + finrank 𝕜 W = finrank 𝕜 M) :
+    Q.radical = ⊥ := by
+  have h1 := le_sigNeg_of_negDef Q hV
+  have h2 := le_sigPos_of_posDef Q hW
+  have h3 := QuadraticForm.sigPos_add_sigNeg_add_radical (Q := Q)
+  exact Submodule.finrank_eq_zero.mp (by omega)
+
+end QuadraticForm
+
 namespace ContinuousLinearMap
 
 section Perturbation
 
 variable {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] [FiniteDimensional ℝ F]
 
-/-- Positive definiteness on a subspace is quantitative: `ε ‖v‖ ^ 2 ≤ b v v` for some `ε > 0`,
-by compactness of the unit sphere and homogeneity. -/
+/-- Positive definiteness on a subspace is quantitative: `ε ‖v‖ ^ 2 ≤ b v v` for some `ε > 0`. -/
 lemma exists_pos_forall_le_of_posDef (b : F →L[ℝ] F →L[ℝ] ℝ) {V : Submodule ℝ F}
     (hV : ∀ v : V, v ≠ 0 → 0 < b v v) :
     ∃ ε > 0, ∀ v : V, ε * ‖(v : F)‖ ^ 2 ≤ b v v := by
@@ -87,8 +140,17 @@ lemma exists_pos_forall_le_of_posDef (b : F →L[ℝ] F →L[ℝ] ℝ) {V : Subm
           mul_le_mul_of_nonneg_right hbu hpos.le
       _ = b (v : F) (v : F) := by field_simp
 
+/-- A positive definite continuous bilinear form on a finite-dimensional real space is coercive. -/
+theorem _root_.IsCoercive.of_posDef {b : F →L[ℝ] F →L[ℝ] ℝ} (h : ∀ v : F, v ≠ 0 → 0 < b v v) :
+    IsCoercive b := by
+  obtain ⟨ε, hε, hle⟩ := exists_pos_forall_le_of_posDef b (V := ⊤) fun v hv ↦
+    h v fun hv0 ↦ hv (Subtype.ext hv0)
+  refine ⟨ε, hε, fun u ↦ ?_⟩
+  have h1 : ε * ‖u‖ ^ 2 ≤ b u u := by
+    simpa using hle ⟨u, _root_.Submodule.mem_top⟩
+  nlinarith [h1, sq_nonneg ‖u‖]
+
 omit [FiniteDimensional ℝ F] in
-/-- If `b ≥ ε ‖·‖ ^ 2` on a subspace and `‖c - b‖ < ε`, then `c` is positive there. -/
 private lemma pos_of_norm_sub_lt {b c : F →L[ℝ] F →L[ℝ] ℝ} {V : Submodule ℝ F} {ε : ℝ}
     (hle : ∀ v : V, ε * ‖(v : F)‖ ^ 2 ≤ b v v) (hc : ‖c - b‖ < ε) :
     ∀ v : V, v ≠ 0 → 0 < c (v : F) (v : F) := by
@@ -112,7 +174,6 @@ lemma eventually_forall_pos {b : F →L[ℝ] F →L[ℝ] ℝ} {V : Submodule ℝ
   rw [dist_eq_norm c b] at h1
   exact pos_of_norm_sub_lt hle h1
 
-/-- Negative definiteness on a fixed subspace is an open condition on the bilinear form. -/
 lemma eventually_forall_neg {b : F →L[ℝ] F →L[ℝ] ℝ} {V : Submodule ℝ F}
     (hV : ∀ v : V, v ≠ 0 → b v v < 0) :
     ∀ᶠ c in 𝓝 b, ∀ v : V, v ≠ 0 → c (v : F) (v : F) < 0 := by
@@ -132,11 +193,6 @@ lemma eventually_forall_neg {b : F →L[ℝ] F →L[ℝ] ℝ} {V : Submodule ℝ
 
 variable {b : F →L[ℝ] F →L[ℝ] ℝ}
 
-private lemma sigPos_add_sigNeg_of_radical_eq_bot (hb : b.toQuadraticForm.radical = ⊥) :
-    sigPos b.toQuadraticForm + sigNeg b.toQuadraticForm = finrank ℝ F := by
-  have h := QuadraticForm.sigPos_add_sigNeg_add_radical (Q := b.toQuadraticForm)
-  rwa [hb, finrank_bot, Nat.add_zero] at h
-
 /-- **The signature is locally constant.** If `b.toQuadraticForm` has trivial radical, so does
 every nearby form, with the same `sigPos` and `sigNeg`.
 
@@ -146,12 +202,11 @@ theorem eventually_sigNeg_eq (hb : b.toQuadraticForm.radical = ⊥) :
     ∀ᶠ c in 𝓝 b, c.toQuadraticForm.radical = ⊥ ∧
       sigPos c.toQuadraticForm = sigPos b.toQuadraticForm ∧
       sigNeg c.toQuadraticForm = sigNeg b.toQuadraticForm := by
-  classical
   obtain ⟨Vp, hVpdim, hVppos⟩ :=
     exists_finrank_eq_sigPos_and_posDef b.toQuadraticForm
   obtain ⟨Vn, hVndim, hVnneg⟩ :=
     exists_finrank_eq_sigNeg_and_negDef b.toQuadraticForm
-  have hsum := sigPos_add_sigNeg_of_radical_eq_bot hb
+  have hsum := QuadraticForm.sigPos_add_sigNeg_of_radical_eq_bot hb
   have hpos : ∀ v : Vp, v ≠ 0 → 0 < b (v : F) (v : F) := fun v hv ↦ hVppos v hv
   have hneg : ∀ v : Vn, v ≠ 0 → b (v : F) (v : F) < 0 := fun v hv ↦ by
     have h : (0 : ℝ) < -(b (v : F) (v : F)) := hVnneg v hv
@@ -168,8 +223,8 @@ theorem eventually_sigNeg_eq (hb : b.toQuadraticForm.radical = ⊥) :
     linarith [hcn v hv]
   -- Sylvester's law caps the total, so both inequalities are equalities.
   have hc := QuadraticForm.sigPos_add_sigNeg_add_radical (Q := c.toQuadraticForm)
-  have hrad : finrank ℝ c.toQuadraticForm.radical = 0 := by lia
-  refine ⟨Submodule.finrank_eq_zero.mp hrad, by lia, by lia⟩
+  have hrad : finrank ℝ c.toQuadraticForm.radical = 0 := by omega
+  refine ⟨Submodule.finrank_eq_zero.mp hrad, by omega, by omega⟩
 
 /-! ### Transport along a linear equivalence -/
 
@@ -185,7 +240,6 @@ lemma sigNeg_toQuadraticForm_of_congr (b : X →L[ℝ] X →L[ℝ] ℝ) (b' : Y 
     sigNeg b.toQuadraticForm = sigNeg b'.toQuadraticForm :=
   QuadraticMap.Equivalent.sigNeg_eq ⟨{ toLinearEquiv := φ, map_app' := fun m ↦ h m m }⟩
 
-/-- Nondegeneracy is likewise transported along a linear equivalence. -/
 lemma radical_toQuadraticForm_eq_bot_of_congr (b : X →L[ℝ] X →L[ℝ] ℝ) (b' : Y →L[ℝ] Y →L[ℝ] ℝ)
     (φ : X ≃ₗ[ℝ] Y) (h : ∀ u w : X, b' (φ u) (φ w) = b u w)
     (hb : b.toQuadraticForm.radical = ⊥) : b'.toQuadraticForm.radical = ⊥ := by
@@ -207,10 +261,34 @@ variable (E : Type*) [AddCommGroup E] [Module ℝ E] [TopologicalSpace E]
   [PseudoInnerProductSpace E]
 
 /-- The index, or negative inertia: the largest dimension of a subspace on which the form is
-negative definite. Index `0` is the Riemannian case, index `1` the Lorentzian one. -/
+negative definite. Index `0` is the Riemannian case, index `1` the Lorentzian one.
+
+As for `QuadraticForm.sigNeg`, this is `0` when `E` is infinite-dimensional, so the results below
+assume `[FiniteDimensional ℝ E]`. -/
 noncomputable def index : ℕ := sigNeg (toQuadraticForm E)
 
-lemma index_def : index E = sigNeg (toQuadraticForm E) := rfl
+lemma index_eq_sigNeg : index E = sigNeg (toQuadraticForm E) := rfl
+
+lemma index_le_finrank : index E ≤ finrank ℝ E := by
+  simpa [index] using sigPos_le_finrank (-toQuadraticForm E)
+
+/-- The coindex, or positive inertia: the largest dimension of a subspace on which the form is
+positive definite. In the "mostly minus" convention a Lorentzian form is one of coindex `1`. -/
+noncomputable def coindex : ℕ := sigPos (toQuadraticForm E)
+
+lemma coindex_eq_sigPos : coindex E = sigPos (toQuadraticForm E) := rfl
+
+lemma coindex_le_finrank : coindex E ≤ finrank ℝ E := sigPos_le_finrank _
+
+variable {E} in
+/-- A form of positive coindex lives on a finite-dimensional space. -/
+lemma finiteDimensional_of_coindex_pos (h : 0 < coindex E) : FiniteDimensional ℝ E :=
+  Module.finite_of_finrank_pos (lt_of_lt_of_le h (coindex_le_finrank E))
+
+variable {E} in
+/-- A form of positive index lives on a finite-dimensional space: `sigNeg` vanishes otherwise. -/
+lemma finiteDimensional_of_index_pos (h : 0 < index E) : FiniteDimensional ℝ E :=
+  Module.finite_of_finrank_pos (lt_of_lt_of_le h (index_le_finrank E))
 
 /-- Nondegeneracy, restated: the quadratic form has trivial radical. -/
 lemma radical_toQuadraticForm_eq_bot : (toQuadraticForm E).radical = ⊥ := by
@@ -228,8 +306,44 @@ lemma radical_toQuadraticForm_eq_bot : (toQuadraticForm E).radical = ⊥ := by
 
 variable [FiniteDimensional ℝ E]
 
+/-- The positive and negative inertia add up to the dimension: the form is nondegenerate, so
+Sylvester's law leaves no radical. -/
+lemma coindex_add_index_eq_finrank : coindex E + index E = finrank ℝ E :=
+  QuadraticForm.sigPos_add_sigNeg_of_radical_eq_bot (radical_toQuadraticForm_eq_bot E)
+
+
 variable {E} in
-/-- One vector of negative square already forces positive index: the form is not Riemannian. -/
+/-- **Computing the index.** A splitting into a negative definite `V` and a positive definite `W`
+of complementary dimensions determines the index, namely `finrank V`. -/
+lemma index_eq_of_negDef_of_posDef {V W : Submodule ℝ E}
+    (hV : ∀ v : V, v ≠ 0 → pseudoInner (v : E) (v : E) < 0)
+    (hW : ∀ w : W, w ≠ 0 → 0 < pseudoInner (w : E) (w : E))
+    (hdim : finrank ℝ V + finrank ℝ W = finrank ℝ E) :
+    index E = finrank ℝ V := by
+  refine QuadraticForm.sigNeg_eq_of_negDef_of_posDef (fun v hv ↦ ?_) (fun w hw ↦ ?_) hdim
+  · show (0 : ℝ) < -(toQuadraticForm E (v : E))
+    have := hV v hv
+    simp only [toQuadraticForm_apply]
+    linarith
+  · show (0 : ℝ) < toQuadraticForm E (w : E)
+    simpa using hW w hw
+
+variable {E} in
+/-- The companion of `index_eq_of_negDef_of_posDef` for the positive inertia. -/
+lemma coindex_eq_of_negDef_of_posDef {V W : Submodule ℝ E}
+    (hV : ∀ v : V, v ≠ 0 → pseudoInner (v : E) (v : E) < 0)
+    (hW : ∀ w : W, w ≠ 0 → 0 < pseudoInner (w : E) (w : E))
+    (hdim : finrank ℝ V + finrank ℝ W = finrank ℝ E) :
+    coindex E = finrank ℝ W := by
+  refine QuadraticForm.sigPos_eq_of_negDef_of_posDef (fun v hv ↦ ?_) (fun w hw ↦ ?_) hdim
+  · show (0 : ℝ) < -(toQuadraticForm E (v : E))
+    have := hV v hv
+    simp only [toQuadraticForm_apply]
+    linarith
+  · show (0 : ℝ) < toQuadraticForm E (w : E)
+    simpa using hW w hw
+
+variable {E} in
 lemma one_le_index_of_neg {v : E} (hv : v ≠ 0) (h : pseudoInner v v < 0) : 1 ≤ index E := by
   have key : Module.finrank ℝ (ℝ ∙ v : Submodule ℝ E) ≤ sigNeg (toQuadraticForm E) := by
     refine le_sigNeg_of_negDef _ fun x hx ↦ ?_
@@ -246,7 +360,6 @@ lemma one_le_index_of_neg {v : E} (hv : v ≠ 0) (h : pseudoInner v v < 0) : 1 �
   rwa [finrank_span_singleton hv] at key
 
 variable {E} in
-/-- A positive definite form has index `0`. -/
 lemma index_eq_zero_of_posDef (h : (toQuadraticForm E).PosDef) : index E = 0 := by
   obtain ⟨W, hW, hWneg⟩ :=
     exists_finrank_eq_sigNeg_and_negDef (Q := toQuadraticForm E)
@@ -262,9 +375,23 @@ lemma index_eq_zero_of_posDef (h : (toQuadraticForm E).PosDef) : index E = 0 := 
     exact absurd (h x hx0) (by linarith)
   simp [index, ← hW, hWbot]
 
-/-- Raising both indices is an isometry, so the inverse metric has the same index. -/
+/-- A form is Riemannian exactly when its index vanishes. -/
+lemma index_eq_zero_iff_posDef : index E = 0 ↔ (toQuadraticForm E).PosDef := by
+  refine ⟨fun h ↦ ?_, index_eq_zero_of_posDef⟩
+  obtain ⟨V, hV, hVpos⟩ := exists_finrank_eq_sigPos_and_posDef (toQuadraticForm E)
+  have hfull : finrank ℝ V = finrank ℝ E := by
+    have hc := coindex_eq_sigPos E
+    have := coindex_add_index_eq_finrank E
+    omega
+  have hVtop : V = ⊤ := Submodule.eq_top_of_finrank_eq hfull
+  intro v hv
+  subst hVtop
+  simpa using hVpos ⟨v, Submodule.mem_top⟩ (fun h0 ↦ hv (congrArg Subtype.val h0))
+
+/-- Raising both indices is an isometry, so the inverse metric on `E⋆` has the same index. -/
 lemma index_dual_eq [IsTopologicalAddGroup E] [ContinuousSMul ℝ E] [T2Space E] :
-    sigNeg (dualPseudoInnerSL E).toQuadraticForm = index E := by
+    letI := dual E
+    index (E →L[ℝ] ℝ) = index E := by
   have key : ∀ u w : E, dualPseudoInnerSL E (flatL E u) (flatL E w) = pseudoInner u w := by
     intro u w
     rw [dualPseudoInnerSL_apply, sharpL_flatL, flatL_apply]

@@ -120,8 +120,11 @@ public import Physlib.Mathematics.Fin
 public import Physlib.Mathematics.Fin.Involutions
 public import Physlib.Mathematics.Geometry.Metric.Lorentzian.Defs
 public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Basic
+public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.CovariantDerivative
 public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
+public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.LeviCivita
 public import Physlib.Mathematics.Geometry.Metric.Riemannian.Defs
+public import Physlib.Mathematics.Geometry.VectorBundle.HomInverse
 public import Physlib.Mathematics.HasTemperateGrowth
 public import Physlib.Mathematics.InnerProductSpace.Adjoint
 public import Physlib.Mathematics.InnerProductSpace.Basic
@@ -469,6 +472,7 @@ public import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.LightLike
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.TimeLike
 public import Physlib.Relativity.Tensors.RealTensor.Vector.MinkowskiProduct
+public import Physlib.Relativity.Tensors.RealTensor.Vector.PseudoInner
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Contraction
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Modules
