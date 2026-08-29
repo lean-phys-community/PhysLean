@@ -104,6 +104,7 @@ public import Physlib.FluidDynamics.FluidFlow.Newtonian
 public import Physlib.FluidDynamics.ThermodynamicCauchyFlow.Basic
 public import Physlib.FluidDynamics.ThermodynamicCauchyFlow.Bernoulli
 public import Physlib.FluidDynamics.ThermodynamicCauchyFlow.Isentropic
+public import Physlib.LatticeQFT.Basic
 public import Physlib.Mathematics.Calculus.AdjFDeriv
 public import Physlib.Mathematics.Calculus.Divergence
 public import Physlib.Mathematics.Calculus.Gradient
