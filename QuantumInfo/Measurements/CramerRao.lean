@@ -5,287 +5,294 @@ Authors: Eduardo Nava-Hernandez
 -/
 module
 
-public import QuantumInfo.States.Pure.Braket
+public import QuantumInfo.States.Mixed.MState
 public import Mathlib.Analysis.InnerProductSpace.Basic
+public import Mathlib.Analysis.InnerProductSpace.PiL2
 
 /-!
-# The quantum Cramér–Rao bound, pure states, unitary parametrization
+# The quantum Cramér–Rao bound, unitary parametrization
 
-For a pure state `ψ` and a one-parameter family `ψ_θ = e^{-iθG}ψ` generated unitarily by a
+For a state `ρ` and a one-parameter family `ρ_θ = e^{-iθG} ρ e^{iθG}` generated unitarily by a
 self-adjoint `G`, and an observable `O` used to build a locally unbiased estimator of `θ`
 (normalized so that `∂_θ⟨O⟩_θ|_{θ=0} = 1`), the standard quantum Cramér–Rao bound states
 
-    Var_ψ(O) ≥ 1 / (4 · Var_ψ(G)),
+    Var_ρ(O) ≥ 1 / (4 · Var_ρ(G)).
 
-with `4 · Var_ψ(G)` the quantum Fisher information of the family at `θ = 0`. This is the
-textbook identification of Helstrom (*Quantum Detection and Estimation Theory*, Academic Press,
-1976, Chap. VIII.4) and of Braunstein and Caves (Phys. Rev. Lett. **72**, 3439 (1994),
-Eqs. (32)–(33), the density-operator metric `ds²_DO/dX² ≤ Σⱼ(dpⱼ/dX)²/pⱼ + 4⟨(Δĥ)²⟩_X` becomes
-an *equality* on the pure-state boundary, giving `4⟨(Δĥ)²⟩_X` exactly, and combines with their
-Eq. (32), `N⟨(δX)²⟩_X · (ds²_DO/dX²) ≥ 1`, to give the bound stated above). Braunstein and Caves
-identify this pure-state case explicitly as "a Mandelstam–Tamm uncertainty principle... for a
-parameter `X` and the 'conjugate' operator `ĥ`" (paragraph following their Eq. (33)), i.e. the
-same Cramér–Rao/Mandelstam–Tamm identification, from the primary source, rather than re-derived.
+This file proves the algebraic content that this rests on:
 
-The bound follows *directly* from the Robertson uncertainty relation applied to the pair
-`(G, O)`, using the identity `∂_θ⟨O⟩_θ|_{θ=0} = i⟨ψ, [G, O] ψ⟩` for a unitarily generated family.
+* `MState.robertson_uncertainty` — Robertson's 1929 uncertainty relation for two Hermitian
+  observables on an arbitrary finite-dimensional state (H. P. Robertson, *The Uncertainty
+  Principle*, Phys. Rev. **34**, 163–164 (1929)). It holds for mixed states verbatim: the only
+  input is Cauchy–Schwarz for the GNS inner product `⟪X, Y⟫_ρ = Tr(ρ X† Y)`.
+* `MState.cramerRao_unitary` — the Cramér–Rao bound as its corollary under the commutator
+  normalization hypothesis `⟨i[G,O]⟩_ρ = 1`.
+* `MState.cramerRao_pure_unitary` — the pure-state specialization, for which `4 · Var_ρ(G)` is
+  *exactly* the quantum Fisher information.
 
-This file proves the algebraic content: Robertson's inequality for two Hermitian matrices on a
-finite-dimensional pure state, and the Cramér–Rao bound as its corollary under the commutator
-normalization hypothesis. It does *not* formalize the dynamics that produces the normalization
-(that identity is a calculus fact about differentiating a unitary conjugation, external to this
-module); the normalization is taken as an explicit hypothesis, exactly as the cited literature
-states it for a locally unbiased estimator.
+## On the quantum Fisher information
 
-## A. Expectation value and variance of a Hermitian observable on a pure state
+For a **pure** state `4 · Var_ρ(G)` is the quantum Fisher information of the family at `θ = 0`
+(Helstrom, *Quantum Detection and Estimation Theory*, Academic Press, 1976, Chap. VIII.4;
+Braunstein and Caves, Phys. Rev. Lett. **72**, 3439 (1994), Eqs. (32)–(33): the density-operator
+metric becomes an equality on the pure-state boundary, giving `4⟨(Δĥ)²⟩` exactly, and combining
+with their Eq. (32) yields the bound above). Braunstein and Caves identify this pure-state case
+explicitly as "a Mandelstam–Tamm uncertainty principle... for a parameter `X` and the 'conjugate'
+operator `ĥ`" (paragraph after their Eq. (33)).
 
-## B. Robertson's uncertainty relation
+For a **mixed** state `4 · Var_ρ(G) ≥ QFI_SLD(ρ, G)`, with equality iff `ρ` is pure. Hence
+`MState.cramerRao_unitary` is a valid Cramér–Rao lower bound for every state, but it is *tight*
+(equal to the inverse quantum Fisher information) only in the pure case. The bound itself follows
+*directly* from `robertson_uncertainty` applied to `(G, O)` together with the identity
+`∂_θ⟨O⟩_θ|_{θ=0} = ⟨i[G,O]⟩_ρ` for a unitarily generated family. This file does *not* formalize
+the dynamics that produces the normalization — that identity is a calculus fact about
+differentiating a unitary conjugation, external to this module — the normalization is taken as an
+explicit hypothesis, exactly as the cited literature states it for a locally unbiased estimator.
 
-## C. The quantum Cramér–Rao bound
+## Table of contents
+
+- A. The Hilbert–Schmidt embedding `Matrix d d ℂ ↪ EuclideanSpace ℂ (d × d)`
+- B. Expectation value, variance, and the commutator pairing on a mixed state
+- C. Robertson's uncertainty relation
+- D. The quantum Cramér–Rao bound
 -/
 
 @[expose] public section
 
 noncomputable section
 
-open scoped ComplexConjugate
+open scoped ComplexConjugate Matrix
 
-variable {d : Type*} [Fintype d]
+namespace MState
 
-/-! ## A. Expectation value and variance of a Hermitian observable on a pure state -/
+variable {d : Type*} [Fintype d] [DecidableEq d]
 
-/-- The state vector of a `Ket`, seen in `EuclideanSpace ℂ d` where Mathlib's inner product
-space API (in particular Cauchy–Schwarz) is available. -/
-def Ket.toEuclideanSpace (ψ : Ket d) : EuclideanSpace ℂ d :=
-  (WithLp.equiv 2 (d → ℂ)).symm ψ.vec
+/-! ## A. The Hilbert–Schmidt embedding
 
+We need exactly one nontrivial analytic fact — Cauchy–Schwarz for the GNS inner product
+`⟪X, Y⟫_ρ = Tr(ρ X† Y)` — and we obtain it by writing `Tr(ρ X† Y) = ⟪X √ρ, Y √ρ⟫` for the
+genuine Hilbert–Schmidt inner product on `d × d` matrices, realized as `EuclideanSpace ℂ (d × d)`.
+Nothing here is specific to quantum information; if it is wanted elsewhere it should move to
+`QuantumInfo/ForMathlib/`.
+-/
+
+/-- A `d × d` matrix seen as a vector of `EuclideanSpace ℂ (d × d)`, where Mathlib's inner
+product space API (Cauchy–Schwarz in particular) is available. This is the Hilbert–Schmidt
+picture: `⟪hsVec A, hsVec B⟫ = Tr(Aᴴ B)` (`hsVec_inner`). -/
+private def hsVec (M : Matrix d d ℂ) : EuclideanSpace ℂ (d × d) :=
+  (WithLp.equiv 2 (d × d → ℂ)).symm (fun p => M p.1 p.2)
+
+set_option linter.unusedSectionVars false in
 @[simp]
-lemma Ket.toEuclideanSpace_apply (ψ : Ket d) (i : d) :
-    ψ.toEuclideanSpace i = ψ.vec i := rfl
+private lemma hsVec_apply (M : Matrix d d ℂ) (p : d × d) : hsVec M p = M p.1 p.2 := rfl
 
-lemma Ket.norm_toEuclideanSpace (ψ : Ket d) : ‖ψ.toEuclideanSpace‖ = 1 := by
-  rw [EuclideanSpace.norm_eq]
-  simp only [Ket.toEuclideanSpace_apply]
-  rw [ψ.normalized']
-  exact Real.sqrt_one
-
-lemma Ket.inner_self_toEuclideanSpace (ψ : Ket d) :
-    inner ℂ ψ.toEuclideanSpace ψ.toEuclideanSpace = (1 : ℂ) := by
-  rw [@inner_self_eq_norm_sq_to_K ℂ, ψ.norm_toEuclideanSpace]
-  norm_num
-
-/-- The action of a matrix on a vector of `EuclideanSpace ℂ d`, via `Matrix.mulVec` on the
-underlying function. -/
-def Matrix.onVec (A : Matrix d d ℂ) (v : EuclideanSpace ℂ d) : EuclideanSpace ℂ d :=
-  (WithLp.equiv 2 (d → ℂ)).symm (A.mulVec (WithLp.equiv 2 (d → ℂ) v))
-
-@[simp]
-lemma Matrix.onVec_apply (A : Matrix d d ℂ) (v : EuclideanSpace ℂ d) (i : d) :
-    A.onVec v i = ∑ j, A i j * v j := rfl
-
-lemma Matrix.onVec_mul (A B : Matrix d d ℂ) (v : EuclideanSpace ℂ d) :
-    (A * B).onVec v = A.onVec (B.onVec v) := by
-  ext i
-  simp only [Matrix.onVec_apply, Matrix.mul_apply, Finset.sum_mul, Finset.mul_sum]
-  rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
-  ring
-
-lemma Matrix.onVec_sub (A B : Matrix d d ℂ) (v : EuclideanSpace ℂ d) :
-    (A - B).onVec v = A.onVec v - B.onVec v := by
-  ext i
-  simp [Matrix.onVec_apply, sub_mul, Finset.sum_sub_distrib]
-
-lemma Matrix.onVec_smul (c : ℂ) (A : Matrix d d ℂ) (v : EuclideanSpace ℂ d) :
-    (c • A).onVec v = c • A.onVec v := by
-  ext i
-  simp [Matrix.onVec_apply, Finset.mul_sum, mul_assoc]
-
-/-- Two Hermitian matrices commute past the inner product: `⟪v, A w⟫ = ⟪A v, w⟫`. This is the
-only place `A.IsHermitian` is used in this file; everything else is Cauchy–Schwarz. -/
-lemma Matrix.IsHermitian.inner_onVec_comm {A : Matrix d d ℂ} (hA : A.IsHermitian)
-    (v w : EuclideanSpace ℂ d) :
-    inner ℂ v (A.onVec w) = inner ℂ (A.onVec v) w := by
-  simp only [PiLp.inner_apply, RCLike.inner_apply', Matrix.onVec_apply, Finset.mul_sum,
-    Finset.sum_mul, map_sum, map_mul]
+set_option linter.unusedSectionVars false in
+/-- The defining property of `hsVec`: its inner product is `Tr(Aᴴ B)`. -/
+private lemma hsVec_inner (A B : Matrix d d ℂ) :
+    inner ℂ (hsVec A) (hsVec B) = (Aᴴ * B).trace := by
+  rw [PiLp.inner_apply, Fintype.sum_prod_type, Matrix.trace]
+  simp only [hsVec_apply, RCLike.inner_apply, starRingEnd_apply, Matrix.diag_apply,
+    Matrix.mul_apply, Matrix.conjTranspose_apply]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-  have hij : (starRingEnd ℂ) (A i j) = A j i := by
-    have := congrFun (congrFun hA.eq j) i
-    simpa [Matrix.conjTranspose_apply] using this
-  rw [hij]
-  ring
+  exact mul_comm _ _
 
-/-- Expectation value of a matrix `A` on the pure state `ψ`: `⟨ψ, A ψ⟩`. -/
-def Ket.expValC (ψ : Ket d) (A : Matrix d d ℂ) : ℂ :=
-  inner ℂ ψ.toEuclideanSpace (A.onVec ψ.toEuclideanSpace)
+/-! ## B. Expectation value, variance, and the commutator pairing -/
 
-/-- The expectation value of a Hermitian matrix on a pure state is real: it equals its own
-conjugate. -/
-lemma Ket.expValC_conj {ψ : Ket d} {A : Matrix d d ℂ} (hA : A.IsHermitian) :
-    (starRingEnd ℂ) (ψ.expValC A) = ψ.expValC A := by
-  unfold Ket.expValC
-  rw [inner_conj_symm, hA.inner_onVec_comm]
+section observables
 
-/-- Expectation value of a Hermitian matrix `A` on the pure state `ψ`, as a real number. -/
-def Ket.expVal (ψ : Ket d) (A : Matrix d d ℂ) : ℝ :=
-  (ψ.expValC A).re
+variable (ρ : MState d)
 
-lemma Ket.expValC_eq_ofReal_expVal {ψ : Ket d} {A : Matrix d d ℂ} (hA : A.IsHermitian) :
-    ψ.expValC A = (ψ.expVal A : ℂ) := by
-  have h := ψ.expValC_conj hA
-  have him : (ψ.expValC A).im = 0 := by
-    have h2 := congrArg Complex.im h
-    simp only [Complex.conj_im] at h2
-    linarith
-  apply Complex.ext
-  · simp [Ket.expVal]
-  · simp [him]
+/-- `exp_val_ℂ` on a Hermitian matrix is real, and equal to `exp_val`. -/
+lemma exp_val_ℂ_hermitian (A : HermitianMat d ℂ) :
+    ρ.exp_val_ℂ A.mat = (ρ.exp_val A : ℂ) := by
+  have hreal : (starRingEnd ℂ) (ρ.exp_val_ℂ A.mat) = ρ.exp_val_ℂ A.mat := by
+    simp only [MState.exp_val_ℂ, starRingEnd_apply, ← Matrix.trace_conjTranspose,
+      Matrix.conjTranspose_mul, ρ.Hermitian.eq, (A.H).eq]
+    rw [Matrix.trace_mul_comm]
+  have hre : (ρ.exp_val_ℂ A.mat).re = ρ.exp_val A := by
+    simp only [MState.exp_val_ℂ, MState.exp_val, HermitianMat.inner_eq_re_trace, MState.mat_M]
+    rw [Matrix.trace_mul_comm]
+    simp
+  rw [← hre]
+  exact (Complex.conj_eq_iff_re.mp hreal).symm
 
-/-- The variance of a Hermitian observable `A` on the pure state `ψ`. -/
-def Ket.variance (ψ : Ket d) (A : Matrix d d ℂ) : ℝ :=
-  ψ.expVal (A * A) - ψ.expVal A ^ 2
+/-- The Hermitian square root of `ρ`, as a bare matrix. -/
+private def sqrtMat : Matrix d d ℂ := ρ.M.sqrt.mat
 
-/-- The centered vector `A ψ - ⟨A⟩ ψ`, whose squared norm is the variance of `A` on `ψ`
-(`Ket.norm_centered_sq`, below). -/
-def Ket.centered (ψ : Ket d) (A : Matrix d d ℂ) : EuclideanSpace ℂ d :=
-  A.onVec ψ.toEuclideanSpace - (ψ.expVal A : ℂ) • ψ.toEuclideanSpace
+private lemma sqrtMat_isHermitian : (ρ.sqrtMat).IsHermitian := ρ.M.sqrt.H
 
-/-- The cross term `⟨A⟩ = ⟪ψ, A ψ⟫ = ⟪A ψ, ψ⟫` for a Hermitian `A`, in both orders. -/
-lemma Ket.inner_onVec_self {ψ : Ket d} {A : Matrix d d ℂ} (hA : A.IsHermitian) :
-    inner ℂ ψ.toEuclideanSpace (A.onVec ψ.toEuclideanSpace) = (ψ.expVal A : ℂ) ∧
-      inner ℂ (A.onVec ψ.toEuclideanSpace) ψ.toEuclideanSpace = (ψ.expVal A : ℂ) := by
-  have h1 : inner ℂ ψ.toEuclideanSpace (A.onVec ψ.toEuclideanSpace) = (ψ.expVal A : ℂ) :=
-    ψ.expValC_eq_ofReal_expVal hA
-  refine ⟨h1, ?_⟩
-  rw [← hA.inner_onVec_comm, h1]
+private lemma sqrtMat_mul_self : ρ.sqrtMat * ρ.sqrtMat = ρ.m := by
+  show ρ.M.sqrt.mat * ρ.M.sqrt.mat = ρ.m
+  simp [HermitianMat.sqrt_sq ρ.nonneg, MState.mat_M]
 
-lemma Ket.norm_centered_sq {ψ : Ket d} {A : Matrix d d ℂ} (hA : A.IsHermitian) :
-    ‖ψ.centered A‖ ^ 2 = ψ.variance A := by
-  have hAA : ψ.expValC (A * A) =
-      inner ℂ (A.onVec ψ.toEuclideanSpace) (A.onVec ψ.toEuclideanSpace) := by
-    show inner ℂ ψ.toEuclideanSpace ((A * A).onVec ψ.toEuclideanSpace) = _
-    rw [Matrix.onVec_mul]
-    exact hA.inner_onVec_comm _ _
-  obtain ⟨hcross, hcross'⟩ := ψ.inner_onVec_self hA
-  have hone := ψ.inner_self_toEuclideanSpace
-  have hexpand : (inner ℂ (ψ.centered A) (ψ.centered A) : ℂ) = ψ.expValC (A * A) -
-      (ψ.expVal A : ℂ) * (ψ.expVal A : ℂ) := by
-    unfold Ket.centered
+/-- `Tr(√ρ X √ρ) = Tr(X ρ)`. -/
+private lemma trace_sandwich (X : Matrix d d ℂ) :
+    (ρ.sqrtMat * X * ρ.sqrtMat).trace = (X * ρ.m).trace := by
+  rw [Matrix.trace_mul_cycle, ρ.sqrtMat_mul_self, Matrix.trace_mul_comm]
+
+/-- `⟪hsVec √ρ, hsVec (A √ρ)⟫ = Tr(A ρ) = ⟨A⟩_ρ`, for Hermitian `A`. -/
+private lemma inner_sqrt_left (A : HermitianMat d ℂ) :
+    inner ℂ (hsVec ρ.sqrtMat) (hsVec (A.mat * ρ.sqrtMat)) = (ρ.exp_val A : ℂ) := by
+  rw [hsVec_inner, ρ.sqrtMat_isHermitian.eq,
+    show ρ.sqrtMat * (A.mat * ρ.sqrtMat) = ρ.sqrtMat * A.mat * ρ.sqrtMat by
+      simp [Matrix.mul_assoc],
+    ρ.trace_sandwich, ← exp_val_ℂ, exp_val_ℂ_hermitian]
+
+/-- `⟪hsVec √ρ, hsVec √ρ⟫ = Tr(ρ) = 1`. -/
+private lemma inner_sqrt_self : inner ℂ (hsVec ρ.sqrtMat) (hsVec ρ.sqrtMat) = (1 : ℂ) := by
+  rw [hsVec_inner, ρ.sqrtMat_isHermitian.eq, ρ.sqrtMat_mul_self, ρ.tr']
+
+/-- `⟪hsVec (G √ρ), hsVec (O √ρ)⟫ = Tr(G O ρ) = ⟨GO⟩_ρ`. -/
+private lemma inner_hsVec_hsVec (G O : HermitianMat d ℂ) :
+    inner ℂ (hsVec (G.mat * ρ.sqrtMat)) (hsVec (O.mat * ρ.sqrtMat)) =
+      ρ.exp_val_ℂ (G.mat * O.mat) := by
+  rw [hsVec_inner, Matrix.conjTranspose_mul, ρ.sqrtMat_isHermitian.eq, (G.H).eq,
+    show ρ.sqrtMat * G.mat * (O.mat * ρ.sqrtMat) = ρ.sqrtMat * (G.mat * O.mat) * ρ.sqrtMat by
+      simp [Matrix.mul_assoc],
+    ρ.trace_sandwich, ← exp_val_ℂ]
+
+/-- The variance of a Hermitian observable `A` on the state `ρ`. -/
+def variance (A : HermitianMat d ℂ) : ℝ :=
+  ρ.exp_val (A ^ 2) - (ρ.exp_val A) ^ 2
+
+/-- The **commutator pairing** `⟨i[G,O]⟩_ρ` of two Hermitian observables. It is a real number
+because `i[G,O]` is Hermitian when `G` and `O` are; it is the quantity normalized to `1` for a
+locally unbiased estimator. -/
+def comm_exp_val (G O : HermitianMat d ℂ) : ℝ :=
+  (ρ.exp_val_ℂ (Complex.I • (G.mat * O.mat - O.mat * G.mat))).re
+
+/-- The centered Hilbert–Schmidt vector `A √ρ - ⟨A⟩_ρ √ρ`, whose squared norm is `Var_ρ(A)`
+(`norm_centered_sq`). -/
+private def centeredVec (A : HermitianMat d ℂ) : EuclideanSpace ℂ (d × d) :=
+  hsVec (A.mat * ρ.sqrtMat) - (ρ.exp_val A : ℂ) • hsVec ρ.sqrtMat
+
+private lemma norm_centered_sq (A : HermitianMat d ℂ) :
+    ‖ρ.centeredVec A‖ ^ 2 = ρ.variance A := by
+  have hself := ρ.inner_sqrt_self
+  have hleft := ρ.inner_sqrt_left A
+  have hright : inner ℂ (hsVec (A.mat * ρ.sqrtMat)) (hsVec ρ.sqrtMat) = (ρ.exp_val A : ℂ) := by
+    rw [← inner_conj_symm, hleft, Complex.conj_ofReal]
+  have hAA := ρ.inner_hsVec_hsVec A A
+  have hAsq : ρ.exp_val_ℂ (A.mat * A.mat) = (ρ.exp_val (A ^ 2) : ℂ) := by
+    rw [← ρ.exp_val_ℂ_hermitian (A ^ 2), HermitianMat.mat_pow, pow_two]
+  have hexpand : (inner ℂ (ρ.centeredVec A) (ρ.centeredVec A) : ℂ) =
+      ρ.exp_val_ℂ (A.mat * A.mat) - (ρ.exp_val A : ℂ) * (ρ.exp_val A : ℂ) := by
+    unfold centeredVec
     simp only [inner_sub_left, inner_sub_right, inner_smul_left, inner_smul_right,
-      Complex.conj_ofReal, ← hAA, hcross, hcross', hone]
+      Complex.conj_ofReal, hself, hleft, hright, hAA]
     ring
-  have hre : ‖ψ.centered A‖ ^ 2 = (inner ℂ (ψ.centered A) (ψ.centered A) : ℂ).re :=
-    (inner_self_eq_norm_sq (𝕜 := ℂ) (ψ.centered A)).symm
-  have hre2 : (ψ.expValC (A * A) - (ψ.expVal A : ℂ) * (ψ.expVal A : ℂ)).re =
-      ψ.expVal (A * A) - ψ.expVal A ^ 2 := by
-    rw [Complex.sub_re, ← Complex.ofReal_mul, Complex.ofReal_re]
-    show ψ.expVal (A * A) - ψ.expVal A * ψ.expVal A = ψ.expVal (A * A) - ψ.expVal A ^ 2
-    ring
-  rw [hre, hexpand, hre2]
-  rfl
-
-/-! ## B. Robertson's uncertainty relation -/
-
-private lemma Ket.inner_centered_centered {ψ : Ket d} {G O : Matrix d d ℂ}
-    (hG : G.IsHermitian) (hO : O.IsHermitian) :
-    (inner ℂ (ψ.centered G) (ψ.centered O) : ℂ) =
-      ψ.expValC (G * O) - (ψ.expVal G : ℂ) * (ψ.expVal O : ℂ) := by
-  have hGO : ψ.expValC (G * O) =
-      inner ℂ (G.onVec ψ.toEuclideanSpace) (O.onVec ψ.toEuclideanSpace) := by
-    show inner ℂ ψ.toEuclideanSpace ((G * O).onVec ψ.toEuclideanSpace) = _
-    rw [Matrix.onVec_mul]
-    exact hG.inner_onVec_comm _ _
-  obtain ⟨hGψψ, hGψ⟩ := ψ.inner_onVec_self hG
-  obtain ⟨hOψψ, hOψ⟩ := ψ.inner_onVec_self hO
-  have hone := ψ.inner_self_toEuclideanSpace
-  unfold Ket.centered
-  simp only [inner_sub_left, inner_sub_right, inner_smul_left, inner_smul_right,
-    Complex.conj_ofReal, ← hGO, hGψ, hOψψ, hone]
+  have hre : ‖ρ.centeredVec A‖ ^ 2 = (inner ℂ (ρ.centeredVec A) (ρ.centeredVec A) : ℂ).re :=
+    (inner_self_eq_norm_sq (𝕜 := ℂ) (ρ.centeredVec A)).symm
+  rw [hre, hexpand, variance, hAsq, ← Complex.ofReal_mul, ← Complex.ofReal_sub, Complex.ofReal_re]
   ring
 
-/-- **Robertson's uncertainty relation**, for two Hermitian matrices on a finite-dimensional
-pure state: the product of variances dominates a quarter of the squared expectation of the
-commutator. This is the standard 1929 inequality (H. P. Robertson, *The Uncertainty Principle*,
-Phys. Rev. 34, 163–164), specialized here to finite dimension. -/
-theorem robertson_uncertainty {ψ : Ket d} {G O : Matrix d d ℂ}
-    (hG : G.IsHermitian) (hO : O.IsHermitian) :
-    (ψ.expVal (Complex.I • (G * O - O * G))) ^ 2 / 4 ≤ ψ.variance G * ψ.variance O := by
-  have hCS : ‖(inner ℂ (ψ.centered G) (ψ.centered O) : ℂ)‖ ≤
-      ‖ψ.centered G‖ * ‖ψ.centered O‖ := norm_inner_le_norm _ _
-  have hprodsq : (‖ψ.centered G‖ * ‖ψ.centered O‖) ^ 2 = ψ.variance G * ψ.variance O := by
-    rw [mul_pow, ψ.norm_centered_sq hG, ψ.norm_centered_sq hO]
-  have hcomm_herm : (Complex.I • (G * O - O * G)).IsHermitian := by
-    unfold Matrix.IsHermitian
-    rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_sub, Matrix.conjTranspose_mul,
-      Matrix.conjTranspose_mul, hG.eq, hO.eq, Complex.star_def, Complex.conj_I]
-    module
-  have hantisym : ψ.expValC (G * O) - ψ.expValC (O * G) =
-      (inner ℂ (ψ.centered G) (ψ.centered O) : ℂ) -
-        (starRingEnd ℂ) (inner ℂ (ψ.centered G) (ψ.centered O) : ℂ) := by
-    have h1 := ψ.inner_centered_centered hG hO
-    have h2 := ψ.inner_centered_centered hO hG
-    have hOG' : inner ℂ (ψ.centered O) (ψ.centered G) =
-        (starRingEnd ℂ) (inner ℂ (ψ.centered G) (ψ.centered O) : ℂ) :=
-      (inner_conj_symm (ψ.centered O) (ψ.centered G)).symm
-    rw [hOG'] at h2
-    rw [h2, h1]
+/-- `Var_ρ(A) ≥ 0`. -/
+lemma variance_nonneg (A : HermitianMat d ℂ) : 0 ≤ ρ.variance A := by
+  rw [← ρ.norm_centered_sq]
+  positivity
+
+/-! ## C. Robertson's uncertainty relation -/
+
+/-- `exp_val_ℂ` of a product is conjugate-antisymmetric: `conj ⟨GO⟩_ρ = ⟨OG⟩_ρ`. -/
+private lemma exp_val_ℂ_swap (G O : HermitianMat d ℂ) :
+    (starRingEnd ℂ) (ρ.exp_val_ℂ (G.mat * O.mat)) = ρ.exp_val_ℂ (O.mat * G.mat) := by
+  simp only [MState.exp_val_ℂ, starRingEnd_apply, ← Matrix.trace_conjTranspose]
+  rw [show ((G.mat * O.mat) * ρ.m)ᴴ = ρ.m * O.mat * G.mat by
+        rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, ρ.Hermitian.eq, (G.H).eq,
+          (O.H).eq, ← Matrix.mul_assoc],
+      Matrix.mul_assoc, Matrix.trace_mul_comm]
+
+private lemma inner_centered_centered (G O : HermitianMat d ℂ) :
+    (inner ℂ (ρ.centeredVec G) (ρ.centeredVec O) : ℂ) =
+      ρ.exp_val_ℂ (G.mat * O.mat) - (ρ.exp_val G : ℂ) * (ρ.exp_val O : ℂ) := by
+  have hself := ρ.inner_sqrt_self
+  have hGl := ρ.inner_sqrt_left G
+  have hOl := ρ.inner_sqrt_left O
+  have hGr : inner ℂ (hsVec (G.mat * ρ.sqrtMat)) (hsVec ρ.sqrtMat) = (ρ.exp_val G : ℂ) := by
+    rw [← inner_conj_symm, hGl, Complex.conj_ofReal]
+  have hGO := ρ.inner_hsVec_hsVec G O
+  unfold centeredVec
+  simp only [inner_sub_left, inner_sub_right, inner_smul_left, inner_smul_right,
+    Complex.conj_ofReal, hself, hOl, hGr, hGO]
+  ring
+
+/-- **Robertson's uncertainty relation** (H. P. Robertson, Phys. Rev. **34**, 163–164 (1929)),
+for two Hermitian observables on an arbitrary finite-dimensional state: the product of variances
+dominates a quarter of the squared commutator pairing. -/
+theorem robertson_uncertainty (G O : HermitianMat d ℂ) :
+    (ρ.comm_exp_val G O) ^ 2 / 4 ≤ ρ.variance G * ρ.variance O := by
+  set z : ℂ := inner ℂ (ρ.centeredVec G) (ρ.centeredVec O) with hz
+  have hCS : ‖z‖ ≤ ‖ρ.centeredVec G‖ * ‖ρ.centeredVec O‖ := norm_inner_le_norm _ _
+  have hprodsq : (‖ρ.centeredVec G‖ * ‖ρ.centeredVec O‖) ^ 2 = ρ.variance G * ρ.variance O := by
+    rw [mul_pow, ρ.norm_centered_sq G, ρ.norm_centered_sq O]
+  -- `z - conj z` is the raw commutator expectation.
+  have hz_sub : z - conj z =
+      ρ.exp_val_ℂ (G.mat * O.mat) - ρ.exp_val_ℂ (O.mat * G.mat) := by
+    have hzz : z =
+        ρ.exp_val_ℂ (G.mat * O.mat) - (ρ.exp_val G : ℂ) * (ρ.exp_val O : ℂ) := by
+      rw [hz]; exact ρ.inner_centered_centered G O
+    rw [hzz, map_sub, map_mul, Complex.conj_ofReal, Complex.conj_ofReal, ρ.exp_val_ℂ_swap]
     ring
-  have hcommC : ψ.expValC (Complex.I • (G * O - O * G)) =
-      Complex.I * (ψ.expValC (G * O) - ψ.expValC (O * G)) := by
-    show inner ℂ ψ.toEuclideanSpace ((Complex.I • (G * O - O * G)).onVec ψ.toEuclideanSpace) = _
-    have hlin : (Complex.I • (G * O - O * G)).onVec ψ.toEuclideanSpace =
-        Complex.I • ((G * O - O * G).onVec ψ.toEuclideanSpace) := Matrix.onVec_smul _ _ _
-    rw [hlin, inner_smul_right, Matrix.onVec_sub, inner_sub_right]
-    unfold Ket.expValC
-    ring
-  have hCreal := ψ.expValC_eq_ofReal_expVal hcomm_herm
-  set z : ℂ := inner ℂ (ψ.centered G) (ψ.centered O) with hz
-  have him : z - (starRingEnd ℂ) z = 2 * Complex.I * z.im := by
-    apply Complex.ext <;> simp [Complex.sub_re, Complex.sub_im]; ring
-  have hCz : (ψ.expVal (Complex.I • (G * O - O * G)) : ℂ) = -2 * z.im := by
-    rw [← hCreal, hcommC, hantisym, him]
-    have : Complex.I * Complex.I = (-1 : ℂ) := Complex.I_mul_I
-    ring_nf
-    rw [show Complex.I ^ 2 = (-1 : ℂ) by rw [sq]; exact this]
-    ring
-  have hCz' : ψ.expVal (Complex.I • (G * O - O * G)) = -2 * z.im := by
-    exact_mod_cast hCz
+  -- `⟨i[G,O]⟩_ρ = -2 · Im z`.
+  have hlin : ρ.exp_val_ℂ (Complex.I • (G.mat * O.mat - O.mat * G.mat)) =
+      Complex.I * (ρ.exp_val_ℂ (G.mat * O.mat) - ρ.exp_val_ℂ (O.mat * G.mat)) := by
+    simp only [MState.exp_val_ℂ, Matrix.smul_mul, Matrix.sub_mul, Matrix.trace_smul,
+      Matrix.trace_sub, smul_eq_mul]
+  have hw : z - conj z = 2 * Complex.I * (z.im : ℂ) := by
+    apply Complex.ext
+    · simp [Complex.sub_re, Complex.conj_re, Complex.mul_re, Complex.mul_im]
+    · simp [Complex.sub_im, Complex.conj_im, Complex.mul_re, Complex.mul_im]
+      ring
+  have hcomm : ρ.comm_exp_val G O = -2 * z.im := by
+    have hval : ρ.exp_val_ℂ (Complex.I • (G.mat * O.mat - O.mat * G.mat)) =
+        ((-2 * z.im : ℝ) : ℂ) := by
+      rw [hlin, ← hz_sub, hw]
+      push_cast
+      rw [show Complex.I * (2 * Complex.I * (z.im : ℂ)) =
+          2 * (Complex.I * Complex.I) * (z.im : ℂ) by ring, Complex.I_mul_I]
+      ring
+    rw [comm_exp_val, hval, Complex.ofReal_re]
+  -- Combine Cauchy–Schwarz with `Im z ^ 2 ≤ ‖z‖ ^ 2`.
   have hnormsq : ‖z‖ ^ 2 = z.re * z.re + z.im * z.im := by
     rw [sq, Complex.norm_mul_self_eq_normSq, Complex.normSq_apply]
   have hzim : z.im ^ 2 ≤ ‖z‖ ^ 2 := by
-    rw [hnormsq, sq]
-    nlinarith [sq_nonneg z.re]
-  have hfinal : (ψ.expVal (Complex.I • (G * O - O * G))) ^ 2 / 4 ≤ ‖z‖ ^ 2 := by
-    rw [hCz']
-    nlinarith [hzim]
-  calc (ψ.expVal (Complex.I • (G * O - O * G))) ^ 2 / 4
+    rw [hnormsq, sq]; nlinarith [sq_nonneg z.re]
+  have hfinal : (ρ.comm_exp_val G O) ^ 2 / 4 ≤ ‖z‖ ^ 2 := by
+    rw [hcomm]; nlinarith [hzim]
+  calc (ρ.comm_exp_val G O) ^ 2 / 4
       ≤ ‖z‖ ^ 2 := hfinal
-    _ ≤ (‖ψ.centered G‖ * ‖ψ.centered O‖) ^ 2 := by
-        gcongr
-    _ = ψ.variance G * ψ.variance O := hprodsq
+    _ ≤ (‖ρ.centeredVec G‖ * ‖ρ.centeredVec O‖) ^ 2 := by gcongr
+    _ = ρ.variance G * ρ.variance O := hprodsq
 
-/-! ## C. The quantum Cramér–Rao bound -/
+/-! ## D. The quantum Cramér–Rao bound -/
 
-/-- **The quantum Cramér–Rao bound**, pure states, unitary parametrization (Helstrom 1976, Chap.
-VIII.4; Braunstein–Caves, Phys. Rev. Lett. 72, 3439 (1994), Eqs. (32)–(33), pure-state case). For
-a family `ψ_θ = e^{-iθG}ψ` and an
-observable `O` normalized to `∂_θ⟨O⟩_θ|_{θ=0} = 1` — the standard normalization of a locally
-unbiased estimator, taken here as an explicit hypothesis rather than derived from the dynamics
-of the family — the variance of `O` is at least the inverse of the quantum Fisher information
-`4 · Var_ψ(G)`. -/
-theorem cramerRao_pureState_unitary {ψ : Ket d} {G O : Matrix d d ℂ}
-    (hG : G.IsHermitian) (hO : O.IsHermitian)
-    (hnorm : ψ.expVal (Complex.I • (G * O - O * G)) = 1) :
-    1 / (4 * ψ.variance G) ≤ ψ.variance O := by
-  have hR := robertson_uncertainty (ψ := ψ) hG hO
+/-- **The quantum Cramér–Rao bound**, unitary parametrization (Helstrom 1976, Chap. VIII.4;
+Braunstein–Caves, Phys. Rev. Lett. **72**, 3439 (1994), Eqs. (32)–(33)). For a family
+`ρ_θ = e^{-iθG} ρ e^{iθG}` and an observable `O` normalized to `∂_θ⟨O⟩_θ|_{θ=0} = 1` — the
+standard normalization of a locally unbiased estimator, taken here as the explicit hypothesis
+`comm_exp_val` rather than derived from the dynamics — the variance of `O` is at least the
+inverse of `4 · Var_ρ(G)`. For a pure state `4 · Var_ρ(G)` is exactly the quantum Fisher
+information (see the module docstring); in general it only bounds it from above, so this is a
+valid but not tight Cramér–Rao bound. -/
+theorem cramerRao_unitary (G O : HermitianMat d ℂ)
+    (hG : 0 < ρ.variance G) (hnorm : ρ.comm_exp_val G O = 1) :
+    1 / (4 * ρ.variance G) ≤ ρ.variance O := by
+  have hR := ρ.robertson_uncertainty G O
   rw [hnorm] at hR
-  have hGpos : 0 < ψ.variance G := by
-    rcases lt_or_eq_of_le (by rw [← ψ.norm_centered_sq hG]; positivity : (0:ℝ) ≤ ψ.variance G)
-      with h | h
-    · exact h
-    · exfalso; rw [← h] at hR; norm_num at hR
+  norm_num at hR
   rw [div_le_iff₀ (by positivity)]
-  nlinarith [hR]
+  nlinarith [hR, ρ.variance_nonneg O]
+
+/-- The pure-state quantum Cramér–Rao bound: the specialization of `cramerRao_unitary` to
+`MState.pure ψ`, for which `4 · Var_ρ(G)` is *exactly* the quantum Fisher information of the
+family (Braunstein–Caves 1994, pure-state boundary), so the bound is tight. -/
+theorem cramerRao_pure_unitary {ψ : Ket d} (G O : HermitianMat d ℂ)
+    (hG : 0 < (MState.pure ψ).variance G) (hnorm : (MState.pure ψ).comm_exp_val G O = 1) :
+    1 / (4 * (MState.pure ψ).variance G) ≤ (MState.pure ψ).variance O :=
+  (MState.pure ψ).cramerRao_unitary G O hG hnorm
+
+end observables
+
+end MState
 
 end
