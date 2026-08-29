@@ -207,7 +207,7 @@ private lemma Ket.inner_centered_centered {ψ : Ket d} {G O : Matrix d d ℂ}
 /-- **Robertson's uncertainty relation**, for two Hermitian matrices on a finite-dimensional
 pure state: the product of variances dominates a quarter of the squared expectation of the
 commutator. This is the standard 1929 inequality (H. P. Robertson, *The Uncertainty Principle*,
-Phys. Rev. 34, 163–166), specialized here to finite dimension. -/
+Phys. Rev. 34, 163–164), specialized here to finite dimension. -/
 theorem robertson_uncertainty {ψ : Ket d} {G O : Matrix d d ℂ}
     (hG : G.IsHermitian) (hO : O.IsHermitian) :
     (ψ.expVal (Complex.I • (G * O - O * G))) ^ 2 / 4 ≤ ψ.variance G * ψ.variance O := by
