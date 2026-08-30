@@ -1,7 +1,7 @@
 /-
-Copyright (c) 2026 The Physlib community. All rights reserved.
+Copyright (c) 2026 Rahul Pamula. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: The Physlib community
+Authors: Rahul Pamula
 -/
 module
 
