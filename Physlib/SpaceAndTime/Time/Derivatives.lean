@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Nikolai Kashcheev, Joseph Tooby-Smith
+Authors: Nikolai Kashcheev, Zhi Kai Pong, Joseph Tooby-Smith
 -/
 module
 
