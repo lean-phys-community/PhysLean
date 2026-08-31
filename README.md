@@ -31,14 +31,14 @@
 
 ### Physlib
 
-The core library — physics formalizations reviewed and curated to a high standard, built for long-term reuse, readability, trust, and maintenance.
+The core library — physics digitalizations reviewed and curated to a high standard, built for long-term reuse, readability, trust, and maintenance.
 
 </td>
 <td width="33%" valign="top">
 
 ### PhyslibAlpha
 
-PhyslibAlpha exists for the rapid development of physics formalizations, enabled by a lighter review process built to handle large-scale, human- or AI-generated contributions.
+PhyslibAlpha exists for the rapid development of physics digitalizations, enabled by a lighter review process built to handle large-scale, human- or AI-generated contributions.
 
 </td>
 <td width="33%" valign="top">
