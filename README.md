@@ -25,6 +25,31 @@
 
 </div>
 
+<table>
+<tr>
+<td width="33%" valign="top">
+
+### Physlib
+
+The core library — physics formalizations reviewed and curated to a high standard, built for long-term reuse, readability, trust, and maintenance.
+
+</td>
+<td width="33%" valign="top">
+
+### PhyslibAlpha
+
+PhyslibAlpha exists for the rapid development of physics formalizations, enabled by a lighter review process built to handle large-scale, human- or AI-generated contributions.
+
+</td>
+<td width="33%" valign="top">
+
+### QuantumInfo
+
+Quantum information theory. Currently a distinct codebase with its own conventions and review norms; work is underway to bring it closer to Physlib.
+
+</td>
+</tr>
+</table>
 
 ## Requirements of the project
 
