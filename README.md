@@ -27,25 +27,47 @@
 
 <table>
 <tr>
+<td colspan="3" align="center">
+
+<sub><b>UPSTREAM</b></sub> · [**Mathlib**](https://github.com/leanprover-community/mathlib4) ↑
+
+</td>
+</tr>
+<tr>
+<td colspan="3" align="center">
+
+<sub><b>THIS REPOSITORY</b></sub>
+
+</td>
+</tr>
+<tr>
 <td width="33%" valign="top">
 
-### Physlib
+### [**Physlib**](./Physlib)
 
 The core library — physics digitalizations reviewed and curated to a high standard, built for long-term reuse, readability, trust, and maintenance.
 
 </td>
 <td width="33%" valign="top">
 
-### PhyslibAlpha
+###  [**PhyslibAlpha**](./PhyslibAlpha)
 
 PhyslibAlpha exists for the rapid development of physics digitalizations, enabled by a lighter review process built to handle large-scale, human- or AI-generated contributions.
 
 </td>
 <td width="33%" valign="top">
 
-### QuantumInfo
+### [**QuantumInfo**](./QuantumInfo)
 
 Quantum information theory. Currently a distinct codebase with its own conventions and review norms; work is underway to bring it closer to Physlib.
+
+</td>
+</tr><tr>
+<td colspan="3" align="center"></td></tr>
+<tr>
+<td colspan="3" align="center">
+
+<sub><b>ADJACENT</b></sub> · [**CSLib**](https://github.com/leanprover/cslib) →
 
 </td>
 </tr>
