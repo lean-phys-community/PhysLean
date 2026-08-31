@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.Space.Module
+public import Physlib.SpaceAndTime.Space.SmoothFunctions
 public import Physlib.Meta.Informal.Basic
 public import Mathlib.Geometry.Manifold.Algebra.SmoothFunctions
 /-!
@@ -32,6 +32,7 @@ centre of mass.
 @[expose] public section
 
 open Manifold InnerProductSpace
+open Space (cmap cmap_apply)
 
 TODO "The definition of a rigid body is currently defined via linear maps
   from the space of smooth functions to ℝ. When possible, it should be change
@@ -65,20 +66,6 @@ noncomputable def inertiaTensor {d : ℕ} (R : RigidBody d) :
 lemma inertiaTensor_symmetric {d : ℕ} (R : RigidBody d) (i j : Fin d) :
     R.inertiaTensor i j = R.inertiaTensor j i := by
   simp only [inertiaTensor, eq_comm, mul_comm]
-
-TODO "Move `cmap` and `cmap_apply` to a more general location, such as a file in
-  `SpaceAndTime/Space/` or `Mathematics/`. Alternatively, define a version of `ρ` taking an
-  unbundled `(f : Space d → ℝ) (hf : ContDiff ℝ ⊤ f)` in place of a `ContMDiffMap`."
-
-/-- Bundle a smooth real-valued function on `Space d` as an element of the space of test
-functions. Keeping this as a named constructor ensures the resulting type head stays
-`ContMDiffMap`, so the module/ring operations and `comp` resolve correctly. -/
-def cmap {d : ℕ} (f : Space d → ℝ) (hf : ContDiff ℝ ⊤ f) :
-    C^⊤⟮𝓘(ℝ, Space d), Space d; 𝓘(ℝ, ℝ), ℝ⟯ := ⟨f, hf.contMDiff⟩
-
-@[simp]
-lemma cmap_apply {d : ℕ} (f : Space d → ℝ) (hf : ContDiff ℝ ⊤ f) (y : Space d) :
-    cmap f hf y = f y := rfl
 
 /-- The first moment of the mass distribution about its own centre of mass vanishes:
 for nonzero mass, `ρ` of the centred `j`-th coordinate function is zero. -/

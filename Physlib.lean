@@ -511,6 +511,7 @@ public import Physlib.SpaceAndTime.Space.Norm.IteratedLaplacian
 public import Physlib.SpaceAndTime.Space.Norm.Regularized
 public import Physlib.SpaceAndTime.Space.Origin
 public import Physlib.SpaceAndTime.Space.Slice
+public import Physlib.SpaceAndTime.Space.SmoothFunctions
 public import Physlib.SpaceAndTime.Space.Translations
 public import Physlib.SpaceAndTime.SpaceTime.Basic
 public import Physlib.SpaceAndTime.SpaceTime.Boosts

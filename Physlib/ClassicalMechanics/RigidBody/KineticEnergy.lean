@@ -37,6 +37,7 @@ smooth for any motion; for differentiable motions it agrees with the honest poin
 @[expose] public section
 
 open Time Manifold Matrix RigidBody InnerProductSpace
+open Space (cmap cmap_apply)
 
 attribute [local instance] Matrix.linftyOpNormedAddCommGroup Matrix.linftyOpNormedSpace
   Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
