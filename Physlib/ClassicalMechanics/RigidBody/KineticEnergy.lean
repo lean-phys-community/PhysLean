@@ -122,11 +122,11 @@ lemma kineticEnergy_integrand_split {d : ℕ} (M : RigidBodyMotion d) (t : Time)
     cmap_apply, smul_eq_mul]
   rw [show (⟪M.velocityClosedForm t y, M.velocityClosedForm t y⟫_ℝ)
         = (M.velocityClosedForm t y : Fin d → ℝ) ⬝ᵥ (M.velocityClosedForm t y : Fin d → ℝ) from
-      Space.inner_eq_sum _ _,
+      EuclideanSpace.inner_eq_star_dotProduct _ _,
     velocityClosedForm_val,
     show (⟪M.centerOfMassVelocity t, M.centerOfMassVelocity t⟫_ℝ)
         = (M.centerOfMassVelocity t : Fin d → ℝ) ⬝ᵥ (M.centerOfMassVelocity t : Fin d → ℝ) from
-      Space.inner_eq_sum _ _,
+      EuclideanSpace.inner_eq_star_dotProduct _ _,
     add_dotProduct, dotProduct_add, dotProduct_add,
     dotProduct_comm (∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j)
       (M.centerOfMassVelocity t : Fin d → ℝ),
