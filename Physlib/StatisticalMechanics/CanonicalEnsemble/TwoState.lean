@@ -6,7 +6,6 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 module
 
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.Finite
-public import Physlib.Meta.Informal.Basic
 /-!
 
 # Two-state canonical ensemble
@@ -98,10 +97,37 @@ lemma twoState_meanEnergy_eq (E₀ E₁ : ℝ) (T : Temperature) :
   simp [Fin.sum_univ_two, twoState_probability_fst, twoState_probability_snd]
   ring
 
-/-- A simplification of the `entropy` of the two-state canonical ensemble. -/
-informal_lemma twoState_entropy_eq where
-  tag := "EVJJI"
-  deps := [``twoState, ``thermodynamicEntropy]
+/-- A simplification of the `entropy` of the two-state canonical ensemble.
+
+Since `β 0 = 0`, at `T = 0` the right-hand side evaluates to `Constants.kB * Real.log 2`.
+See `twoState_entropy_eq_T_neq_zero` for the same statement carrying `T ≠ 0`. -/
+lemma twoState_entropy_eq (E₀ E₁ : ℝ) (T : Temperature) :
+    (twoState E₀ E₁).thermodynamicEntropy T =
+      Constants.kB * (Real.log (2 * Real.cosh (β T * (E₁ - E₀) / 2))
+        - β T * (E₁ - E₀) / 2 * Real.tanh (β T * (E₁ - E₀) / 2)) := by
+  rw [thermodynamicEntropy_eq_shannonEntropy, shannonEntropy]
+  set x := β T * (E₁ - E₀) / 2
+  have h2c : (2 : ℝ) * Real.cosh x ≠ 0 := by positivity
+  have hp0 : (twoState E₀ E₁).probability T 0 = Real.exp x / (2 * Real.cosh x) := by
+    rw [twoState_probability_fst, Real.tanh_eq_sinh_div_cosh, Real.sinh_eq, Real.cosh_eq]
+    field_simp
+    ring
+  have hp1 : (twoState E₀ E₁).probability T 1 = Real.exp (-x) / (2 * Real.cosh x) := by
+    rw [twoState_probability_snd, Real.tanh_eq_sinh_div_cosh, Real.sinh_eq, Real.cosh_eq]
+    field_simp
+    ring
+  rw [Fin.sum_univ_two, hp0, hp1, Real.log_div (Real.exp_ne_zero _) h2c,
+    Real.log_div (Real.exp_ne_zero _) h2c, Real.log_exp, Real.log_exp]
+  rw [Real.tanh_eq_sinh_div_cosh, Real.sinh_eq, Real.cosh_eq]
+  field_simp
+  ring
+
+/-- An instance of `twoState_entropy_eq` assuming T ≠ 0 -/
+lemma twoState_entropy_eq_T_neq_zero (E₀ E₁ : ℝ) (T : Temperature) (_ : T ≠ 0) :
+    (twoState E₀ E₁).thermodynamicEntropy T =
+      Constants.kB * (Real.log (2 * Real.cosh (β T * (E₁ - E₀) / 2))
+        - β T * (E₁ - E₀) / 2 * Real.tanh (β T * (E₁ - E₀) / 2)) :=
+  twoState_entropy_eq E₀ E₁ T
 
 /-- A simplification of the `helmholtzFreeEnergy` of the two-state canonical ensemble. -/
 lemma twoState_helmholtzFreeEnergy_eq (E₀ E₁ : ℝ) (T : Temperature) :
