@@ -189,6 +189,15 @@ private lemma component_npow (component : Dimension LTMCTDimensionBase → Expon
     _ = n • d.exponent b := npow_exponent d n b
     _ = n • component d := congrArg (n • ·) (h _)
 
+private lemma component_epow (component : Dimension LTMCTDimensionBase → Exponent)
+    (b : LTMCTDimensionBase) (h : ∀ d, d.exponent b = component d)
+    (d : Dimension LTMCTDimensionBase) (c : Exponent) :
+    component (d ^ c) = component d * c := by
+  calc
+    component (d ^ c) = (d ^ c).exponent b := (h _).symm
+    _ = d.exponent b * c := epow_exponent d c b
+    _ = component d * c := congrArg (· * c) (h _)
+
 @[simp]
 lemma div_length (d1 d2 : Dimension LTMCTDimensionBase) :
     (d1 / d2).length = d1.length - d2.length := rfl
@@ -227,6 +236,38 @@ lemma npow_charge (d : Dimension LTMCTDimensionBase) (n : ℕ) : (d ^ n).charge 
 lemma npow_temperature (d : Dimension LTMCTDimensionBase) (n : ℕ) :
     (d ^ n).temperature = n • d.temperature := by
   exact component_npow temperature .temperature exponent_temperature d n
+
+/-- The length component of an `Exponent` power. Since `Pow (Dimension B) Exponent` is the
+  default instance, an unascribed numeric exponent elaborates to this power rather than to
+  the `ℕ` one, so `npow_length` does not apply to it and this lemma is what `simp` needs. -/
+@[simp]
+lemma epow_length (d : Dimension LTMCTDimensionBase) (c : Exponent) :
+    (d ^ c).length = d.length * c := by
+  exact component_epow length .length exponent_length d c
+
+/-- The time component of an `Exponent` power. -/
+@[simp]
+lemma epow_time (d : Dimension LTMCTDimensionBase) (c : Exponent) :
+    (d ^ c).time = d.time * c := by
+  exact component_epow time .time exponent_time d c
+
+/-- The mass component of an `Exponent` power. -/
+@[simp]
+lemma epow_mass (d : Dimension LTMCTDimensionBase) (c : Exponent) :
+    (d ^ c).mass = d.mass * c := by
+  exact component_epow mass .mass exponent_mass d c
+
+/-- The charge component of an `Exponent` power. -/
+@[simp]
+lemma epow_charge (d : Dimension LTMCTDimensionBase) (c : Exponent) :
+    (d ^ c).charge = d.charge * c := by
+  exact component_epow charge .charge exponent_charge d c
+
+/-- The temperature component of an `Exponent` power. -/
+@[simp]
+lemma epow_temperature (d : Dimension LTMCTDimensionBase) (c : Exponent) :
+    (d ^ c).temperature = d.temperature * c := by
+  exact component_epow temperature .temperature exponent_temperature d c
 
 /-- The dimension corresponding to length. -/
 def L𝓭 : Dimension LTMCTDimensionBase := ofLTMCTDimensionBase 1 0 0 0 0
