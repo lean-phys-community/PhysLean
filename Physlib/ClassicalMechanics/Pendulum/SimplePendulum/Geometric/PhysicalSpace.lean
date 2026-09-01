@@ -144,10 +144,10 @@ lemma differentiable_spaceTrajectory (θ : Time → EuclideanSpace ℝ (Fin 1))
   of radius `ℓ` at the position of the bob. -/
 lemma deriv_spaceTrajectory (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Differentiable ℝ θ)
     (t : Time) :
-    ∂ₜ (S.spaceTrajectory θ) t =
-      ⟨![S.ℓ * Real.cos (θ t 0) * (∂ₜ θ t) 0, S.ℓ * Real.sin (θ t 0) * (∂ₜ θ t) 0]⟩ := by
-  refine Space.eq_of_apply fun i ↦ ?_
-  fin_cases i <;> apply (Time.deriv_space (by fun_prop) t _).symm.trans
+    ∂ₜᵥ (S.spaceTrajectory θ) t =
+      !₂[S.ℓ * Real.cos (θ t 0) * (∂ₜ θ t) 0, S.ℓ * Real.sin (θ t 0) * (∂ₜ θ t) 0] := by
+  refine PiLp.ext fun i ↦ ?_
+  fin_cases i <;> apply (Time.derivVec_space (by fun_prop) t _).trans
   · simp only [S.spaceTrajectory_apply_zero, Fin.zero_eta, Matrix.cons_val_zero]
     rw [Time.deriv_eq, fderiv_const_mul, smul_apply, smul_eq_mul, ← Time.deriv, deriv_sin_coord,
       mul_assoc]
@@ -160,8 +160,8 @@ lemma deriv_spaceTrajectory (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Di
 /-- The square of the speed of the bob along a differentiable lift of the angle is `ℓ² θ̇²`. -/
 lemma norm_sq_deriv_spaceTrajectory (θ : Time → EuclideanSpace ℝ (Fin 1))
     (hθ : Differentiable ℝ θ) (t : Time) :
-    ‖∂ₜ (S.spaceTrajectory θ) t‖ ^ 2 = S.ℓ ^ 2 * ((∂ₜ θ t) 0) ^ 2 := by
-  rw [S.deriv_spaceTrajectory θ hθ t, Space.norm_sq_eq, Fin.sum_univ_two]
+    ‖∂ₜᵥ (S.spaceTrajectory θ) t‖ ^ 2 = S.ℓ ^ 2 * ((∂ₜ θ t) 0) ^ 2 := by
+  rw [S.deriv_spaceTrajectory θ hθ t, EuclideanSpace.real_norm_sq_eq, Fin.sum_univ_two]
   show (S.ℓ * Real.cos (θ t 0) * (∂ₜ θ t) 0) ^ 2
       + (S.ℓ * Real.sin (θ t 0) * (∂ₜ θ t) 0) ^ 2 = _
   linear_combination S.ℓ ^ 2 * ((∂ₜ θ t) 0) ^ 2 * Real.sin_sq_add_cos_sq (θ t 0)
@@ -185,7 +185,7 @@ energy `T + V`.
   kinetic energy of the bob in physical space. -/
 lemma kineticEnergy_eq_space (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Differentiable ℝ θ)
     (t : Time) :
-    S.kineticEnergy θ t = (1 / (2 : ℝ)) * S.m * ‖∂ₜ (S.spaceTrajectory θ) t‖ ^ 2 := by
+    S.kineticEnergy θ t = (1 / (2 : ℝ)) * S.m * ‖∂ₜᵥ (S.spaceTrajectory θ) t‖ ^ 2 := by
   rw [S.norm_sq_deriv_spaceTrajectory θ hθ t]
   show (1 / (2 : ℝ)) * (S.m * S.ℓ ^ 2) * ⟪∂ₜ θ t, ∂ₜ θ t⟫_ℝ = _
   rw [PiLp.inner_apply, Fin.sum_univ_one, RCLike.inner_apply, conj_trivial]
@@ -205,7 +205,7 @@ lemma potentialEnergy_eq_height (θ : Time → EuclideanSpace ℝ (Fin 1)) (t : 
 lemma lagrangian_eq_space (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Differentiable ℝ θ)
     (t : Time) :
     S.lagrangian t (θ t) (∂ₜ θ t) =
-      (1 / (2 : ℝ)) * S.m * ‖∂ₜ (S.spaceTrajectory θ) t‖ ^ 2
+      (1 / (2 : ℝ)) * S.m * ‖∂ₜᵥ (S.spaceTrajectory θ) t‖ ^ 2
         - S.m * S.g * (S.spaceTrajectory θ t 1 + S.ℓ) := by
   rw [S.lagrangian_eq_kineticEnergy_sub_potentialEnergy t θ, S.kineticEnergy_eq_space θ hθ t,
     S.potentialEnergy_eq_height θ t]
@@ -216,7 +216,7 @@ lemma lagrangian_eq_space (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Diff
 lemma energy_eq_space (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Differentiable ℝ θ)
     (t : Time) :
     S.energy θ t =
-      (1 / (2 : ℝ)) * S.m * ‖∂ₜ (S.spaceTrajectory θ) t‖ ^ 2
+      (1 / (2 : ℝ)) * S.m * ‖∂ₜᵥ (S.spaceTrajectory θ) t‖ ^ 2
         + S.m * S.g * (S.spaceTrajectory θ t 1 + S.ℓ) := by
   rw [← S.kineticEnergy_eq_space θ hθ t, ← S.potentialEnergy_eq_height θ t]
   rfl
