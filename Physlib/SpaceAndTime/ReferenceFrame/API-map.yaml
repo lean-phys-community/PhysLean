@@ -41,55 +41,55 @@ Requirements:
 
   - description: "The key data structure `ReferenceFrame d`, recording an affine origin and a displacement basis at each time, is defined."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (ReferenceFrame, ReferenceFrame.origin, ReferenceFrame.basis)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (ReferenceFrame, ReferenceFrame.origin, ReferenceFrame.basis)"
 
   - description: "The API contains a construction of a frame from the trajectories of a collection of reference points forming an affine basis at each time."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (ReferenceFrame.fromReferencePoints)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (ReferenceFrame.fromReferencePoints)"
 
   - description: "The API contains the condition that a frame induces the same inner product on coordinates at every time."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (ReferenceFrame.IsMetricConserved)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (ReferenceFrame.IsMetricConserved)"
 
   - description: "The API contains the condition that a frame's axes are orthonormal at every time, the result that such a frame conserves its coordinate metric, and the instance making that available to typeclass inference."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (ReferenceFrame.Orthonormal, Orthonormal.isMetricConserved, Fact frame.IsMetricConserved)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (ReferenceFrame.Orthonormal, Orthonormal.isMetricConserved, Fact frame.IsMetricConserved)"
 
   - description: "The API contains the condition for a frame to be inertial, namely that its origin moves with constant velocity and its axes are the same at every time."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (ReferenceFrame.IsInertial, origin_moves_uniformly, basis_conserved)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (ReferenceFrame.IsInertial, origin_moves_uniformly, basis_conserved)"
 
   - description: "The API contains the constant velocity of an inertial frame's origin."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (IsInertial.velocity)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (IsInertial.velocity)"
 
   - description: "The API contains the result that an inertial frame conserves its coordinate metric, and the instance making that available to typeclass inference."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (IsInertial.isMetricConserved, Fact frame.IsMetricConserved)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (IsInertial.isMetricConserved, Fact frame.IsMetricConserved)"
 
   - description: "The API contains the carrier `frame.Vector` for the components of a vector quantity measured relative to a frame, together with its equivalence to coordinate tuples."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (ReferenceFrame.Vector, components, componentEquiv, componentLinearEquiv)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (ReferenceFrame.Vector, components, componentEquiv, componentLinearEquiv)"
 
   - description: "The API contains the additive and scalar structure on frame vectors, inherited componentwise."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (AddCommGroup frame.Vector, Module ℝ frame.Vector)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (AddCommGroup frame.Vector, Module ℝ frame.Vector)"
 
   - description: "The API contains the identification of a frame vector with a geometric displacement in space at a given time, through the frame's basis, in both linear and continuous linear form."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (dispEquiv, contDispEquiv)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (dispEquiv, contDispEquiv)"
 
   - description: "The API contains the topology on frame vectors, its continuous linear equivalence with coordinate tuples, and finite dimensionality."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (componentContLinearEquiv, TopologicalSpace frame.Vector, FiniteDimensional ℝ frame.Vector)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (componentContLinearEquiv, TopologicalSpace frame.Vector, FiniteDimensional ℝ frame.Vector)"
 
   - description: "The API contains the norm and inner product on frame vectors of a frame with conserved coordinate metric, pulled back through the frame basis from geometric displacement space, so that a displacement keeps its length and its angles when the axes are skew or unequally scaled."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (NormedAddCommGroup frame.Vector, InnerProductSpace ℝ frame.Vector)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (NormedAddCommGroup frame.Vector, InnerProductSpace ℝ frame.Vector)"
 
   - description: "The API contains the Euclidean component formulas for the norm and inner product in an orthonormal frame."
     done: true
-    location: "Physlib/SpaceAndTime/ReferenceFrame.lean (norm_euclidean_if_orthonormal, inner_euclidean_if_orthonormal)"
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (norm_euclidean_if_orthonormal, inner_euclidean_if_orthonormal)"
 
   - description: "The API shall contain a choice of time origin for a frame, so that time translations can act on frames."
     done: false
