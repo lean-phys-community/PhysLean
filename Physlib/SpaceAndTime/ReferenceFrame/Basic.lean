@@ -5,7 +5,6 @@ Authors: Raunak Chhatwal
 -/
 module
 
-public import Mathlib.LinearAlgebra.AffineSpace.Basis
 public import Mathlib.Topology.Algebra.Module.TransferInstance
 public import Physlib.SpaceAndTime.Space.Basic
 public import Physlib.SpaceAndTime.Time.Basic
@@ -115,6 +114,11 @@ structure IsInertial (frame : ReferenceFrame d) : Prop where
 /-- The time-independent velocity of an inertial frame's coordinate origin. -/
 def IsInertial.velocity (h : frame.IsInertial) : EuclideanSpace ℝ (Fin d) :=
   Classical.choose h.origin_moves_uniformly
+
+/-- The displacement of the origin is elapsed time times `h.velocity`. -/
+lemma IsInertial.origin_vsub (h : frame.IsInertial) (t₁ t₂ : Time) :
+    frame.origin t₂ -ᵥ frame.origin t₁ = (t₂ - t₁).val • h.velocity :=
+  Classical.choose_spec h.origin_moves_uniformly t₁ t₂
 
 /-- An inertial frame conserves its coordinate metric. -/
 lemma IsInertial.isMetricConserved (h : frame.IsInertial) : frame.IsMetricConserved := by

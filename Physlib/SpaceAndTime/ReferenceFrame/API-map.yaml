@@ -91,11 +91,19 @@ Requirements:
     done: true
     location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (norm_euclidean_if_orthonormal, inner_euclidean_if_orthonormal)"
 
+  - description: "The API contains the velocity of a trajectory read off a frame's axes as a frame vector, its vanishing for a trajectory at rest, and its value for an inertial frame's own origin."
+    done: true
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Velocity.lean (velocityComponents, velocityComponents_const, velocityComponents_origin)"
+
   - description: "The API shall contain a choice of time origin for a frame, so that time translations can act on frames."
     done: false
     location: N/A
 
-  - description: "The API shall contain the defining property of an inertial frame's origin velocity, and the origin and basis of a frame built from reference points."
+  - description: "The API contains the defining property of an inertial frame's origin velocity, both as the displacement law and as the time derivative of the origin."
+    done: true
+    location: "Physlib/SpaceAndTime/ReferenceFrame/Basic.lean (IsInertial.origin_vsub); Physlib/SpaceAndTime/ReferenceFrame/Velocity.lean (IsInertial.derivVec_origin)"
+
+  - description: "The API shall contain the origin and basis of a frame built from reference points."
     done: false
     location: N/A
 
@@ -103,7 +111,7 @@ Requirements:
     done: false
     location: N/A
 
-  - description: "The API shall contain the derivative of a trajectory expressed in a frame, giving the velocity and acceleration measured by that frame as the time derivative of its coordinate components."
+  - description: "The API shall contain the derivative of a trajectory expressed in a frame, giving the velocity and acceleration measured by that frame as the time derivative of its coordinate components, recorded as a TODO in Physlib/SpaceAndTime/ReferenceFrame/Velocity.lean."
     done: false
     location: N/A
 

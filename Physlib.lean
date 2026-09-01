@@ -484,6 +484,7 @@ public import Physlib.Relativity.Tensors.Tensorial
 public import Physlib.Relativity.Tensors.UnitTensor
 public import Physlib.SpaceAndTime.GalileanGroup.Basic
 public import Physlib.SpaceAndTime.ReferenceFrame.Basic
+public import Physlib.SpaceAndTime.ReferenceFrame.Velocity
 public import Physlib.SpaceAndTime.Space.Basic
 public import Physlib.SpaceAndTime.Space.ConstantSliceDist
 public import Physlib.SpaceAndTime.Space.CrossProduct
