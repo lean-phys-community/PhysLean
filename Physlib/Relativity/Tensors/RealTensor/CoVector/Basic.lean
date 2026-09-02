@@ -54,10 +54,6 @@ def equivEuclid (d : ℕ) :
     CoVector d ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 1 ⊕ Fin d) :=
   (WithLp.linearEquiv _ _ _).symm
 
-@[simp]
-lemma equivEuclid_apply (d : ℕ) (v : CoVector d) (i : Fin 1 ⊕ Fin d) :
-    equivEuclid d v i = v i := rfl
-
 @[ext]
 lemma eq_of_apply_eq {d : ℕ} {v w : CoVector d} (h : ∀ i, v i = w i) : v = w := by
   apply (equivEuclid d).injective
@@ -112,11 +108,6 @@ instance innerProductSpace (d : ℕ) : InnerProductSpace ℝ (CoVector d) where
   smul_left x y r := by
     simp only [inner_eq_equivEuclid, map_smul]
     exact InnerProductSpace.smul_left (equivEuclid d x) (equivEuclid d y) r
-
-/-- The inner product on `CoVector d` as a sum over components. -/
-lemma inner_eq_sum {d : ℕ} (v w : CoVector d) : ⟪v, w⟫_ℝ = ∑ μ, v μ * w μ := by
-  rw [inner_eq_equivEuclid, PiLp.inner_apply]
-  simp [mul_comm]
 
 /-- The instance of a `ChartedSpace` on `Vector d`. -/
 instance : ChartedSpace (CoVector d) (CoVector d) := chartedSpaceSelf (CoVector d)
