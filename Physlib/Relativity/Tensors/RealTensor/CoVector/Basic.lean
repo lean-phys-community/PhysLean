@@ -28,8 +28,12 @@ noncomputable section
 
 namespace Lorentz
 
-/-- Real contravariant Lorentz vector. -/
+/-- Real covariant Lorentz vector. -/
 def CoVector (d : ℕ := 3) := Fin 1 ⊕ Fin d → ℝ
+
+/- As for `Vector`, `CoVector d` is applied directly as a function throughout the library;
+  marking it implicit-reducible lets such applications typecheck at implicit transparency. -/
+attribute [implicit_reducible] CoVector
 
 namespace CoVector
 
@@ -104,6 +108,12 @@ instance innerProductSpace (d : ℕ) : InnerProductSpace ℝ (CoVector d) where
     simp only [inner_eq_equivEuclid, map_smul]
     exact InnerProductSpace.smul_left (equivEuclid d x) (equivEuclid d y) r
 
+/-- The inner product on `CoVector d` as a sum over components. -/
+lemma inner_eq_sum {d : ℕ} (v w : CoVector d) : ⟪v, w⟫_ℝ = ∑ μ, v μ * w μ := by
+  rw [inner_eq_equivEuclid, PiLp.inner_apply]
+  simp [-Fintype.sum_sum_type, mul_comm]
+  rfl
+
 /-- The instance of a `ChartedSpace` on `Vector d`. -/
 instance : ChartedSpace (CoVector d) (CoVector d) := chartedSpaceSelf (CoVector d)
 
@@ -148,14 +158,14 @@ def basis {d : ℕ} : Basis (Fin 1 ⊕ Fin d) ℝ (CoVector d) :=
 lemma basis_apply {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) :
     basis μ ν = if μ = ν then 1 else 0 := by
   simp [basis]
-  erw [Pi.basisFun_apply, Pi.single_apply]
+  rw [Pi.basisFun_apply, Pi.single_apply]
   congr 1
   exact Lean.Grind.eq_congr' rfl rfl
 
 lemma basis_repr_apply {d : ℕ} (p : CoVector d) (μ : Fin 1 ⊕ Fin d) :
     basis.repr p μ = p μ := by
   simp [basis]
-  erw [Pi.basisFun_repr]
+  rw [Pi.basisFun_repr]
 
 lemma map_apply_eq_basis_mulVec {d : ℕ} (f : CoVector d →ₗ[ℝ] CoVector d) (p : CoVector d) :
     (f p) = (LinearMap.toMatrix basis basis) f *ᵥ p := by
