@@ -143,7 +143,6 @@ lemma minkowskiProduct_toCoord_minkowskiMatrix {d : ℕ} (p q : Vector d) :
     neg_mul, Finset.sum_neg_distrib]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma minkowskiProduct_invariant {d : ℕ} (p q : Vector d) (Λ : LorentzGroup d) :
     ⟪Λ • p, Λ • q⟫ₘ = ⟪p, q⟫ₘ := by
@@ -226,7 +225,6 @@ def adjoint {d : ℕ} (f : Vector d →ₗ[ℝ] Vector d) : Vector d →ₗ[ℝ]
   minkowskiMatrix.dual <|
   LinearMap.toMatrix Vector.basis Vector.basis f
 
-set_option backward.isDefEq.respectTransparency false in
 lemma map_minkowskiProduct_eq_adjoint {d : ℕ} (f : Vector d →ₗ[ℝ] Vector d) (p q : Vector d) :
     ⟪f p, q⟫ₘ = ⟪p, adjoint f q⟫ₘ := by
   rw [minkowskiProduct_toCoord_minkowskiMatrix, minkowskiProduct_toCoord_minkowskiMatrix]

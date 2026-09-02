@@ -126,7 +126,6 @@ lemma canonicalMomentum_eq_gradient_kineticTerm {d}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma canonicalMomentum_eq {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ 2 A) (J : LorentzCurrentDensity d) :
     A.canonicalMomentum 𝓕 J = fun x => fun μ =>
@@ -136,6 +135,8 @@ lemma canonicalMomentum_eq {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
   apply ext_inner_right (𝕜 := ℝ)
   intro v
   simp [gradient]
+  conv_rhs => rw [Lorentz.Vector.inner_eq_sum]
+  simp only [toFieldStrength_eval_apply_eq_single]
   conv_lhs =>
     enter [1, 2, v]
     rw [kineticTerm_add_time_mul_const _ (hA.differentiable (by simp))]
@@ -146,11 +147,8 @@ lemma canonicalMomentum_eq {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
   rw [← Finset.sum_sub_distrib, Finset.mul_sum]
   congr
   ext μ
-  simp only [Fin.isValue, RCLike.inner_apply, conj_trivial, equivEuclid_apply]
-  rw [toFieldStrength_eval_apply_eq_single]
-  simp only [Fin.isValue, inl_0_inl_0, one_mul]
-  ring_nf
-  simp
+  linear_combination (-(v μ * 𝓕.μ₀⁻¹ * ∂_ μ A x (Sum.inl 0))) *
+    minkowskiMatrix.η_apply_mul_η_apply_diag μ
 
 /-!
 
