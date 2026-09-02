@@ -74,8 +74,10 @@ syntax ident : indexExpr
 syntax num : indexExpr
 
 
-/-- Notation to describe the evaluation of a tensor index. -/
-syntax "[" ident "]" : indexExpr
+/-- Notation to describe the evaluation of a tensor index. The term inside the brackets is
+  the value of the index, which can be an identifier `[μ]` or an arbitrary term such as
+  `[Sum.inl 0]`. -/
+syntax "[" term "]" : indexExpr
 
 /-- Notation to describe the jiggle of a tensor index. -/
 syntax "τ(" ident ")" : indexExpr
@@ -120,9 +122,15 @@ def indexToIdent (stx : Syntax) : TermElabM Ident :=
   match stx with
   | `(indexExpr|$a:ident) => return a
   | `(indexExpr| τ($a:ident)) => return a
-  | `(indexExpr| [$a:ident]) => return a
   | _ =>
     throwError "Unsupported expression syntax in indexToIdent: {stx}"
+
+/-- For an evaluated bracket index `[t]`, the term `t` giving the value of the index. -/
+def indexToBracketTerm (stx : Syntax) : TermElabM Term :=
+  match stx with
+  | `(indexExpr| [$a:term]) => return a
+  | _ =>
+    throwError "Unsupported expression syntax in indexToBracketTerm: {stx}"
 
 /-- Takes a pair ``a b : ℕ × TSyntax `indexExpr``. If `a.1 < b.1` and `a.2 = b.2` then
   outputs `some (a.1, b.1)`, otherwise `none`. -/
@@ -198,7 +206,7 @@ def getEvalPos (ind : List (TSyntax `indexExpr)) : TermElabM (List (ℕ × ℕ))
 def getEvalBracketPos (ind : List (TSyntax `indexExpr)) : TermElabM (List (ℕ × Term)) := do
   let indEnum := ind.zipIdx
   let evals := indEnum.filter (fun x => indexExprIsBracketEval x.1)
-  let evals2 ← (evals.mapM (fun x => indexToIdent x.1))
+  let evals2 ← (evals.mapM (fun x => indexToBracketTerm x.1))
   let pos := evalAdjustPos (evals.map (fun x => x.2))
   return List.zip pos evals2
 

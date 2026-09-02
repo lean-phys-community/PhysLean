@@ -18,7 +18,7 @@ that the field strength tensor is invariant under such transformations.
 
 The raised-index gradient `∂^μ χ := η^{μν} ∂_ν χ` is necessary because the bare covariant gradient
 `∂_μ χ` does not make `F^{μν}` invariant. The formal witness is
-`fieldStrengthMatrix_bareGradient_inl_inr` (§B.5), which computes a specific nonzero component of
+`toFieldStrength_eval_bareGradient_inl_inr` (§B.5), which computes a specific nonzero component of
 the field strength of a bare-gradient potential. The invariance theorem
 `toFieldStrength_gaugeTransform` doubles as a correctness test of `ofGradient`.
 
@@ -29,13 +29,13 @@ the field strength of a bare-gradient potential. The invariance theorem
 - `toFieldStrength_ofGradient` : A pure-gauge potential has vanishing field strength.
 - `toFieldStrength_gaugeTransform` : The field strength tensor is invariant under gauge
   transformations.
-- `fieldStrengthMatrix_gaugeTransform` : The field strength matrix is invariant under gauge
-  transformations.
+- `toFieldStrength_eval_gaugeTransform` : The components of the field strength tensor are
+  invariant under gauge transformations.
 - `gaugeTransform_gaugeTransform` : Composing two gauge shifts equals shifting by the sum;
   upgrades one-step F-invariance to invariance along any finite chain.
 - `ofGradient_equivariant` : `ofGradient` intertwines the Lorentz action with function composition.
 - `gaugeTransform_equivariant` : Gauge transformations commute with Lorentz transformations.
-- `fieldStrengthMatrix_bareGradient_inl_inr` : The `(inl 0, inr i)` field-strength component of
+- `toFieldStrength_eval_bareGradient_inl_inr` : The `(inl 0, inr i)` field-strength component of
   the bare-gradient potential `χ(x) = x⁰·xⁱ` equals `2`; in particular the bare gradient does
   not give a gauge-invariant field strength (necessity of the metric contraction in `ofGradient`).
 
@@ -76,6 +76,7 @@ open Lorentz
 
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
+attribute [-simp] Fin.succAbove_zero
 
 /-!
 
@@ -161,27 +162,21 @@ lemma contDiff_ofGradient {n} {d} {χ : SpaceTime d → ℝ} (hχ : ContDiff ℝ
 /-- A pure-gauge potential has vanishing field strength. -/
 lemma toFieldStrength_ofGradient {d} {χ : SpaceTime d → ℝ} (hχ : ContDiff ℝ 2 χ)
     (x : SpaceTime d) : (ofGradient χ).toFieldStrength x = 0 := by
-  apply (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr.injective
-  apply Finsupp.ext
-  intro μν
-  simp only [toFieldStrength_basis_repr_apply_eq_single]
-  rw [SpaceTime.deriv_apply_eq μν.1 μν.2 (ofGradient χ) (differentiable_ofGradient hχ),
-    SpaceTime.deriv_apply_eq μν.2 μν.1 (ofGradient χ) (differentiable_ofGradient hχ)]
+  rw [congrFun (toFieldStrength_eq_sum_basis_eval (A := ofGradient χ)) x]
+  refine Finset.sum_eq_zero fun μ _ => Finset.sum_eq_zero fun ν _ => ?_
+  rw [toFieldStrength_eval_apply_eq_single]
+  rw [SpaceTime.deriv_apply_eq μ ν (ofGradient χ) (differentiable_ofGradient hχ),
+    SpaceTime.deriv_apply_eq ν μ (ofGradient χ) (differentiable_ofGradient hχ)]
   simp only [ofGradient_apply]
-  rw [fderiv_const_mul (SpaceTime.differentiable_deriv μν.1 χ hχ).differentiableAt,
-    fderiv_const_mul (SpaceTime.differentiable_deriv μν.2 χ hχ).differentiableAt]
+  rw [fderiv_const_mul (SpaceTime.differentiable_deriv μ χ hχ).differentiableAt,
+    fderiv_const_mul (SpaceTime.differentiable_deriv ν χ hχ).differentiableAt]
   simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
-  -- simplify repr 0 to 0
-  conv_rhs => rw [show (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr
-      (0 : Lorentz.Vector d ⊗[ℝ] Lorentz.Vector d) = 0 from map_zero _]
-  simp only [Finsupp.zero_apply]
   -- use Clairaut: ∂_ μ (∂_ ν χ) x = ∂_ ν (∂_ μ χ) x, so the two terms cancel
-  have heq : fderiv ℝ (∂_ μν.2 χ) x (Lorentz.Vector.basis μν.1) =
-      fderiv ℝ (∂_ μν.1 χ) x (Lorentz.Vector.basis μν.2) := by
-    change ∂_ μν.1 (∂_ μν.2 χ) x = ∂_ μν.2 (∂_ μν.1 χ) x
-    rw [← SpaceTime.deriv_commute μν.2 μν.1 χ hχ]
-  rw [heq]
-  ring
+  have heq : fderiv ℝ (∂_ ν χ) x (Lorentz.Vector.basis μ) =
+      fderiv ℝ (∂_ μ χ) x (Lorentz.Vector.basis ν) := by
+    change ∂_ μ (∂_ ν χ) x = ∂_ ν (∂_ μ χ) x
+    rw [← SpaceTime.deriv_commute ν μ χ hχ]
+  rw [heq, mul_left_comm, sub_self, zero_smul]
 
 /-!
 
@@ -270,11 +265,13 @@ lemma toFieldStrength_gaugeTransform {d} (A : ElectromagneticPotential d)
   rw [gaugeTransform, toFieldStrength_add A (ofGradient χ) x hA (differentiable_ofGradient hχ),
     toFieldStrength_ofGradient hχ, add_zero]
 
-/-- The field strength matrix is invariant under gauge transformations. -/
-lemma fieldStrengthMatrix_gaugeTransform {d} (A : ElectromagneticPotential d)
-    (χ : SpaceTime d → ℝ) (hA : Differentiable ℝ A) (hχ : ContDiff ℝ 2 χ) (x : SpaceTime d) :
-    (gaugeTransform χ A).fieldStrengthMatrix x = A.fieldStrengthMatrix x := by
-  rw [fieldStrengthMatrix, toFieldStrength_gaugeTransform A χ hA hχ]
+/-- The components of the field strength tensor are invariant under gauge transformations. -/
+lemma toFieldStrength_eval_gaugeTransform {d} (A : ElectromagneticPotential d)
+    (χ : SpaceTime d → ℝ) (hA : Differentiable ℝ A) (hχ : ContDiff ℝ 2 χ) (x : SpaceTime d)
+    (μ ν : Fin 1 ⊕ Fin d) :
+    toField {(gaugeTransform χ A).toFieldStrength x | [μ] [ν]}ᵀ =
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ := by
+  rw [toFieldStrength_gaugeTransform A χ hA hχ]
 
 /-!
 
@@ -340,15 +337,15 @@ contraction in `ofGradient` is required for gauge invariance.
 
 -/
 
-/-- The `(inl 0, inr i)` component of the field strength matrix of the bare-gradient potential
+/-- The `(inl 0, inr i)` component of the field strength tensor of the bare-gradient potential
   `B^μ := ∂_μ χ` for `χ(x) = x⁰·xⁱ` equals `2`. This witnesses that the bare covariant gradient
   does not produce a gauge-invariant field strength, so the raised-index contraction
   `η^{μν} ∂_ν χ` in `ofGradient` is necessary (see the module overview). -/
-lemma fieldStrengthMatrix_bareGradient_inl_inr {d : ℕ} (i : Fin d)
+lemma toFieldStrength_eval_bareGradient_inl_inr {d : ℕ} (i : Fin d)
     (x : SpaceTime d) :
     let χ : SpaceTime d → ℝ := fun y => y (Sum.inl 0) * y (Sum.inr i)
     let B : ElectromagneticPotential d := ⟨fun y μ => ∂_ μ χ y⟩
-    B.fieldStrengthMatrix x (Sum.inl 0, Sum.inr i) = 2 := by
+    toField {B.toFieldStrength x | [Sum.inl 0] [Sum.inr i]}ᵀ = 2 := by
   intro χ B
   have hχ : ContDiff ℝ 2 χ := by
     show ContDiff ℝ 2 (fun y : SpaceTime d => y (Sum.inl 0) * y (Sum.inr i))
@@ -356,8 +353,8 @@ lemma fieldStrengthMatrix_bareGradient_inl_inr {d : ℕ} (i : Fin d)
   have hB : Differentiable ℝ B := by
     rw [← SpaceTime.differentiable_vector]; intro μ
     exact SpaceTime.differentiable_deriv μ χ hχ
-  -- fieldStrengthMatrix (μ, ν) = η μ μ * ∂_ μ B x ν − η ν ν * ∂_ ν B x μ
-  rw [toFieldStrength_basis_repr_apply_eq_single]
+  -- F^{μν} = η μ μ * ∂_ μ B x ν − η ν ν * ∂_ ν B x μ
+  rw [toFieldStrength_eval_apply_eq_single]
   -- Expand ∂_ μ B x ν as ∂_ μ (fun y => ∂_ ν χ y) x = ∂_ μ (∂_ ν χ) x
   rw [SpaceTime.deriv_apply_eq (Sum.inl 0) (Sum.inr i) B hB,
       SpaceTime.deriv_apply_eq (Sum.inr i) (Sum.inl 0) B hB]
@@ -391,19 +388,17 @@ lemma fieldStrengthMatrix_bareGradient_inl_inr {d : ℕ} (i : Fin d)
   norm_num
 
 /-- The field strength of the bare-gradient potential `B^μ := ∂_μ χ` for
-  `χ(x) = x⁰·xⁱ` is nonzero (follows from `fieldStrengthMatrix_bareGradient_inl_inr`). -/
+  `χ(x) = x⁰·xⁱ` is nonzero (follows from `toFieldStrength_eval_bareGradient_inl_inr`). -/
 lemma toFieldStrength_bareGradient_ne_zero {d : ℕ} (i : Fin d)
     (x : SpaceTime d) :
     let χ : SpaceTime d → ℝ := fun y => y (Sum.inl 0) * y (Sum.inr i)
     let B : ElectromagneticPotential d := ⟨fun y μ => ∂_ μ χ y⟩
     B.toFieldStrength x ≠ 0 := by
   intro χ B h
-  have h2 := fieldStrengthMatrix_bareGradient_inl_inr i x
+  have h2 := toFieldStrength_eval_bareGradient_inl_inr i x
   dsimp only at h2
-  rw [fieldStrengthMatrix_eq, h] at h2
-  have h3 : ((Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr
-      (0 : Lorentz.CoVector d ⊗[ℝ] Lorentz.Vector d)) = 0 := map_zero _
-  erw [h3, Finsupp.zero_apply] at h2
+  rw [h] at h2
+  simp only [map_zero] at h2
   norm_num at h2
 
 end ElectromagneticPotential

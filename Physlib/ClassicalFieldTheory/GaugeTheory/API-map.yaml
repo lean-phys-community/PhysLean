@@ -48,11 +48,11 @@ Requirements:
 
   - description: "Gauge invariance of the field strength under abelian U(1) gauge transformations"
     done: true
-    location: Physlib/Electromagnetism/Kinematics/GaugeTransformation.lean (toFieldStrength_gaugeTransform, fieldStrengthMatrix_gaugeTransform)
+    location: Physlib/Electromagnetism/Kinematics/GaugeTransformation.lean (toFieldStrength_gaugeTransform, toFieldStrength_eval_gaugeTransform)
 
   - description: "Pure-gauge (flat) configurations have vanishing curvature, and the bare gradient does not (necessity of the metric contraction)"
     done: true
-    location: Physlib/Electromagnetism/Kinematics/GaugeTransformation.lean (toFieldStrength_ofGradient, fieldStrengthMatrix_bareGradient_inl_inr, toFieldStrength_bareGradient_ne_zero)
+    location: Physlib/Electromagnetism/Kinematics/GaugeTransformation.lean (toFieldStrength_ofGradient, toFieldStrength_eval_bareGradient_inl_inr, toFieldStrength_bareGradient_ne_zero)
 
   - description: "Group structure of gauge transformations: identity shift and composition of successive shifts"
     done: true

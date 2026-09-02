@@ -306,11 +306,11 @@ lemma lagrangian_hasVarGradientAt_gradLagrangian {𝓕 : FreeSpace}
 
 -/
 
-lemma gradLagrangian_eq_sum_fieldStrengthMatrix {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
+lemma gradLagrangian_eq_sum_toFieldStrength_eval {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJ : ContDiff ℝ ∞ J) :
     A.gradLagrangian 𝓕 J = fun x => ∑ ν,
-      (η ν ν • (1 / 𝓕.μ₀ * ∑ μ, ∂_ μ (fun x => (A.fieldStrengthMatrix x) (μ, ν)) x - J x ν)
-      • Lorentz.Vector.basis ν) := by
+      (η ν ν • (1 / 𝓕.μ₀ * ∑ μ, ∂_ μ (fun x => toField {A.toFieldStrength x | [μ] [ν]}ᵀ) x
+      - J x ν) • Lorentz.Vector.basis ν) := by
   rw [gradLagrangian_eq_kineticTerm_sub A hA J hJ]
   funext x
   simp only [Pi.sub_apply]
