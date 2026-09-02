@@ -396,13 +396,8 @@ open ContDiff
 lemma toFieldStrength_eval_differentiable {d} {A : ElectromagneticPotential d}
     {μ ν : Fin 1 ⊕ Fin d} (hA : ContDiff ℝ 2 A) :
     Differentiable ℝ (fun x => toField {A.toFieldStrength x | [μ] [ν]}ᵀ) := by
-  have diff_partial (μ) :
-      ∀ ν, Differentiable ℝ fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [SpaceTime.differentiable_vector]
-    exact Differentiable.clm_apply
-      (((contDiff_succ_iff_fderiv (n := 1)).mp hA).2.2.differentiable (by simp)) (by fun_prop)
-  simp only [toFieldStrength_eval_apply_eq_single, SpaceTime.deriv_eq]
-  exact ((diff_partial _ _).const_mul _).sub ((diff_partial _ _).const_mul _)
+  simp only [toFieldStrength_eval_apply_eq_single]
+  fun_prop
 
 lemma toFieldStrength_eval_differentiable_space {d} {A : ElectromagneticPotential d}
     {μ ν : Fin 1 ⊕ Fin d} (hA : ContDiff ℝ 2 A) (t : Time) {c : SpeedOfLight} :
@@ -423,11 +418,8 @@ lemma toFieldStrength_eval_differentiable_time {d} {A : ElectromagneticPotential
 lemma toFieldStrength_eval_contDiff {d} {n : WithTop ℕ∞} {A : ElectromagneticPotential d}
     {μ ν : Fin 1 ⊕ Fin d} (hA : ContDiff ℝ (n + 1) A) :
     ContDiff ℝ n (fun x => toField {A.toFieldStrength x | [μ] [ν]}ᵀ) := by
-  have h (μ) : ∀ ν, ContDiff ℝ n fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [SpaceTime.contDiff_vector]
-    exact ContDiff.clm_apply (ContDiff.fderiv_right (m := n) hA (by rfl)) (by fun_prop)
-  simp only [toFieldStrength_eval_apply_eq_single, SpaceTime.deriv_eq]
-  exact (contDiff_const.mul (h _ _)).sub (contDiff_const.mul (h _ _))
+  simp only [toFieldStrength_eval_apply_eq_single]
+  fun_prop
 
 lemma toFieldStrength_eval_smooth {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μ ν : Fin 1 ⊕ Fin d) :

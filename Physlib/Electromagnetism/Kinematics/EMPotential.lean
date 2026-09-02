@@ -25,6 +25,10 @@ spacetime to contravariant Lorentz vectors.
 
 - `ElectromagneticPotential` : is the type of electromagnetic potentials.
 - `ElectromagneticPotential.deriv` : the derivative tensor `∂_μ A^ν`.
+- `ElectromagneticPotential.contDiff_deriv_deriv` : the second derivatives `∂_μ ∂_ν A^ρ` are
+  `C^n` if the potential is `C^{n+2}`.
+- `ElectromagneticPotential.deriv_contDiff` : the derivative tensor is `C^n` if the potential
+  is `C^{n+1}`.
 
 ## iii. Table of contents
 
@@ -33,12 +37,15 @@ spacetime to contravariant Lorentz vectors.
   - A.2. Basic constructors of the electromagnetic potential
   - A.3. The group action on the ElectromagneticPotential
   - A.4. Differentiability
-  - A.5. The action on the space-time derivatives
-  - A.6. Variational adjoint derivative of component
-  - A.7. Variational adjoint derivative of derivatives of the potential
+    - A.4.1. Differentiability of the derivative of the potential
+  - A.5. Differentiability in terms of constructors
+  - A.6. The action on the space-time derivatives
+  - A.7. Variational adjoint derivative of component
+  - A.8. Variational adjoint derivative of derivatives of the potential
 - B. The derivative tensor of the electromagnetic potential
   - B.1. Equivariance of the derivative tensor
   - B.2. The elements of the derivative tensor in terms of the basis
+  - B.3. Differentiability of the derivative tensor
 
 ## iv. References
 
@@ -280,7 +287,8 @@ noncomputable instance {d} :
 
 ### A.4. Differentiability
 
-We show that the components of field strength tensor are differentiable if the potential is.
+We show that the components of the potential, and of its derivatives, are differentiable
+(or smooth) if the potential is.
 -/
 
 open ContDiff
@@ -327,12 +335,47 @@ lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d}
     fun_prop
   exact h ν
 
-TODO "Add results related to the differentiability of the
-  derivative of the Electromagnetic potential."
+@[fun_prop]
+lemma contDiff_deriv_of_smooth {n : ℕ} {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ ∞ A) (μ ν : Fin 1 ⊕ Fin d) :
+    ContDiff ℝ n (fun x => ∂_ μ A x ν) :=
+  contDiff_deriv (hA.of_le (mod_cast le_top)) μ ν
 
 /-!
 
-### A.5. Differentiablity in terms of constructors
+#### A.4.1. Differentiability of the derivative of the potential
+
+The derivatives `∂_ μ A x ν` of the potential are themselves differentiable if the
+potential is `C^3`, and `C^n` if the potential is `C^{n+2}`. This is what is needed to
+make sense of second derivatives `∂_ μ (∂_ ν A) x ρ` of the potential, as appear for example
+in Maxwell's equations.
+
+-/
+
+/-- The second derivatives `∂_ μ ∂_ ν A^ρ` of a `C^{n+2}` potential are `C^n`. -/
+@[fun_prop]
+lemma contDiff_deriv_deriv {n} {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ (n + 2) A) (μ ν ρ : Fin 1 ⊕ Fin d) :
+    ContDiff ℝ n (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) :=
+  SpaceTime.contDiff_deriv μ _ (contDiff_deriv (n := n + 1)
+    (by rw [add_assoc, one_add_one_eq_two]; exact hA) ν ρ)
+
+/-- The second derivatives `∂_ μ ∂_ ν A^ρ` of a `C^3` potential are differentiable. -/
+@[fun_prop]
+lemma differentiable_deriv_deriv {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ 3 A) (μ ν ρ : Fin 1 ⊕ Fin d) :
+    Differentiable ℝ (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) :=
+  SpaceTime.differentiable_deriv μ _ (contDiff_deriv (n := 2) (by norm_cast) ν ρ)
+
+@[fun_prop]
+lemma differentiable_deriv_deriv_of_smooth {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ ∞ A) (μ ν ρ : Fin 1 ⊕ Fin d) :
+    Differentiable ℝ (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) :=
+  differentiable_deriv_deriv (hA.of_le ENat.LEInfty.out) μ ν ρ
+
+/-!
+
+### A.5. Differentiability in terms of constructors
 
 -/
 
@@ -434,7 +477,7 @@ lemma contDiff_ofElectromagneticField {n : ℕ} (c : SpeedOfLight)
 
 /-!
 
-### A.5. The action on the space-time derivatives
+### A.6. The action on the space-time derivatives
 
 Given a ElectromagneticPotential `A^μ`, we can consider its derivative `∂_μ A^ν`.
 Under a Lorentz transformation `Λ`, this transforms as
@@ -455,7 +498,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
 
 /-!
 
-### A.6. Variational adjoint derivative of component
+### A.7. Variational adjoint derivative of component
 
 We find the variational adjoint derivative of the components of the potential.
 This will be used to find e.g. the variational derivative of the kinetic term,
@@ -485,7 +528,7 @@ lemma hasVarAdjDerivAt_component {d : ℕ} (μ : Fin 1 ⊕ Fin d) (A : SpaceTime
 
 /-!
 
-### A.7. Variational adjoint derivative of derivatives of the potential
+### A.8. Variational adjoint derivative of derivatives of the potential
 
 We find the variational adjoint derivative of the derivatives of the components of the potential.
 This will again be used to find the variational derivative of the kinetic term,
@@ -631,6 +674,34 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
     simp
   rw [hb, Module.Basis.repr_reindex_apply, deriv_basis_repr_apply]
   rfl
+
+/-!
+
+### B.3. Differentiability of the derivative tensor
+
+We show that the derivative tensor `∂_μ A^ν`, as a function on spacetime, is differentiable
+(or `C^n`) if the potential is `C^2` (or `C^{n+1}`).
+
+-/
+
+/-- The derivative tensor of a `C^2` potential is differentiable. -/
+@[fun_prop]
+lemma deriv_differentiable {d} {A : ElectromagneticPotential d} (hA : ContDiff ℝ 2 A) :
+    Differentiable ℝ A.deriv := by
+  unfold deriv
+  fun_prop
+
+@[fun_prop]
+lemma deriv_differentiable_of_smooth {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ ∞ A) : Differentiable ℝ A.deriv :=
+  deriv_differentiable (hA.of_le ENat.LEInfty.out)
+
+/-- The derivative tensor of a `C^{n+1}` potential is `C^n`. -/
+@[fun_prop]
+lemma deriv_contDiff {n} {d} {A : ElectromagneticPotential d} (hA : ContDiff ℝ (n + 1) A) :
+    ContDiff ℝ n A.deriv := by
+  unfold deriv
+  fun_prop
 
 end ElectromagneticPotential
 
