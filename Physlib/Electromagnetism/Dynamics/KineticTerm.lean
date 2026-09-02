@@ -97,7 +97,6 @@ We show that the kinetic energy is Lorentz invariant.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma kineticTerm_equivariant {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (Λ : LorentzGroup d)
     (hf : Differentiable ℝ A) (x : SpaceTime d) :

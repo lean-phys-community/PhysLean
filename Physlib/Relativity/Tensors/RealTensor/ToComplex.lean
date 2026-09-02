@@ -409,7 +409,6 @@ Finally we record that `toComplex` is equivariant for the natural action of
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` is equivariant. -/
 lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
     (v : ℝT(3, c)) (Λ : SL(2, ℂ)) :

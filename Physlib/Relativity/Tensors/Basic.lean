@@ -426,13 +426,16 @@ end Pure
 
 -/
 
-noncomputable instance : SMul G (S.Tensor c) where
+/- The action on `S.Tensor c` is given priority above `Tensorial.smulAction` (which has
+  `priority := high` so that it beats Mathlib's left action on tensor products), so that for a
+  bare tensor `g • t` elaborates to this instance, as used in the `*_equivariant` lemmas. -/
+noncomputable instance (priority := high + 1) instSMul : SMul G (S.Tensor c) where
   smul g t := PiTensorProduct.map (fun i => rep (c i) g) t
 
 lemma actionT_eq {g : G} {t : S.Tensor c} : g • t =
     PiTensorProduct.map (fun i => rep (c i) g) t := rfl
 
-noncomputable instance actionT : MulAction G (S.Tensor c) where
+noncomputable instance (priority := high + 1) actionT : MulAction G (S.Tensor c) where
   one_smul t := by
     simp [actionT_eq]
   mul_smul g g' t := by
@@ -464,9 +467,15 @@ lemma actionT_neg {g : G} {t : S.Tensor c} :
   simp only [map_neg, neg_inj]
   rfl
 
-noncomputable instance : DistribMulAction G (S.Tensor c) where
+noncomputable instance (priority := high + 1) : DistribMulAction G (S.Tensor c) where
   smul_zero g := by simp [actionT_zero]
   smul_add g t1 t2 := by simp [actionT_add]
+
+instance : SMulCommClass k G (S.Tensor c) where
+  smul_comm _ _ _ := actionT_smul.symm
+
+-- `SMulCommClass.symm` is not registered as an instance, as it would cause a loop
+instance : SMulCommClass G k (S.Tensor c) := SMulCommClass.symm _ _ _
 
 
 /-!

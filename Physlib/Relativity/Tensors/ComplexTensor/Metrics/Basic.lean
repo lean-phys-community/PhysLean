@@ -437,32 +437,26 @@ lemma dualRightMetric_eq_ofRat : εR' = ofRat fun f =>
 
 open TensorSpecies
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `coMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_coMetric (g : SL(2,ℂ)) : g • η' = η' := by
   rw [metricTensor_invariant]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `contrMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_contrMetric (g : SL(2,ℂ)) : g • η = η := by
   rw [metricTensor_invariant]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `leftMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_leftMetric (g : SL(2,ℂ)) : g • εL = εL := by
   rw [metricTensor_invariant]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `rightMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_rightMetric (g : SL(2,ℂ)) : g • εR = εR := by
   rw [metricTensor_invariant]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `dualLeftMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_dualLeftMetric (g : SL(2,ℂ)) : g • εL' = εL' := by
   rw [metricTensor_invariant]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `dualRightMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_dualRightMetric (g : SL(2,ℂ)) : g • εR' = εR' := by
   rw [metricTensor_invariant]
