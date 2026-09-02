@@ -125,7 +125,7 @@ instance innerProductSpace (d : ℕ) : InnerProductSpace ℝ (Vector d) where
 /-- The inner product on `Vector d` as a sum over components. -/
 lemma inner_eq_sum {d : ℕ} (v w : Vector d) : ⟪v, w⟫_ℝ = ∑ μ, v μ * w μ := by
   rw [inner_eq_equivEuclid, PiLp.inner_apply]
-  simp [-Fintype.sum_sum_type, mul_comm]
+  simp [mul_comm]
 
 /-- The instance of a `ChartedSpace` on `Vector d`. -/
 instance : ChartedSpace (Vector d) (Vector d) := chartedSpaceSelf (Vector d)
@@ -444,13 +444,11 @@ open InnerProductSpace
 
 lemma basis_inner {d : ℕ} (μ : Fin 1 ⊕ Fin d) (p : Lorentz.Vector d) :
     ⟪Lorentz.Vector.basis μ, p⟫_ℝ = p μ := by
-  rw [inner_eq_sum]
-  simp [-Fintype.sum_sum_type, basis_apply]
+  simp [inner_eq_sum]
 
 lemma inner_basis {d : ℕ} (p : Lorentz.Vector d) (μ : Fin 1 ⊕ Fin d) :
     ⟪p, Lorentz.Vector.basis μ⟫_ℝ = p μ := by
-  rw [inner_eq_sum]
-  simp [-Fintype.sum_sum_type, basis_apply]
+  simp [inner_eq_sum]
 
 end Vector
 
