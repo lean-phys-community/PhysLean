@@ -29,11 +29,11 @@ noncomputable section
 namespace Lorentz
 
 /-- Real covariant Lorentz vector. -/
+@[implicit_reducible]
 def CoVector (d : ℕ := 3) := Fin 1 ⊕ Fin d → ℝ
 
 /- As for `Vector`, `CoVector d` is applied directly as a function throughout the library;
   marking it implicit-reducible lets such applications typecheck at implicit transparency. -/
-attribute [implicit_reducible] CoVector
 
 namespace CoVector
 

@@ -29,13 +29,13 @@ noncomputable section
 namespace Lorentz
 
 /-- Real contravariant Lorentz vector. -/
+@[implicit_reducible]
 def Vector (d : ℕ := 3) := Fin 1 ⊕ Fin d → ℝ
 
 /- `Vector d` is applied directly as a function throughout the library. Marking it
   implicit-reducible lets such applications typecheck at implicit transparency, so that
   `rw` and `simp` can match patterns containing them (see the Lean 4.33 release notes on
   `backward.isDefEq.respectTransparency.types`). -/
-attribute [implicit_reducible] Vector
 
 namespace Vector
 
