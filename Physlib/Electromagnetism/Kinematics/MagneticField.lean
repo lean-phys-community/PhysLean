@@ -184,7 +184,7 @@ lemma toFieldStrength_eval_eq_electric_magnetic {c} (A : ElectromagneticPotentia
     | 2, 1 => A.magneticField c t x 0
     | 2, 2 => 0 := by
   match μ, ν with
-  | Sum.inl 0, Sum.inl 0 => simp
+  | Sum.inl 0, Sum.inl 0 => simp [toFieldStrength_eval_diag_eq_zero]
   | Sum.inl 0, Sum.inr i => simp [electricField_eq_toFieldStrength_eval A t x i hA]
   | Sum.inr i, Sum.inl 0 =>
     simp [electricField_eq_toFieldStrength_eval A t x i hA]
@@ -192,7 +192,7 @@ lemma toFieldStrength_eval_eq_electric_magnetic {c} (A : ElectromagneticPotentia
     rw [toFieldStrength_eval_antisymm]
   | Sum.inr i, Sum.inr j =>
     fin_cases i <;> fin_cases j <;>
-    simp [magneticField_coord_eq_toFieldStrength_eval A t x hA]
+    simp [magneticField_coord_eq_toFieldStrength_eval A t x hA, toFieldStrength_eval_diag_eq_zero]
     repeat rw [toFieldStrength_eval_antisymm]
 
 lemma toFieldStrength_eval_eq_electric_magnetic_of_spaceTime (c : SpeedOfLight)

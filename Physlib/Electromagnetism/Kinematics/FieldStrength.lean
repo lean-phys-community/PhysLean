@@ -454,7 +454,6 @@ lemma toFieldStrength_eval_antisymm {d} (A : ElectromagneticPotential d) (x : Sp
   rw [toFieldStrength_eval_apply, toFieldStrength_eval_apply, ← Finset.sum_neg_distrib]
   exact Finset.sum_congr rfl fun κ _ => by simp
 
-@[simp]
 lemma toFieldStrength_eval_diag_eq_zero {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
     (μ : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [μ]}ᵀ = 0 := by

@@ -75,7 +75,7 @@ lemma electricField_apply_x_boost_zero {d : ℕ} {c : SpeedOfLight} (β : ℝ) (
     A.electricField c t' x' 0 := by
   dsimp
   rw [electricField_eq_toFieldStrength_eval, toFieldStrength_eval_equivariant _ _ hA]
-  simp [Fintype.sum_sum_type, Fin.sum_univ_succ]
+  simp [Fintype.sum_sum_type, Fin.sum_univ_succ, toFieldStrength_eval_diag_eq_zero]
   rw [electricField_eq_toFieldStrength_eval (hA := hA)]
   simp only [Fin.isValue, neg_mul, neg_inj, mul_eq_mul_left_iff, SpeedOfLight.val_ne_zero, or_false]
   conv_lhs =>

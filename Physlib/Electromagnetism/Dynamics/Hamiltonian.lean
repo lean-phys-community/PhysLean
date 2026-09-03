@@ -165,7 +165,7 @@ lemma canonicalMomentum_eq_electricField {d} {𝓕 : FreeSpace} (A : Electromagn
   rw [canonicalMomentum_eq A hA J]
   funext x μ
   match μ with
-  | Sum.inl 0 => simp
+  | Sum.inl 0 => simp [toFieldStrength_eval_diag_eq_zero]
   | Sum.inr i =>
   simp only [one_div, inr_i_inr_i, Fin.isValue, smul_eq_mul, neg_mul, one_mul, mul_neg, mul_inv_rev,
     neg_inj]

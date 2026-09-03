@@ -272,7 +272,7 @@ lemma kineticTerm_eq_electricMatrix_magneticFieldMatrix_time_space {𝓕 : FreeS
   conv_lhs =>
     enter [1, 2, 1, 2, 2, i]
     rw [toFieldStrength_eval_antisymm]
-  simp [FreeSpace.c_sq]
+  simp [FreeSpace.c_sq, toFieldStrength_eval_diag_eq_zero]
   field_simp
   ring
 
