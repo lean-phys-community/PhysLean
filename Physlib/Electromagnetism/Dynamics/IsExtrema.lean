@@ -60,8 +60,6 @@ open TensorProduct
 open minkowskiMatrix
 open InnerProductSpace
 open Lorentz.Vector
-
-attribute [-simp] Fin.succAbove_zero
 open Time Space
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one

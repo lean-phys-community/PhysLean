@@ -76,8 +76,6 @@ open Lorentz
 
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
-attribute [-simp] Fin.succAbove_zero
-
 /-!
 
 ## A. The pure-gauge potential
