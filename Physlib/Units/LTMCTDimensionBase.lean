@@ -189,7 +189,7 @@ private lemma component_npow (component : Dimension LTMCTDimensionBase → Expon
     _ = n • d.exponent b := npow_exponent d n b
     _ = n • component d := congrArg (n • ·) (h _)
 
-private lemma component_epow (component : Dimension LTMCTDimensionBase → Exponent)
+lemma component_epow (component : Dimension LTMCTDimensionBase → Exponent)
     (b : LTMCTDimensionBase) (h : ∀ d, d.exponent b = component d)
     (d : Dimension LTMCTDimensionBase) (c : Exponent) :
     component (d ^ c) = component d * c := by
