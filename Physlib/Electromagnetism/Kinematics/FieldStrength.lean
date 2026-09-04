@@ -268,6 +268,11 @@ and are not expected to be used directly.
 
 -/
 
+TODO "For the electromagnetic field strength, we have lots of lemmas related
+  to the components of the field strength tensor in terms of the basis. For example,
+  `toTensor_toFieldStrength_basis_repr`, these should be removed. They are used
+  downstream, so there use there should be refactored."
+
 lemma toTensor_toFieldStrength_basis_repr {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
     (b : ComponentIdx (S := realLorentzTensor d) (Fin.append ![Color.up] ![Color.up])) :
     (Tensor.basis _).repr (Tensorial.toTensor (toFieldStrength A x)) b =
