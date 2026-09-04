@@ -42,7 +42,7 @@ public import QuantumInfo.Entropy.DPI
 public import QuantumInfo.States.Mixed.MState
 public import QuantumInfo.Channels.Pinching
 public import QuantumInfo.Measurements.POVM
-public import QuantumInfo.Measurements.CramerRao
+public import QuantumInfo.Measurements.RobertsonUncertainty
 public import QuantumInfo.Operators.Unitary
 
 --Documentation without code
