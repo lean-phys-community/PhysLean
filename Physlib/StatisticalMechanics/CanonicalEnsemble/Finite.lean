@@ -113,7 +113,7 @@ instance [IsFinite 𝓒] (n : ℕ) : IsFinite (nsmul n 𝓒) where
   μ_eq_count := by
     induction n with
     | zero =>
-      haveI : Subsingleton (Fin 0 → ι) := ⟨by intro f g; funext i; exact Fin.elim0 i⟩
+      have : Subsingleton (Fin 0 → ι) := ⟨by intro f g; funext i; exact Fin.elim0 i⟩
       have h_cases : ∀ s : Set (Fin 0 → ι), s = ∅ ∨ s = Set.univ := fun s =>
         s.eq_empty_or_nonempty.imp_right fun ⟨y, hy⟩ =>
           Set.eq_univ_of_forall fun x => by rwa [Subsingleton.elim x y]
@@ -124,7 +124,7 @@ instance [IsFinite 𝓒] (n : ℕ) : IsFinite (nsmul n 𝓒) where
       · subst hs
         simp [CanonicalEnsemble.nsmul, IsFinite.μ_eq_count (𝓒:=𝓒)]
     | succ n ih =>
-      haveI : IsFinite (nsmul n 𝓒) := {
+      have : IsFinite (nsmul n 𝓒) := {
         μ_eq_count := ih
         dof_eq_zero := by
           simp [CanonicalEnsemble.dof_nsmul, IsFinite.dof_eq_zero (𝓒:=𝓒)]
@@ -132,7 +132,7 @@ instance [IsFinite 𝓒] (n : ℕ) : IsFinite (nsmul n 𝓒) where
           simp [CanonicalEnsemble.phase_space_unit_nsmul,
             IsFinite.phase_space_unit_eq_one (𝓒:=𝓒)]
       }
-      letI : Fintype (Fin (n+1) → ι) := inferInstance
+      let : Fintype (Fin (n+1) → ι) := inferInstance
       have h :
         ((𝓒 + nsmul n 𝓒).congr
             (MeasurableEquiv.piFinSuccAbove (fun _ => ι) 0)).μ

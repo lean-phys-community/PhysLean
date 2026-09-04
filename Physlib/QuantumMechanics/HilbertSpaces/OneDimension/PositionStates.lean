@@ -6,17 +6,16 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Mathlib.Analysis.Distribution.TemperedDistribution
-public import Physlib.Meta.TODO.Basic
 /-!
 
 # Position states
 
-We define plane waves as a member of the dual of the
-Schwartz submodule of the Hilbert space.
+We define position state as a member of the dual of the Schwartz submodule of the 1d Hilbert space.
+
+This module has been generalized to d-dimensions in
+`QuantumMechanics/HilbertSpaces/SpaceD/PositionStates.lean` and will be removed in the near future.
 
 -/
-
-TODO "Generalize position states to d dimensions and SpaceDHilbertSpace."
 
 @[expose] public section
 namespace QuantumMechanics

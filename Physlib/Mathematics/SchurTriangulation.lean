@@ -65,7 +65,6 @@ end Equiv
 /-- The type family parameterized by `Bool` is finite if each type variant is finite. -/
 instance [M : Fintype m] [N : Fintype n] (b : Bool) : Fintype (cond b m n) := b.rec N M
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The type family parameterized by `Bool` has decidable equality if each type variant is
 decidable. -/
 instance [DecidableEq m] [DecidableEq n] : DecidableEq (Σ b, cond b m n)
@@ -76,9 +75,6 @@ instance [DecidableEq m] [DecidableEq n] : DecidableEq (Σ b, cond b m n)
     if h : i = j then isTrue (Sigma.eq rfl h) else isFalse fun | rfl => h rfl
 
 namespace Matrix
-
-/-- The property of a matrix being upper triangular. See also `Matrix.det_of_upperTriangular`. -/
-abbrev IsUpperTriangular [LT n] [CommRing R] (A : Matrix n n R) := A.BlockTriangular id
 
 /-- The subtype of upper triangular matrices. -/
 abbrev UpperTriangular (n R) [LT n] [CommRing R] := { A : Matrix n n R // A.IsUpperTriangular }
@@ -137,7 +133,6 @@ variable [IsAlgClosed 𝕜]
 
 set_option maxHeartbeats 800000 in
 set_option maxRecDepth 2000 in
-set_option backward.isDefEq.respectTransparency false in
 /-- **Don't use this definition directly.** This is the key algorithm behind
 `Matrix.schur_triangulation`. -/
 protected noncomputable def SchurTriangulationAux.of

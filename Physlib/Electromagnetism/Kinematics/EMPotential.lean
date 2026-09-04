@@ -208,6 +208,7 @@ noncomputable def ofPotentials {d} (c : SpeedOfLight) (ϕ : Time → Space d →
     | Sum.inl 0 => ((timeSlice c).symm ϕ x) / c
     | Sum.inr i => (timeSlice c).symm A x i
 
+set_option backward.isDefEq.respectTransparency false in
 lemma ofPotentials_eq_add {d} (c : SpeedOfLight) (ϕ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
     ofPotentials c ϕ A = ofScalarPotential c ϕ + ofVectorPotential c A := by
@@ -335,6 +336,7 @@ TODO "Add results related to the differentiability of the
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma differentiable_ofScalarPotential {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (hϕ : Differentiable ℝ ↿φ) : Differentiable ℝ (ofScalarPotential c φ) := by
   simp [ofScalarPotential]
@@ -343,6 +345,7 @@ lemma differentiable_ofScalarPotential {d} (c : SpeedOfLight) (φ : Time → Spa
   match μ with
   | Sum.inl 0 | Sum.inr _ => fun_prop
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (hϕ : ContDiff ℝ n ↿φ) : ContDiff ℝ n (ofScalarPotential c φ) := by
   simp [ofScalarPotential]
@@ -351,6 +354,7 @@ lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space
   match μ with
   | Sum.inl 0 | Sum.inr _ => fun_prop
 
+set_option backward.isDefEq.respectTransparency false in
 lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
     (hA : Differentiable ℝ ↿A) : Differentiable ℝ (ofVectorPotential c A) := by
@@ -360,6 +364,7 @@ lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
   match μ with
   | Sum.inl 0 | Sum.inr _ => fun_prop
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
     (hA : ContDiff ℝ n ↿A) : ContDiff ℝ n (ofVectorPotential c A) := by
@@ -369,6 +374,7 @@ lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
   match μ with
   | Sum.inl 0 | Sum.inr _ => fun_prop
 
+set_option backward.isDefEq.respectTransparency false in
 lemma differentiable_ofPotentials {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : Differentiable ℝ ↿φ)
     (hA : Differentiable ℝ ↿A) : Differentiable ℝ (ofPotentials c φ A) := by
@@ -378,6 +384,7 @@ lemma differentiable_ofPotentials {d} (c : SpeedOfLight) (φ : Time → Space d 
   match μ with
   | Sum.inl 0 | Sum.inr _ => fun_prop
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contDiff_ofPotentials {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : ContDiff ℝ n ↿φ)
     (hA : ContDiff ℝ n ↿A) : ContDiff ℝ n (ofPotentials c φ A) := by
@@ -564,6 +571,7 @@ are just equal to `∂_ μ A x ν`.
 -/
 
 open Tensorial
+set_option backward.isDefEq.respectTransparency false in
 /-- Evaluation of the tensor components of `∂_ μ A x ν`. -/
 lemma tensorDeriv_eval_eq {d} {A : ElectromagneticPotential d} (hA : Differentiable ℝ A)
     (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
@@ -594,6 +602,7 @@ lemma tensorDeriv_eval_eq {d} {A : ElectromagneticPotential d} (hA : Differentia
   · simp only [map_smul, h, smul_eq_mul, Finsupp.coe_smul, Pi.smul_apply]
   · simp only [map_add, h1, h2, Finsupp.coe_add, Pi.add_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma deriv_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     (A : ElectromagneticPotential d)

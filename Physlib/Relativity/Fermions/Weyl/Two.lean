@@ -38,6 +38,7 @@ def leftLeftToMatrix : (LeftHandedWeyl ⊗[ℂ] LeftHandedWeyl) ≃ₗ[ℂ] Matr
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `leftLeftToMatrix` in terms of the standard basis. -/
 lemma leftLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     leftLeftToMatrix.symm M = ∑ i, ∑ j, M i j •
@@ -57,6 +58,7 @@ def dualLeftdualLeftToMatrix : (DualLeftHandedWeyl ⊗[ℂ] DualLeftHandedWeyl) 
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `dualLeftdualLeftToMatrix` in terms of the standard basis. -/
 lemma dualLeftdualLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     dualLeftdualLeftToMatrix.symm M = ∑ i, ∑ j, M i j •
@@ -77,6 +79,7 @@ def leftDualLeftToMatrix : (LeftHandedWeyl ⊗[ℂ] DualLeftHandedWeyl) ≃ₗ[�
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `leftDualLeftToMatrix` in terms of the standard basis. -/
 lemma leftDualLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     leftDualLeftToMatrix.symm M = ∑ i, ∑ j, M i j •
@@ -96,6 +99,7 @@ def dualLeftLeftToMatrix : (DualLeftHandedWeyl ⊗[ℂ] LeftHandedWeyl) ≃ₗ[�
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `dualLeftLeftToMatrix` in terms of the standard basis. -/
 lemma dualLeftLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     dualLeftLeftToMatrix.symm M = ∑ i, ∑ j, M i j •
@@ -115,6 +119,7 @@ def rightRightToMatrix : (RightHandedWeyl ⊗[ℂ] RightHandedWeyl) ≃ₗ[ℂ]
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `rightRightToMatrix` in terms of the standard basis. -/
 lemma rightRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     rightRightToMatrix.symm M = ∑ i, ∑ j, M i j •
@@ -134,6 +139,7 @@ def dualRightDualRightToMatrix : (DualRightHandedWeyl ⊗[ℂ] DualRightHandedWe
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `dualRightDualRightToMatrix` in terms of the standard basis. -/
 lemma dualRightDualRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     dualRightDualRightToMatrix.symm M =
@@ -154,6 +160,7 @@ def rightDualRightToMatrix : (RightHandedWeyl ⊗[ℂ] DualRightHandedWeyl) ≃�
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `rightDualRightToMatrix` in terms of the standard basis. -/
 lemma rightDualRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     rightDualRightToMatrix.symm M = ∑ i, ∑ j, M i j •
@@ -173,6 +180,7 @@ def dualRightRightToMatrix : (DualRightHandedWeyl ⊗[ℂ] RightHandedWeyl) ≃�
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `dualRightRightToMatrix` in terms of the standard basis. -/
 lemma dualRightRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     dualRightRightToMatrix.symm M = ∑ i, ∑ j, M i j •
@@ -192,6 +200,7 @@ def dualLeftDualRightToMatrix : (DualLeftHandedWeyl ⊗[ℂ] DualRightHandedWeyl
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `dualLeftDualRightToMatrix` in terms of the standard basis. -/
 lemma dualLeftDualRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     dualLeftDualRightToMatrix.symm M = ∑ i, ∑ j, M i j •
@@ -211,6 +220,7 @@ def leftRightToMatrix : (LeftHandedWeyl ⊗[ℂ] RightHandedWeyl) ≃ₗ[ℂ] Ma
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `leftRightToMatrix` in terms of the standard basis. -/
 lemma leftRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     leftRightToMatrix.symm M = ∑ i, ∑ j, M i j •

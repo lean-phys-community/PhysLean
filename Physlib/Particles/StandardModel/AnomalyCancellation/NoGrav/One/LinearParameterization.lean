@@ -66,6 +66,7 @@ lemma speciesVal (S : linearParameters) :
   | 3 => rfl
   | 4 => rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toSpecies_apply_asCharges (S : linearParameters) (i : Fin 5) :
     toSpecies i S.asCharges = fun _ => S.asCharges i := by
   funext j

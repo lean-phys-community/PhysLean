@@ -171,8 +171,6 @@ the speed with which an electromagnetic wave propagates is invariant under Loren
 
 -/
 
-set_option maxHeartbeats 600000 in
-set_option backward.isDefEq.respectTransparency false in
 lemma isExtrema_lorentzGroup_apply_iff {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJ : ContDiff ℝ ∞ J)

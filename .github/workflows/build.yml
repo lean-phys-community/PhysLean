@@ -13,9 +13,15 @@ jobs:
   doc_lint:
     name: Lean based style linters
     runs-on: ubuntu-latest
+    env:
+      LAKE_CACHE_DIR: .lake/cache
     steps:
 
+      # Need the full history here, lake looks back through the commits to find
+      # one with a cache. A shallow clone only has one so it never finds anything.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install elan
         run: |
@@ -29,9 +35,18 @@ jobs:
           lean --version
           lake --version
 
-      - name: build cache
+      - name: Mathlib build cache
         run: |
           lake exe cache get
+
+      # Pulls the cache from the bucket so we only compile what the PR changed.
+      # No key needed as it is only reading. If it fails we just build from scratch.
+      - name: Physlib's build cache
+        env:
+          LAKE_CONFIG: ${{ github.workspace }}/lake-cache.toml
+        run: |
+          lake cache get --scope="physlib-master/$(tr '/:' '--' < lean-toolchain | tr -d '[:space:]')/physlib" \
+            || echo "no existing cache to restore -- building from scratch"
 
       - name: build Physlib
         id: build

@@ -574,7 +574,7 @@ lemma exists_contraction_pair_of_card_ge_zero {φs : List 𝓕.FieldOp}
   Finset.card_pos.mp h
 
 set_option backward.isDefEq.respectTransparency false in
-set_option maxHeartbeats 400000 in
+set_option maxHeartbeats 800000 in
 lemma exists_join_singleton_of_card_ge_zero {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
     (h : 0 < φsΛ.1.card) (hc : φsΛ.GradingCompliant) :
     ∃ (i j : Fin φs.length) (h : i < j) (φsucΛ : WickContraction [singleton h]ᵘᶜ.length),

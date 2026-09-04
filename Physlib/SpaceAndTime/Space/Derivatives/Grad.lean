@@ -479,7 +479,6 @@ scoped[Space] notation "∇ᵈ" => distGrad
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma distGrad_inner_eq {d} (f : (Space d) →d[ℝ] ℝ) (η : 𝓢(Space d, ℝ))
     (y : EuclideanSpace ℝ (Fin d)) : ⟪∇ᵈ f η, y⟫_ℝ = fderivD ℝ f η (basis.repr.symm y) := by
   rw [distGrad]

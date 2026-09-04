@@ -36,7 +36,7 @@ theorem isSelfAdjoint : IsSelfAdjoint A.mat := by
 @[fun_prop]
 theorem continuousOn_finite {α β : Type*} (f : α → β) (S : Set α)
     [TopologicalSpace α] [TopologicalSpace β] [T1Space α] [Finite S] : ContinuousOn f S := by
-  rw [continuousOn_iff_continuous_restrict]
+  rw [continuousOn_iff_continuous_domRestrict]
   exact continuous_of_discreteTopology
 
 @[simp]
@@ -272,6 +272,7 @@ theorem cfc_nonSingular (hf : ∀ i, f (A.H.eigenvalues i) ≠ 0) : NonSingular 
   simpa [he] using fun i ↦ hf (e i)
 
 
+set_option backward.isDefEq.respectTransparency false in
 theorem trace_mul_cfc (A : HermitianMat d 𝕜) (f : ℝ → ℝ) :
     (A.mat * (A.cfc f).mat).trace = ∑ i, A.H.eigenvalues i * f (A.H.eigenvalues i) := by
   conv_lhs => rw [A.eq_conj_diagonal]
@@ -406,10 +407,10 @@ ContinuousOn variant for when all the matrices (A x) have a spectrum in a set T,
 theorem continuousOn_cfc_fun {T : Set ℝ}
   (hf : ∀ i ∈ T, ContinuousOn (f · i) S) (hA : spectrum ℝ A.mat ⊆ T) :
     ContinuousOn (fun x ↦ A.cfc (f x)) S := by
-  simp_rw [continuousOn_iff_continuous_restrict] at hf ⊢
+  simp_rw [continuousOn_iff_continuous_domRestrict] at hf ⊢
   apply Continuous.subtype_mk
   conv => enter [1, x]; apply A.cfc_toMat_eq_sum_smul_proj (f x)
-  unfold Set.restrict at hf
+  unfold Set.domRestrict at hf
   apply continuous_finsetSum _
   rw [A.H.spectrum_real_eq_range_eigenvalues] at hA
   refine fun i _ ↦ Continuous.smul (hf _ (by grind)) (by fun_prop)
@@ -508,6 +509,7 @@ lemma dist_lt_of_continuous' {X : Type*} [TopologicalSpace X]
     have := hUV t' ( ht_fin.1 t' ht'_fin ) x₀ ⟨ mem_of_mem_nhds ( hU t' ( ht_fin.1 t' ht'_fin ) ), hx₀ ⟩ t ⟨ ht'_t, ht ⟩;
     exact abs_lt.mpr ⟨ by linarith [ abs_lt.mp ‹‖f x t - f x₀ t'‖ < ε / 2›, abs_lt.mp ‹‖f x₀ t - f x₀ t'‖ < ε / 2› ], by linarith [ abs_lt.mp ‹‖f x t - f x₀ t'‖ < ε / 2›, abs_lt.mp ‹‖f x₀ t - f x₀ t'‖ < ε / 2› ] ⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The functional calculus is continuous on matrices with spectrum in a compact set.
 -/
@@ -523,7 +525,7 @@ lemma continuousOn_cfc_of_compact {K : Set ℝ} {g : ℝ → ℝ} (hK : IsCompac
       -- Extend $g$ to a continuous function on $[a, b]$.
       obtain ⟨f, hf⟩ : ∃ f : ℝ → ℝ, ContinuousOn f (Set.Icc a b) ∧ ∀ x ∈ K, f x = g x := by
         have := @ContinuousMap.exists_restrict_eq;
-        specialize this ( show IsClosed K from hK.isClosed ) ( ContinuousMap.mk ( fun x => g x ) <| by exact continuousOn_iff_continuous_restrict.mp hg );
+        specialize this ( show IsClosed K from hK.isClosed ) ( ContinuousMap.mk ( fun x => g x ) <| by exact continuousOn_iff_continuous_domRestrict.mp hg );
         exact ⟨ _, this.choose.continuous.continuousOn, fun x hx => by simpa using congr_arg ( fun f => f ⟨ x, hx ⟩ ) this.choose_spec ⟩;
       exact fun ε εpos => by rcases this a b f hf.1 ε εpos with ⟨ p, hp ⟩ ; exact ⟨ p, fun x hx => by simpa only [ hf.2 x hx ] using hp x ( hab hx ) ⟩ ;
     exact ⟨ fun n => Classical.choose ( h_stone_weierstrass ( 1 / ( n + 1 ) ) ( by positivity ) ), fun n x hx => le_of_lt ( Classical.choose_spec ( h_stone_weierstrass ( 1 / ( n + 1 ) ) ( by positivity ) ) x hx ) ⟩;
@@ -633,6 +635,7 @@ The proof uses the resolvent approach and compactness.
 Note: we need to connect spectrum ℝ B.mat (the real spectrum) to IsUnit in the complex matrix ring. Use that for self-adjoint elements, t ∈ spectrum ℝ A.mat iff algebraMap ℝ (Matrix d d ℂ) t ∈ spectrum ℂ A.mat, and the resolvent set is open. We can use spectrum.isOpen_resolventSet or the characterization via IsUnit.
 -/
 set_option maxHeartbeats 400000 in
+set_option backward.isDefEq.respectTransparency false in
 lemma spectrum_subset_of_isOpen (A₀ : HermitianMat d ℂ) (U : Set ℝ)
     (hU : IsOpen U) (hAU : spectrum ℝ A₀.mat ⊆ U) :
     ∀ᶠ B in nhds A₀, spectrum ℝ B.mat ⊆ U := by
@@ -743,7 +746,7 @@ lemma continuousWithinAt_cfc_of_continuousOn {T : Set ℝ} {g : ℝ → ℝ}
       exact hg.mono hA₀
     generalize_proofs at *; (
     have := @ContinuousMap.exists_restrict_eq ℝ;
-    specialize this ( show IsClosed ( spectrum ℝ A₀.val ) from h_finite.isClosed ) ( ContinuousMap.mk ( fun x => g x ) <| by exact continuousOn_iff_continuous_restrict.mp h_cont ) ; rcases this with ⟨ h, hh ⟩ ; exact ⟨ h, h.continuous, fun x hx => by simpa using congr_arg ( fun f => f ⟨ x, hx ⟩ ) hh ⟩ ;));
+    specialize this ( show IsClosed ( spectrum ℝ A₀.val ) from h_finite.isClosed ) ( ContinuousMap.mk ( fun x => g x ) <| by exact continuousOn_iff_continuous_domRestrict.mp h_cont ) ; rcases this with ⟨ h, hh ⟩ ; exact ⟨ h, h.continuous, fun x hx => by simpa using congr_arg ( fun f => f ⟨ x, hx ⟩ ) hh ⟩ ;));
   obtain ⟨h, hh_cont, hh_eq⟩ := h_ext;
   have h_cfc_cont : ContinuousWithinAt (fun B => B.cfc h) {B : HermitianMat d ℂ | spectrum ℝ B.mat ⊆ T} A₀ := by
     exact Continuous.continuousWithinAt (HermitianMat.cfc_continuous hh_cont)
@@ -1160,6 +1163,7 @@ theorem cfc_pos_of_pos {A : HermitianMat d 𝕜} {f : ℝ → ℝ} (hA : 0 < A)
     simp [h_f_pos, spectrum.mem_iff, Matrix.isUnit_iff_isUnit_det, Algebra.algebraMap_eq_smul_one]
   exact lt_of_le_of_ne h_f_nonneg h_f_nonzero.symm
 
+set_option backward.isDefEq.respectTransparency false in
 /-- If two matrices A and B commute, then they is a common matrix with which they are both CFCs of.
 This is a variant of the common theorem that "commuting matrices can be simultaneously diagonalized." -/
 theorem _root_.Commute.exists_HermitianMat_cfc (hAB : Commute A.mat B.mat) :

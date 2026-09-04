@@ -127,6 +127,7 @@ lemma distTranslate_distGrad {d : ℕ} (a : EuclideanSpace ℝ (Fin d))
   rw [fderiv_comp_add_right]
 
 open MeasureTheory
+set_option backward.isDefEq.respectTransparency false in
 lemma distTranslate_ofFunction {d : ℕ} (a : EuclideanSpace ℝ (Fin d))
     (f : Space d → X) (hf : IsDistBounded f) :
     distTranslate a (distOfFunction f hf) =

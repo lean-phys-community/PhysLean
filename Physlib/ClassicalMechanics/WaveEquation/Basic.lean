@@ -156,11 +156,10 @@ lemma planeWave_time_deriv_time_deriv {d f₀ c x} {s : Direction d}
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, PiLp.smul_apply, smul_eq_mul, neg_mul,
     mul_neg, neg_neg]
   ring_nf
-  suffices h : (fun x => _root_.deriv (fun x => _root_.deriv f₀ x) x) =
-      fun x => iteratedDeriv 2 f₀ x by rw [h]
-  funext x
-  erw [iteratedDeriv_succ]
-  simp only [iteratedDeriv_one]
+  suffices h : (fun x => _root_.deriv (fun y => _root_.deriv f₀ y) x) =
+      iteratedDeriv 2 f₀ by rw [h]
+  simpa only [iteratedDeriv_one] using
+    (iteratedDeriv_succ (n := 1) (f := f₀)).symm
 
 /-!
 
@@ -236,17 +235,17 @@ lemma planeWave_apply_space_deriv_space_deriv {d f₀ c} {s : Direction d}
     rw [planeWave_apply_space_deriv (h'.differentiable (by simp)) i]
   funext x
   rw [Space.deriv_eq_fderiv_basis, fderiv_const_smul]
-  simp only [fderiv_eq_smul_deriv, one_smul, FunLike.coe_smul, Pi.smul_apply,
-    smul_eq_mul]
-  rw [← Space.deriv_eq_fderiv_basis, planeWave_apply_space_deriv]
-  simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, smul_eq_mul]
-  ring_nf
-  suffices h : (fun x => _root_.deriv (fun x => _root_.deriv f₀ x) x) =
-      fun x => iteratedDeriv 2 f₀ x by rw [h]
-  ext x i
-  erw [iteratedDeriv_succ']
-  simp only [iteratedDeriv_one]
-  repeat fun_prop
+  · simp only [fderiv_eq_smul_deriv, one_smul, FunLike.coe_smul, Pi.smul_apply,
+      smul_eq_mul]
+    rw [← Space.deriv_eq_fderiv_basis, planeWave_apply_space_deriv]
+    · simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, smul_eq_mul]
+      ring_nf
+      suffices h : (fun x => _root_.deriv (fun y => _root_.deriv f₀ y) x) =
+          iteratedDeriv 2 f₀ by rw [h]
+      simpa only [iteratedDeriv_one] using
+        (iteratedDeriv_succ (n := 1) (f := f₀)).symm
+    all_goals fun_prop
+  · fun_prop
 
 /-!
 
@@ -355,10 +354,11 @@ lemma space_fderiv_of_inner_product_wave_eq_space_fderiv
     =
     - s.unit u * ∂ₜ (fun t => f₀ (inner ℝ x s.unit - c * t)) t v := by
   simp [EuclideanSpace.inner_single_right]
-  trans c * (fderiv ℝ (fun x => f₀ (⟪x, s.unit⟫_ℝ - c * t.val) v) x) (Space.basis u)
+  trans c * (fderiv ℝ (fun x => planeWave f₀ c s t x v) x) (Space.basis u)
   · rfl
-  erw [← Space.deriv_eq_fderiv_basis, planeWave_apply_space_deriv h' u v,
-    planeWave_time_deriv h']
+  rw [← Space.deriv_eq_fderiv_basis, planeWave_apply_space_deriv h' u v]
+  change _ = -(s.unit u * ∂ₜ (planeWave f₀ c s · x) t v)
+  rw [planeWave_time_deriv h']
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, smul_eq_mul, PiLp.smul_apply, neg_mul,
     mul_neg, neg_neg]
   ring

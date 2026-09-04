@@ -81,7 +81,7 @@ open NNReal
 
 /-- The choice of units. -/
 @[ext]
-structure UnitChoices where
+structure LTMCTUnitChoices where
   /-- The length unit. -/
   length : LengthUnit
   /-- The time unit. -/
@@ -93,12 +93,12 @@ structure UnitChoices where
   /-- The temperature unit. -/
   temperature : TemperatureUnit
 
-namespace UnitChoices
+namespace LTMCTUnitChoices
 
 /-- Given two choices of units `u1` and `u2` and a dimension `d`, the
   element of `ℝ≥0` corresponding to the scaling (by definition) of a quantity of dimension `d`
   when changing from units `u1` to `u2`. -/
-noncomputable def dimScale (u1 u2 : UnitChoices) :Dimension LTMCTDimensionBase →* ℝ≥0 where
+noncomputable def dimScale (u1 u2 : LTMCTUnitChoices) :Dimension LTMCTDimensionBase →* ℝ≥0 where
   toFun d :=
     (u1.length / u2.length) ^ (d.length : ℝ) *
     (u1.time / u2.time) ^ (d.time : ℝ) *
@@ -108,14 +108,12 @@ noncomputable def dimScale (u1 u2 : UnitChoices) :Dimension LTMCTDimensionBase �
   map_one' := by
     simp
   map_mul' d1 d2 := by
-    simp only [Dimension.length_mul, Rat.cast_add, Dimension.time_mul, Dimension.mass_mul,
-      Dimension.charge_mul, Dimension.temperature_mul]
-    repeat rw [rpow_add]
+    simp only [Dimension.length_mul, Dimension.Exponent.coe_add, Rat.cast_add, Dimension.time_mul,
+      Dimension.mass_mul, Dimension.charge_mul, Dimension.temperature_mul]
+    repeat rw [NNReal.rpow_add (by simp)]
     ring
-    all_goals
-      simp
 
-lemma dimScale_apply (u1 u2 : UnitChoices) (d : Dimension LTMCTDimensionBase) :
+lemma dimScale_apply (u1 u2 : LTMCTUnitChoices) (d : Dimension LTMCTDimensionBase) :
     dimScale u1 u2 d =
       (u1.length / u2.length) ^ (d.length : ℝ) *
       (u1.time / u2.time) ^ (d.time : ℝ) *
@@ -124,16 +122,16 @@ lemma dimScale_apply (u1 u2 : UnitChoices) (d : Dimension LTMCTDimensionBase) :
       (u1.temperature / u2.temperature) ^ (d.temperature : ℝ) := rfl
 
 @[simp]
-lemma dimScale_self (u : UnitChoices) (d : Dimension LTMCTDimensionBase) :
+lemma dimScale_self (u : LTMCTUnitChoices) (d : Dimension LTMCTDimensionBase) :
     dimScale u u d = 1 := by
   simp [dimScale]
 
 @[simp]
-lemma dimScale_one (u1 u2 : UnitChoices) :
+lemma dimScale_one (u1 u2 : LTMCTUnitChoices) :
     dimScale u1 u2 1 = 1 := by
   simp [dimScale]
 
-lemma dimScale_transitive (u1 u2 u3 : UnitChoices) (d : Dimension LTMCTDimensionBase) :
+lemma dimScale_transitive (u1 u2 u3 : LTMCTUnitChoices) (d : Dimension LTMCTDimensionBase) :
     dimScale u1 u2 d * dimScale u2 u3 d = dimScale u1 u3 d := by
   simp [dimScale]
   trans ((u1.length / u2.length) ^ (d.length : ℝ) * (u2.length / u3.length) ^ (d.length : ℝ)) *
@@ -144,30 +142,27 @@ lemma dimScale_transitive (u1 u2 u3 : UnitChoices) (d : Dimension LTMCTDimension
       (u2.temperature / u3.temperature) ^ (d.temperature : ℝ))
   · ring
   repeat rw [← mul_rpow]
-  apply NNReal.eq
-  simp only [LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val, ChargeUnit.div_eq_val,
-    TemperatureUnit.div_eq_val, NNReal.coe_mul, coe_rpow]
-  rw [toReal]
-  field_simp
+  rw [LengthUnit.div_mul_div, TimeUnit.div_mul_div, MassUnit.div_mul_div,
+    ChargeUnit.div_mul_div, TemperatureUnit.div_mul_div]
 
 @[simp]
-lemma dimScale_mul_symm (u1 u2 : UnitChoices) (d : Dimension LTMCTDimensionBase) :
+lemma dimScale_mul_symm (u1 u2 : LTMCTUnitChoices) (d : Dimension LTMCTDimensionBase) :
     dimScale u1 u2 d * dimScale u2 u1 d = 1 := by
   rw [dimScale_transitive, dimScale_self]
 
 @[simp]
-lemma dimScale_coe_mul_symm (u1 u2 : UnitChoices) (d : Dimension LTMCTDimensionBase) :
+lemma dimScale_coe_mul_symm (u1 u2 : LTMCTUnitChoices) (d : Dimension LTMCTDimensionBase) :
     (toReal (dimScale u1 u2 d)) * (toReal (dimScale u2 u1 d)) = 1 := by
   trans toReal (dimScale u1 u2 d * dimScale u2 u1 d)
   · rw [NNReal.coe_mul]
   simp
 
 @[simp]
-lemma dimScale_ne_zero (u1 u2 : UnitChoices) (d : Dimension LTMCTDimensionBase) :
+lemma dimScale_ne_zero (u1 u2 : LTMCTUnitChoices) (d : Dimension LTMCTDimensionBase) :
     dimScale u1 u2 d ≠ 0 := by
   simp [dimScale]
 
-lemma dimScale_symm (u1 u2 : UnitChoices) (d : Dimension LTMCTDimensionBase) :
+lemma dimScale_symm (u1 u2 : LTMCTUnitChoices) (d : Dimension LTMCTDimensionBase) :
     dimScale u1 u2 d = (dimScale u2 u1 d)⁻¹ := by
   simp only [dimScale_apply, mul_inv]
   congr
@@ -177,13 +172,13 @@ lemma dimScale_symm (u1 u2 : UnitChoices) (d : Dimension LTMCTDimensionBase) :
   · rw [ChargeUnit.div_symm, inv_rpow]
   · rw [TemperatureUnit.div_symm, inv_rpow]
 
-lemma dimScale_of_inv_eq_swap (u1 u2 : UnitChoices) (d : Dimension LTMCTDimensionBase) :
+lemma dimScale_of_inv_eq_swap (u1 u2 : LTMCTUnitChoices) (d : Dimension LTMCTDimensionBase) :
     dimScale u1 u2 d⁻¹ = dimScale u2 u1 d := by
   simp only [map_inv]
   conv_rhs => rw[dimScale_symm]
 
 @[simp]
-lemma smul_dimScale_injective {M : Type} [MulAction ℝ≥0 M] (u1 u2 : UnitChoices)
+lemma smul_dimScale_injective {M : Type} [MulAction ℝ≥0 M] (u1 u2 : LTMCTUnitChoices)
     (d : Dimension LTMCTDimensionBase) (m1 m2 : M) :
     (u1.dimScale u2 d) • m1 = (u1.dimScale u2 d) • m2 ↔ m1 = m2:= by
   refine IsUnit.smul_left_cancel ?_
@@ -192,13 +187,13 @@ lemma smul_dimScale_injective {M : Type} [MulAction ℝ≥0 M] (u1 u2 : UnitChoi
   simp
 
 @[simp]
-lemma dimScale_pos (u1 u2 : UnitChoices) (d : Dimension LTMCTDimensionBase) :
+lemma dimScale_pos (u1 u2 : LTMCTUnitChoices) (d : Dimension LTMCTDimensionBase) :
     0 < (dimScale u1 u2 d) := by
   apply lt_of_le_of_ne
   · simp
   · exact Ne.symm (dimScale_ne_zero u1 u2 d)
 
-TODO "Make SI : UnitChoices computable, probably by
+TODO "Make SI : LTMCTUnitChoices computable, probably by
   replacing the axioms defining the units. See here:
   https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/topic/physical.20units/near/534914807"
 /-- The choice of units corresponding to SI units, that is
@@ -208,7 +203,7 @@ TODO "Make SI : UnitChoices computable, probably by
 - coulombs,
 - kelvin.
 -/
-noncomputable def SI : UnitChoices where
+noncomputable def SI : LTMCTUnitChoices where
   length := LengthUnit.meters
   time := TimeUnit.seconds
   mass := MassUnit.kilograms
@@ -230,10 +225,10 @@ lemma SI_charge : SI.charge = ChargeUnit.coulombs := rfl
 @[simp]
 lemma SI_temperature : SI.temperature = TemperatureUnit.kelvin := rfl
 
-/-- A `UnitChoices` which is related to `SI` by a prime scaling of each
+/-- A `LTMCTUnitChoices` which is related to `SI` by a prime scaling of each
   of the underlying units. This is useful in proving that a result is not
   dimensionally correct. -/
-noncomputable def SIPrimed : UnitChoices where
+noncomputable def SIPrimed : LTMCTUnitChoices where
   length := LengthUnit.scale 2 LengthUnit.meters
   time := TimeUnit.scale 3 TimeUnit.seconds
   mass := MassUnit.scale 5 MassUnit.kilograms
@@ -262,7 +257,7 @@ lemma dimScale_SIPrimed_SI (d : Dimension LTMCTDimensionBase) :
   simp [dimScale, SI, SIPrimed]
   rfl
 
-end UnitChoices
+end LTMCTUnitChoices
 
 /-!
 
@@ -293,7 +288,7 @@ class abbrev CarriesDimension (M : Type) := HasDim M, MulAction ℝ≥0 M
 
 Given a type `M` which carries a dimension `d`,
 we are interested in elements of `M` which depend on a choice of units, i.e. functions
-`UnitChoices → M`.
+`LTMCTUnitChoices → M`.
 
 We define both a proposition
 - `HasDimension f` which says that `f` scales correctly with units,
@@ -302,29 +297,27 @@ and a type
 
 -/
 
-/-- A quantity of type `M` which depends on a choice of units `UnitChoices` is said to be
-  of dimension `d` if it scales by `UnitChoices.dimScale u1 u2 d` under a change in units. -/
-def HasDimension {M : Type} [CarriesDimension M] (f : UnitChoices → M) : Prop :=
-  ∀ u1 u2 : UnitChoices, f u2 = UnitChoices.dimScale u1 u2 (dim M) • f u1
+/-- A quantity of type `M` which depends on a choice of units `LTMCTUnitChoices` is said to be
+  of dimension `d` if it scales by `LTMCTUnitChoices.dimScale u1 u2 d` under a change in units. -/
+def HasDimension {M : Type} [CarriesDimension M] (f : LTMCTUnitChoices → M) : Prop :=
+  ∀ u1 u2 : LTMCTUnitChoices, f u2 = LTMCTUnitChoices.dimScale u1 u2 (dim M) • f u1
 
-lemma hasDimension_iff {M : Type} [CarriesDimension M] (f : UnitChoices → M) :
-    HasDimension f ↔ ∀ u1 u2 : UnitChoices, f u2 =
-    UnitChoices.dimScale u1 u2 (dim M) • f u1 := by
+lemma hasDimension_iff {M : Type} [CarriesDimension M] (f : LTMCTUnitChoices → M) :
+    HasDimension f ↔ ∀ u1 u2 : LTMCTUnitChoices, f u2 =
+    LTMCTUnitChoices.dimScale u1 u2 (dim M) • f u1 := by
   rfl
 
-/-- The subtype of functions `UnitChoices → M`, for which `M` carries a dimension,
+/-- The subtype of functions `LTMCTUnitChoices → M`, for which `M` carries a dimension,
   which `HasDimension`. -/
 def Dimensionful (M : Type) [CarriesDimension M] := Subtype (HasDimension (M := M))
 
-instance {M : Type} [CarriesDimension M] : CoeFun (Dimensionful M) (fun _ => UnitChoices → M) where
+instance {M : Type} [CarriesDimension M] :
+    CoeFun (Dimensionful M) (fun _ => LTMCTUnitChoices → M) where
   coe := Subtype.val
 
 @[ext]
 lemma Dimensionful.ext {M : Type} [CarriesDimension M] (f1 f2 : Dimensionful M)
-    (h : f1.val = f2.val) : f1 = f2 := by
-  cases f1
-  cases f2
-  simp_all
+    (h : f1.val = f2.val) : f1 = f2 := Subtype.ext h
 
 instance {M : Type} [CarriesDimension M] : MulAction ℝ≥0 (Dimensionful M) where
   smul a f := ⟨fun u => a • f.1 u, fun u1 u2 => by
@@ -342,19 +335,19 @@ instance {M : Type} [CarriesDimension M] : MulAction ℝ≥0 (Dimensionful M) wh
 
 @[simp]
 lemma Dimensionful.smul_apply {M : Type} [CarriesDimension M]
-    (a : ℝ≥0) (f : Dimensionful M) (u : UnitChoices) :
+    (a : ℝ≥0) (f : Dimensionful M) (u : LTMCTUnitChoices) :
     (a • f).1 u = a • f.1 u := rfl
 
 /-- For `M` carrying a dimension `d`, the equivalence between `M` and `Dimension M`,
   given a choice of units. -/
 noncomputable def CarriesDimension.toDimensionful {M : Type} [CarriesDimension M]
-    (u : UnitChoices) :
+    (u : LTMCTUnitChoices) :
     M ≃ Dimensionful M where
   toFun m := {
     val := fun u1 => (u.dimScale u1 (dim M)) • m
     property := fun u1 u2 => by
       simp [smul_smul]
-      rw [mul_comm, UnitChoices.dimScale_transitive]}
+      rw [mul_comm, LTMCTUnitChoices.dimScale_transitive]}
   invFun f := f.1 u
   left_inv m := by
     simp
@@ -364,5 +357,5 @@ noncomputable def CarriesDimension.toDimensionful {M : Type} [CarriesDimension M
     simpa using (f.2 u u1).symm
 
 lemma CarriesDimension.toDimensionful_apply_apply
-    {M : Type} [CarriesDimension M] (u1 u2 : UnitChoices) (m : M) :
+    {M : Type} [CarriesDimension M] (u1 u2 : LTMCTUnitChoices) (m : M) :
     (toDimensionful u1 m).1 u2 = (u1.dimScale u2 (dim M)) • m := by rfl

@@ -153,7 +153,7 @@ lemma det_exp_of_blockTriangular_id {A : Matrix m m 𝕂} (hA : BlockTriangular 
     (NormedSpace.exp A).det = NormedSpace.exp A.trace := by
   have h_exp_upper : BlockTriangular (NormedSpace.exp A) id :=
     blockTriangular_exp_of_blockTriangular_id hA
-  rw [det_of_upperTriangular h_exp_upper]
+  rw [det_of_isUpperTriangular h_exp_upper]
   have h_diag_exp : (NormedSpace.exp A).diag = fun i => NormedSpace.exp (A i i) :=
     diag_exp_of_blockTriangular_id hA
   simp_rw [← diag_apply]
@@ -229,18 +229,17 @@ end Matrix
 
 namespace NormedSpace
 
-set_option backward.isDefEq.respectTransparency false in
 lemma exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
     (A : Matrix n n ℝ) :
     (exp A).map (algebraMap ℝ ℂ) = exp (A.map (algebraMap ℝ ℂ)) := by
-  letI : SeminormedRing (Matrix n n ℝ) := Matrix.linftyOpSemiNormedRing
-  letI : NormedRing (Matrix n n ℝ) := Matrix.linftyOpNormedRing
-  letI : NormedAlgebra ℝ (Matrix n n ℝ) := Matrix.linftyOpNormedAlgebra
-  letI : CompleteSpace (Matrix n n ℝ) := inferInstance
-  letI : SeminormedRing (Matrix n n ℂ) := Matrix.linftyOpSemiNormedRing
-  letI : NormedRing (Matrix n n ℂ) := Matrix.linftyOpNormedRing
-  letI : NormedAlgebra ℂ (Matrix n n ℂ) := Matrix.linftyOpNormedAlgebra
-  letI : CompleteSpace (Matrix n n ℂ) := inferInstance
+  let : SeminormedRing (Matrix n n ℝ) := Matrix.linftyOpSemiNormedRing
+  let : NormedRing (Matrix n n ℝ) := Matrix.linftyOpNormedRing
+  let : NormedAlgebra ℝ (Matrix n n ℝ) := Matrix.linftyOpNormedAlgebra
+  let : CompleteSpace (Matrix n n ℝ) := inferInstance
+  let : SeminormedRing (Matrix n n ℂ) := Matrix.linftyOpSemiNormedRing
+  let : NormedRing (Matrix n n ℂ) := Matrix.linftyOpNormedRing
+  let : NormedAlgebra ℂ (Matrix n n ℂ) := Matrix.linftyOpNormedAlgebra
+  let : CompleteSpace (Matrix n n ℂ) := inferInstance
   simp only [exp_eq_tsum ℝ]
   have hs : Summable (fun k => (k.factorial : ℝ)⁻¹ • A ^ k) := by
     exact NormedSpace.expSeries_summable' A
@@ -262,7 +261,7 @@ theorem det_exp_real {n : Type*} [Fintype n] [LinearOrder n]
     (A : Matrix n n ℝ) : (NormedSpace.exp A).det = Real.exp A.trace := by
   let A_ℂ := A.map (algebraMap ℝ ℂ)
   have h_complex : (NormedSpace.exp A_ℂ).det = Complex.exp A_ℂ.trace := by
-    haveI : IsAlgClosed ℂ := Complex.isAlgClosed
+    have : IsAlgClosed ℂ := Complex.isAlgClosed
     rw [Complex.exp_eq_exp_ℂ, ← Matrix.det_exp]
   have h_trace_comm : A_ℂ.trace = (algebraMap ℝ ℂ) A.trace := by
     simp only [A_ℂ, trace, diag_map, map_sum];rfl

@@ -278,6 +278,7 @@ lemma rightDualRightUnit_eq_tensor_basis : δR =
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma coContrUnit_eq_ofRat : δ' = ofRat fun f =>
     if f 0 = f 1 then 1 else 0 := by
   rw [coContrUnit_eq_basis]
@@ -288,6 +289,7 @@ lemma coContrUnit_eq_ofRat : δ' = ofRat fun f =>
   congr
   with_unfolding_all decide
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contrCoUnit_eq_ofRat : δ = ofRat fun f =>
     if f 0 = f 1 then 1 else 0 := by
   rw [contrCoUnit_eq_basis]
@@ -298,6 +300,7 @@ lemma contrCoUnit_eq_ofRat : δ = ofRat fun f =>
   congr
   with_unfolding_all decide
 
+set_option backward.isDefEq.respectTransparency false in
 lemma dualLeftLeftUnit_eq_ofRat : δL' = ofRat fun f =>
     if f 0 = f 1 then 1 else 0 := by
   rw [dualLeftLeftUnit_eq_tensor_basis]
@@ -308,6 +311,7 @@ lemma dualLeftLeftUnit_eq_ofRat : δL' = ofRat fun f =>
   congr
   with_unfolding_all decide
 
+set_option backward.isDefEq.respectTransparency false in
 lemma leftDualLeftUnit_eq_ofRat : δL = ofRat fun f =>
     if f 0 = f 1 then 1 else 0 := by
   rw [leftDualLeftUnit_eq_tensor_basis]
@@ -318,6 +322,7 @@ lemma leftDualLeftUnit_eq_ofRat : δL = ofRat fun f =>
   congr
   with_unfolding_all decide
 
+set_option backward.isDefEq.respectTransparency false in
 lemma dualRightRightUnit_eq_ofRat : δR' = ofRat fun f =>
     if f 0 = f 1 then 1 else 0 := by
   rw [dualRightRightUnit_eq_tensor_basis]
@@ -328,6 +333,7 @@ lemma dualRightRightUnit_eq_ofRat : δR' = ofRat fun f =>
   congr
   with_unfolding_all decide
 
+set_option backward.isDefEq.respectTransparency false in
 lemma rightDualRightUnit_eq_ofRat : δR = ofRat fun f =>
     if f 0 = f 1 then 1 else 0 := by
   rw [rightDualRightUnit_eq_tensor_basis]

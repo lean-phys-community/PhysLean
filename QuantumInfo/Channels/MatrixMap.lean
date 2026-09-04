@@ -64,6 +64,7 @@ def id : MatrixMap A A R := LinearMap.id
 def choi_matrix (M : MatrixMap A B R) : Matrix (B × A) (B × A) R :=
   fun (j₁,i₁) (j₂,i₂) ↦ M (Matrix.single i₁ i₂ 1) j₁ j₂
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Given the Choi matrix, generate the corresponding R-linear map between matrices as a
 MatrixMap. This is the inverse of `MatrixMap.choi_matrix`. -/
 def of_choi_matrix (M : Matrix (B × A) (B × A) R) : MatrixMap A B R where
@@ -73,12 +74,14 @@ def of_choi_matrix (M : Matrix (B × A) (B × A) R) : MatrixMap A B R where
     funext b₁ b₂
     simp only [Matrix.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum, mul_assoc]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Proves that `MatrixMap.of_choi_matrix` and `MatrixMap.choi_matrix` inverses. -/
 @[simp]
 theorem map_choi_inv (M : Matrix (B × A) (B × A) R) : choi_matrix (of_choi_matrix M) = M := by
   ext ⟨i₁,i₂⟩ ⟨j₁,j₂⟩
   simp [of_choi_matrix, choi_matrix, Matrix.single, ite_and]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Proves that `MatrixMap.choi_matrix` and `MatrixMap.of_choi_matrix` inverses. -/
 @[simp]
 theorem choi_map_inv (M : MatrixMap A B R) : of_choi_matrix (choi_matrix M) = M := by

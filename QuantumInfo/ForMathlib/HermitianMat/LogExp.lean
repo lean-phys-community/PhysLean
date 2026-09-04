@@ -235,7 +235,7 @@ theorem logApprox_mono {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.m
         exact h_inv_cont.comp ( continuous_subtype_val.tendsto _ );
       · fun_prop;
       · intro t ht;
-        simp only [Set.mem_setOf_eq, mat_add, mat_smul, mat_one]
+        simp only [Set.mem_ofPred_eq, mat_add, mat_smul, mat_one]
         rw [Matrix.posDef_iff_dotProduct_mulVec] at hx ⊢
         refine' ⟨ _, _ ⟩;
         · exact H ((fun t => x + t • 1) t);
@@ -274,7 +274,7 @@ theorem logApprox_mono {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.m
           simp_all [ Matrix.inv_def ];
           exact ContinuousOn.smul ( h_cont_det.inv₀ fun t ht => h_inv t ht.1 ht.2 ) h_cont_adj;
         convert h_cont_inv using 1;
-      rw [ continuousOn_iff_continuous_restrict ] at *;
+      rw [ continuousOn_iff_continuous_domRestrict ] at *;
       exact continuous_induced_rng.mpr h_cont
   rw [ intervalIntegral.integral_of_le hT.le, intervalIntegral.integral_of_le hT.le ];
   apply_rules [ MeasureTheory.integral_mono_ae ];
@@ -434,7 +434,7 @@ theorem le_of_exp_commute (hAB₂ : A.exp ≤ B.exp) :
   · exact hAB₂
 
 set_option maxHeartbeats 10000000 in
-open ComplexOrder Matrix in
+open ComplexOrder _root_.HermitianMat.Matrix in
 /--
 The inverse function is operator convex on positive definite matrices.
 -/
@@ -540,7 +540,8 @@ lemma inv_shift_convex {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.m
   ext
   simp [add_assoc, add_left_comm, hab, ← add_smul]
 
-open MeasureTheory intervalIntegral ComplexOrder Matrix in
+open MeasureTheory intervalIntegral ComplexOrder in
+open _root_.HermitianMat.Matrix in
 open scoped Matrix.Norms.Frobenius in
 set_option backward.isDefEq.respectTransparency false in
 /--
@@ -628,6 +629,7 @@ theorem log_concave {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.mat.
 /-
 The logarithm of the Kronecker product of two diagonal Hermitian matrices is the sum of the Kronecker products of their logarithms with the identity matrix.
 -/
+set_option backward.isDefEq.respectTransparency false in
 lemma log_kron_diagonal {m n 𝕜 : Type*} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] [RCLike 𝕜]
     {d₁ : m → ℝ} {d₂ : n → ℝ} (h₁ : ∀ i, 0 < d₁ i) (h₂ : ∀ j, 0 < d₂ j) :
     (diagonal 𝕜 d₁ ⊗ₖ diagonal 𝕜 d₂).log =

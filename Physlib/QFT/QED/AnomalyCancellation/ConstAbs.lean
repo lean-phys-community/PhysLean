@@ -37,7 +37,8 @@ lemma constAbs_perm (S : (PureU1 n).Charges) (M :(FamilyPermutations n).group) :
     MonoidHom.coe_mk, OneHom.coe_mk, chargeMap_apply]
   refine Iff.intro (fun h i j => ?_) (fun h i j => h (M.invFun i) (M.invFun j))
   have h2 := h (M.toFun i) (M.toFun j)
-  simp only [Equiv.toFun_as_coe, Equiv.Perm.coe_inv, Equiv.symm_apply_apply] at h2
+  simp only [Equiv.toFun_as_coe, Equiv.Perm.coe_inv, Function.comp_apply,
+    Equiv.symm_apply_apply] at h2
   exact h2
 
 lemma constAbs_sort {S : (PureU1 n).Charges} (CA : ConstAbs S) : ConstAbs (sort S) := by
@@ -244,6 +245,7 @@ lemma AFL_even_below (A : (PureU1 (2 * n.succ)).LinSols) (h : ConstAbsSorted A.v
     rfl
   · exact AFL_even_below' h hA i
 
+set_option backward.isDefEq.respectTransparency false in
 lemma AFL_even_above' {A : (PureU1 (2 * n.succ)).LinSols} (h : ConstAbsSorted A.val)
     (hA : A.val (0 : Fin (2*n.succ)) ≠ 0) (i : Fin n.succ) :
     A.val (Fin.cast (split_equal n.succ) (Fin.natAdd n.succ i)) =

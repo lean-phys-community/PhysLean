@@ -1,0 +1,86 @@
+# Review claims: `claim` / `disclaim` commands on a pull request.
+#
+# To avoid two reviewers (human or AI) picking up the same PR, a reviewer says
+# what they intend to review and claims it:
+#
+#   claim              -- claim this PR for review, for the default window
+#   claim 5 days       -- ... for a specific window (hours / days / weeks)
+#   claim 2026-08-01   -- ... until a specific date
+#   disclaim           -- release the claim early
+#
+# The bot assigns the claimant, applies the `review-claimed` label and keeps a
+# single status comment recording the deadline.  Claiming again extends the
+# window; submitting a review completes the claim.  Stale claims are released
+# automatically by `review_claim_expiry.yml`, so nothing stays blocked forever.
+#
+# A claim is cooperative, not a lock: it signals intent so that others can steer
+# around it, and anyone remains free to review the PR.
+#
+# As in `labels_from_comment.yml`, a command is a whole line of the comment, so
+# that a comment merely discussing claims does not trigger one.  Commands need
+# no repository permissions -- anyone can claim a review.
+#
+# The work itself is in `scripts/review_claim.py`.
+
+name: Review claims
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+
+# Limit permissions for GITHUB_TOKEN for the entire workflow
+permissions:
+  contents: read
+  issues: write         # Only allow issue/PR comments, labels and reactions
+  pull-requests: write  # Only allow PR comments/labels/assignees
+  # All other permissions are implicitly 'none'
+
+jobs:
+  command:
+    name: Handle claim command
+    runs-on: ubuntu-latest
+    # Cheap prefilter: only comments on PRs, and only ones that mention a command
+    # at all, reach the checkout below.  `disclaim` contains `claim`, so one test
+    # covers both; the capitalised variant is here because expressions have no
+    # case-insensitive compare, while the parser itself accepts any casing.
+    #
+    # Don't run on forks, where we wouldn't have permission to act on the PR anyway.
+    if: >-
+      github.repository == 'leanprover-community/physlib' &&
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      github.event.comment.user.type != 'Bot' &&
+      (contains(github.event.comment.body, 'claim') ||
+       contains(github.event.comment.body, 'Claim'))
+    steps:
+      - name: Check out the claim script
+        uses: actions/checkout@v7.0.0
+        with:
+          sparse-checkout: scripts/review_claim.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Claim or disclaim
+        run: python3 scripts/review_claim.py comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  complete:
+    name: Complete claim on review
+    runs-on: ubuntu-latest
+    # Don't run on forks, where we wouldn't have permission to act on the PR anyway.
+    if: >-
+      github.repository == 'leanprover-community/physlib' &&
+      github.event_name == 'pull_request_review'
+    steps:
+      - name: Check out the claim script
+        uses: actions/checkout@v7.0.0
+        with:
+          sparse-checkout: scripts/review_claim.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Clear the claim once its claimant has reviewed
+        run: python3 scripts/review_claim.py review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

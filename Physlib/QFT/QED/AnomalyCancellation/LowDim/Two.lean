@@ -23,6 +23,7 @@ variable {n : ℕ}
 
 namespace Two
 
+set_option backward.isDefEq.respectTransparency false in
 /-- An equivalence between `LinSols` and `Sols`. -/
 def equiv : (PureU1 2).LinSols ≃ (PureU1 2).Sols where
   toFun S := ⟨⟨S, fun i => Fin.elim0 i⟩, by

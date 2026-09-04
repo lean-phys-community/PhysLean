@@ -56,7 +56,13 @@ inductive ISQDimensionBase where
   | amount
   /-- The luminous-intensity base quantity. -/
   | luminousIntensity
-deriving DecidableEq, Fintype
+deriving DecidableEq
+
+instance : Fintype ISQDimensionBase where
+  elems := {.length, .mass, .time, .current, .temperature, .amount, .luminousIntensity}
+  complete := fun x => by cases x <;> decide
+
+instance : DimensionBasis ISQDimensionBase := DimensionBasis.pi _
 
 namespace ISQDimensionBase
 

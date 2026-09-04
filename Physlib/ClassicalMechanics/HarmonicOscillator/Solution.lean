@@ -173,9 +173,9 @@ Solving this linear system for `x₀` and `v₀` gives the formulas in `toInitia
   /-- The time at which the initial conditions are specified. -/
   t₀ : Time
   /-- The position at time t₀. -/
-  x_t₀ : EuclideanSpace ℝ (Fin 1)
+  xT₀ : EuclideanSpace ℝ (Fin 1)
   /-- The velocity at time t₀. -/
-  v_t₀ : EuclideanSpace ℝ (Fin 1)
+  vT₀ : EuclideanSpace ℝ (Fin 1)
 
 namespace InitialConditionsAtTime
 
@@ -183,14 +183,14 @@ namespace InitialConditionsAtTime
 
   This conversion uses the harmonic oscillator solution formula with time-reversal.
   The resulting `InitialConditions` will produce a trajectory that passes through
-  `x_t₀` with velocity `v_t₀` at time `t₀`.
+  `xT₀` with velocity `vT₀` at time `t₀`.
 
   See `toInitialConditions_trajectory_at_t₀` and `toInitialConditions_velocity_at_t₀` for
   the correctness proofs. -/
 noncomputable def toInitialConditions (S : HarmonicOscillator)
     (IC : InitialConditionsAtTime) : InitialConditions where
-  x₀ := cos (S.ω * IC.t₀) • IC.x_t₀ - (sin (S.ω * IC.t₀) / S.ω) • IC.v_t₀
-  v₀ := S.ω • sin (S.ω * IC.t₀) • IC.x_t₀ + cos (S.ω * IC.t₀) • IC.v_t₀
+  x₀ := cos (S.ω * IC.t₀) • IC.xT₀ - (sin (S.ω * IC.t₀) / S.ω) • IC.vT₀
+  v₀ := S.ω • sin (S.ω * IC.t₀) • IC.xT₀ + cos (S.ω * IC.t₀) • IC.vT₀
 
 /-!
 The correctness proofs showing that the conversion produces the expected trajectory
@@ -204,18 +204,18 @@ end InitialConditionsAtTime
 
 #### A.2.2. Initial conditions from two positions at different times
 
-We define a type for initial conditions specified by two measured positions `x_t₁` and `x_t₂`
+We define a type for initial conditions specified by two measured positions `xT₁` and `xT₂`
 at two distinct times `t₁` and `t₂`.
 
 The conversion to the standard `InitialConditions` is obtained by solving for `x₀` and `v₀` the
 two equations given by evaluating the trajectory at `t₁` and `t₂`:
-  `x_t₁ = cos(ωt₁)·x₀ + (sin(ωt₁)/ω)·v₀`
-  `x_t₂ = cos(ωt₂)·x₀ + (sin(ωt₂)/ω)·v₀`
+  `xT₁ = cos(ωt₁)·x₀ + (sin(ωt₁)/ω)·v₀`
+  `xT₂ = cos(ωt₂)·x₀ + (sin(ωt₂)/ω)·v₀`
 
 This linear system has determinant `(cos(ωt₁)·sin(ωt₂) - cos(ωt₂)·sin(ωt₁))/ω = sin(ω(t₂-t₁))/ω`.
 Writing `Δ = sin(ω(t₂-t₁))`, solving the system gives the formulas used below:
-  `x₀ = (sin(ωt₂)·x_t₁ - sin(ωt₁)·x_t₂)/Δ`
-  `v₀ = ω·(cos(ωt₁)·x_t₂ - cos(ωt₂)·x_t₁)/Δ`
+  `x₀ = (sin(ωt₂)·xT₁ - sin(ωt₁)·xT₂)/Δ`
+  `v₀ = ω·(cos(ωt₁)·xT₂ - cos(ωt₂)·xT₁)/Δ`
 
 The conversion is defined as a total function, but it recovers the initial conditions only when
 `Δ = sin(ω(t₂-t₁)) ≠ 0`, i.e. when `t₂ - t₁` is not an integer multiple of half a period. The
@@ -224,7 +224,7 @@ correctness proofs, under this nondegeneracy condition, are given later in secti
 -/
 
 /-- Initial conditions for the harmonic oscillator specified by two positions
-  `x_t₁` and `x_t₂` measured at two times `t₁` and `t₂` respectively.
+  `xT₁` and `xT₂` measured at two times `t₁` and `t₂` respectively.
 
   The conditions can be converted to the standard `InitialConditions` format
   using the `toInitialConditions` function. -/
@@ -232,11 +232,11 @@ correctness proofs, under this nondegeneracy condition, are given later in secti
   /-- The first measurement time. -/
   t₁ : Time
   /-- The position at time `t₁`. -/
-  x_t₁ : EuclideanSpace ℝ (Fin 1)
+  xT₁ : EuclideanSpace ℝ (Fin 1)
   /-- The second measurement time. -/
   t₂ : Time
   /-- The position at time `t₂`. -/
-  x_t₂ : EuclideanSpace ℝ (Fin 1)
+  xT₂ : EuclideanSpace ℝ (Fin 1)
 
 
 namespace InitialConditionsFromTwoPositions
@@ -248,10 +248,10 @@ namespace InitialConditionsFromTwoPositions
   section D.2 for the correctness proofs (valid under `sin (S.ω * (t₂ - t₁)) ≠ 0`). -/
 noncomputable def toInitialConditions (S : HarmonicOscillator)
     (IC : InitialConditionsFromTwoPositions) : InitialConditions where
-  x₀ := (sin (S.ω * IC.t₂) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.x_t₁
-      - (sin (S.ω * IC.t₁) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.x_t₂
-  v₀ := (S.ω * cos (S.ω * IC.t₁) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.x_t₂
-      - (S.ω * cos (S.ω * IC.t₂) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.x_t₁
+  x₀ := (sin (S.ω * IC.t₂) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.xT₁
+      - (sin (S.ω * IC.t₁) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.xT₂
+  v₀ := (S.ω * cos (S.ω * IC.t₁) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.xT₂
+      - (S.ω * cos (S.ω * IC.t₂) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.xT₁
 
 end InitialConditionsFromTwoPositions
 
@@ -259,18 +259,18 @@ end InitialConditionsFromTwoPositions
 
 #### A.2.3. Initial conditions from two velocities at different times
 
-We define a type for initial conditions specified by two measured velocities `v_t₁` and `v_t₂`
+We define a type for initial conditions specified by two measured velocities `vT₁` and `vT₂`
 at two distinct times `t₁` and `t₂`.
 
 The conversion to the standard `InitialConditions` is obtained by solving for `x₀` and `v₀` the
 two equations given by evaluating the velocity of the trajectory at `t₁` and `t₂`:
-  `v_t₁ = -ω·sin(ωt₁)·x₀ + cos(ωt₁)·v₀`
-  `v_t₂ = -ω·sin(ωt₂)·x₀ + cos(ωt₂)·v₀`
+  `vT₁ = -ω·sin(ωt₁)·x₀ + cos(ωt₁)·v₀`
+  `vT₂ = -ω·sin(ωt₂)·x₀ + cos(ωt₂)·v₀`
 
 This linear system has determinant `ω·(cos(ωt₁)·sin(ωt₂) - cos(ωt₂)·sin(ωt₁)) = ω·sin(ω(t₂-t₁))`.
 Writing `Δ = sin(ω(t₂-t₁))`, solving the system gives the formulas used below:
-  `x₀ = (cos(ωt₂)·v_t₁ - cos(ωt₁)·v_t₂)/(ω·Δ)`
-  `v₀ = (sin(ωt₂)·v_t₁ - sin(ωt₁)·v_t₂)/Δ`
+  `x₀ = (cos(ωt₂)·vT₁ - cos(ωt₁)·vT₂)/(ω·Δ)`
+  `v₀ = (sin(ωt₂)·vT₁ - sin(ωt₁)·vT₂)/Δ`
 
 The conversion is defined as a total function, but it recovers the initial conditions only when
 `Δ = sin(ω(t₂-t₁)) ≠ 0`, i.e. when `t₂ - t₁` is not an integer multiple of half a period. The
@@ -279,7 +279,7 @@ correctness proofs, under this nondegeneracy condition, are given later in secti
 -/
 
 /-- Initial conditions for the harmonic oscillator specified by two velocities
-  `v_t₁` and `v_t₂` measured at two times `t₁` and `t₂` respectively.
+  `vT₁` and `vT₂` measured at two times `t₁` and `t₂` respectively.
 
   The conditions can be converted to the standard `InitialConditions` format
   using the `toInitialConditions` function. -/
@@ -287,11 +287,11 @@ correctness proofs, under this nondegeneracy condition, are given later in secti
   /-- The first measurement time. -/
   t₁ : Time
   /-- The velocity at time `t₁`. -/
-  v_t₁ : EuclideanSpace ℝ (Fin 1)
+  vT₁ : EuclideanSpace ℝ (Fin 1)
   /-- The second measurement time. -/
   t₂ : Time
   /-- The velocity at time `t₂`. -/
-  v_t₂ : EuclideanSpace ℝ (Fin 1)
+  vT₂ : EuclideanSpace ℝ (Fin 1)
 
 namespace InitialConditionsFromTwoVelocities
 
@@ -302,10 +302,10 @@ namespace InitialConditionsFromTwoVelocities
   section D.3 for the correctness proofs (valid under `sin (S.ω * (t₂ - t₁)) ≠ 0`). -/
 noncomputable def toInitialConditions (S : HarmonicOscillator)
     (IC : InitialConditionsFromTwoVelocities) : InitialConditions where
-  x₀ := (cos (S.ω * IC.t₂) / (S.ω * sin (S.ω * (IC.t₂ - IC.t₁)))) • IC.v_t₁
-      - (cos (S.ω * IC.t₁) / (S.ω * sin (S.ω * (IC.t₂ - IC.t₁)))) • IC.v_t₂
-  v₀ := (sin (S.ω * IC.t₂) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.v_t₁
-      - (sin (S.ω * IC.t₁) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.v_t₂
+  x₀ := (cos (S.ω * IC.t₂) / (S.ω * sin (S.ω * (IC.t₂ - IC.t₁)))) • IC.vT₁
+      - (cos (S.ω * IC.t₁) / (S.ω * sin (S.ω * (IC.t₂ - IC.t₁)))) • IC.vT₂
+  v₀ := (sin (S.ω * IC.t₂) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.vT₁
+      - (sin (S.ω * IC.t₁) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.vT₂
 
 end InitialConditionsFromTwoVelocities
 
@@ -598,36 +598,36 @@ the specified position and velocity at the specified time.
 namespace InitialConditionsAtTime
 
 /-- The trajectory resulting from `toInitialConditions` passes through the specified
-  position `x_t₀` at time `t₀`. -/
+  position `xT₀` at time `t₀`. -/
 @[simp]
 lemma toInitialConditions_trajectory_at_t₀ (S : HarmonicOscillator)
     (IC : InitialConditionsAtTime) :
-    (IC.toInitialConditions S).trajectory S IC.t₀ = IC.x_t₀ := by
+    (IC.toInitialConditions S).trajectory S IC.t₀ = IC.xT₀ := by
   rw [InitialConditions.trajectory_eq, toInitialConditions]
   ext i
   simp only [smul_add, PiLp.add_apply, PiLp.smul_apply, PiLp.sub_apply, smul_eq_mul]
   field_simp [S.ω_ne_zero]
-  linear_combination (S.ω * IC.x_t₀.ofLp i) * cos_sq_add_sin_sq (S.ω * IC.t₀.val)
+  linear_combination (S.ω * IC.xT₀.ofLp i) * cos_sq_add_sin_sq (S.ω * IC.t₀.val)
 
 /-- The trajectory resulting from `toInitialConditions` has the specified
-  velocity `v_t₀` at time `t₀`. -/
+  velocity `vT₀` at time `t₀`. -/
 @[simp]
 lemma toInitialConditions_velocity_at_t₀ (S : HarmonicOscillator)
     (IC : InitialConditionsAtTime) :
-    ∂ₜ ((IC.toInitialConditions S).trajectory S) IC.t₀ = IC.v_t₀ := by
+    ∂ₜ ((IC.toInitialConditions S).trajectory S) IC.t₀ = IC.vT₀ := by
   rw [InitialConditions.trajectory_velocity, toInitialConditions]
   ext i
   simp only [neg_smul, smul_add, PiLp.add_apply, PiLp.neg_apply, PiLp.smul_apply, PiLp.sub_apply,
     smul_eq_mul]
   field_simp [S.ω_ne_zero]
-  linear_combination (IC.v_t₀.ofLp i) * cos_sq_add_sin_sq (S.ω * IC.t₀.val)
+  linear_combination (IC.vT₀.ofLp i) * cos_sq_add_sin_sq (S.ω * IC.t₀.val)
 
 /-- The energy of the trajectory at time `t₀` equals the energy computed from the
   initial conditions at `t₀`. -/
 lemma toInitialConditions_energy_at_t₀ (S : HarmonicOscillator)
     (IC : InitialConditionsAtTime) :
     S.energy ((IC.toInitialConditions S).trajectory S) IC.t₀ =
-    1/2 * (S.m * ‖IC.v_t₀‖^2 + S.k * ‖IC.x_t₀‖^2) := by
+    1/2 * (S.m * ‖IC.vT₀‖^2 + S.k * ‖IC.xT₀‖^2) := by
   unfold energy kineticEnergy potentialEnergy
   simp only [toInitialConditions_trajectory_at_t₀, toInitialConditions_velocity_at_t₀]
   simp only [real_inner_self_eq_norm_sq, smul_eq_mul]
@@ -644,31 +644,31 @@ condition fails exactly when `ω·(t₂ - t₁) = n·π` for some integer `n`, i
 integer multiple of half a period; in that case `x(t₂) = (-1)^n · x(t₁)` for every trajectory,
 independent of `v₀`, so the two positions do not determine the initial conditions.
 
-Under this nondegeneracy condition, we prove that the resulting trajectory passes through `x_t₁`
-at `t₁` and `x_t₂` at `t₂`.
+Under this nondegeneracy condition, we prove that the resulting trajectory passes through `xT₁`
+at `t₁` and `xT₂` at `t₂`.
 
 -/
 
 namespace InitialConditionsFromTwoPositions
 
-/-- The trajectory from `toInitialConditions` passes through `x_t₁` at time `t₁`,
+/-- The trajectory from `toInitialConditions` passes through `xT₁` at time `t₁`,
   provided `sin (S.ω * (t₂ - t₁)) ≠ 0`. -/
 lemma toInitialConditions_trajectory_at_t₁ (S : HarmonicOscillator)
     (IC : InitialConditionsFromTwoPositions)
     (hΔ : sin (S.ω * (IC.t₂ - IC.t₁)) ≠ 0) :
-    (IC.toInitialConditions S).trajectory S IC.t₁ = IC.x_t₁ := by
+    (IC.toInitialConditions S).trajectory S IC.t₁ = IC.xT₁ := by
   rw [InitialConditions.trajectory_eq, toInitialConditions]
   ext i
   simp only [PiLp.add_apply, PiLp.smul_apply, PiLp.sub_apply, smul_eq_mul]
   field_simp [S.ω_ne_zero]
   grind [mul_sub, Real.sin_sub]
 
-/-- The trajectory from `toInitialConditions` passes through `x_t₂` at time `t₂`,
+/-- The trajectory from `toInitialConditions` passes through `xT₂` at time `t₂`,
   provided `sin (S.ω * (t₂ - t₁)) ≠ 0`. -/
 lemma toInitialConditions_trajectory_at_t₂ (S : HarmonicOscillator)
     (IC : InitialConditionsFromTwoPositions)
     (hΔ : sin (S.ω * (IC.t₂ - IC.t₁)) ≠ 0) :
-    (IC.toInitialConditions S).trajectory S IC.t₂ = IC.x_t₂ := by
+    (IC.toInitialConditions S).trajectory S IC.t₂ = IC.xT₂ := by
   rw [InitialConditions.trajectory_eq, toInitialConditions]
   ext i
   simp only [PiLp.add_apply, PiLp.smul_apply, PiLp.sub_apply, smul_eq_mul]
@@ -682,19 +682,19 @@ end InitialConditionsFromTwoPositions
 ### D.3. Correctness of InitialConditionsFromTwoVelocities conversion
 
 The conversion recovers the initial conditions only when `sin (S.ω * (t₂ - t₁)) ≠ 0`. Under this
-nondegeneracy condition, we prove that the resulting trajectory has velocity `v_t₁` at `t₁` and
-`v_t₂` at `t₂`.
+nondegeneracy condition, we prove that the resulting trajectory has velocity `vT₁` at `t₁` and
+`vT₂` at `t₂`.
 
 -/
 
 namespace InitialConditionsFromTwoVelocities
 
-/-- The trajectory from `toInitialConditions` has velocity `v_t₁` at time `t₁`,
+/-- The trajectory from `toInitialConditions` has velocity `vT₁` at time `t₁`,
   provided `sin (S.ω * (t₂ - t₁)) ≠ 0`. -/
 lemma toInitialConditions_velocity_at_t₁ (S : HarmonicOscillator)
     (IC : InitialConditionsFromTwoVelocities)
     (hΔ : sin (S.ω * (IC.t₂ - IC.t₁)) ≠ 0) :
-    ∂ₜ ((IC.toInitialConditions S).trajectory S) IC.t₁ = IC.v_t₁ := by
+    ∂ₜ ((IC.toInitialConditions S).trajectory S) IC.t₁ = IC.vT₁ := by
   rw [InitialConditions.trajectory_velocity, toInitialConditions]
   ext i
   simp only [neg_smul, PiLp.add_apply, PiLp.neg_apply, PiLp.smul_apply, PiLp.sub_apply,
@@ -702,12 +702,12 @@ lemma toInitialConditions_velocity_at_t₁ (S : HarmonicOscillator)
   field_simp [S.ω_ne_zero]
   grind [mul_sub, Real.sin_sub]
 
-/-- The trajectory from `toInitialConditions` has velocity `v_t₂` at time `t₂`,
+/-- The trajectory from `toInitialConditions` has velocity `vT₂` at time `t₂`,
   provided `sin (S.ω * (t₂ - t₁)) ≠ 0`. -/
 lemma toInitialConditions_velocity_at_t₂ (S : HarmonicOscillator)
     (IC : InitialConditionsFromTwoVelocities)
     (hΔ : sin (S.ω * (IC.t₂ - IC.t₁)) ≠ 0) :
-    ∂ₜ ((IC.toInitialConditions S).trajectory S) IC.t₂ = IC.v_t₂ := by
+    ∂ₜ ((IC.toInitialConditions S).trajectory S) IC.t₂ = IC.vT₂ := by
   rw [InitialConditions.trajectory_velocity, toInitialConditions]
   ext i
   simp only [neg_smul, PiLp.add_apply, PiLp.neg_apply, PiLp.smul_apply, PiLp.sub_apply,

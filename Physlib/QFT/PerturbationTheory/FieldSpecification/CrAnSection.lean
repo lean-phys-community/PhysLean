@@ -94,6 +94,7 @@ lemma eq_head_cons_tail {φ : 𝓕.FieldOp} {ψs : CrAnSection (φ :: φs)} :
     subst h2
     rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The creation of a section from for `φ : φs` from a section for `φs` and a
   element of `𝓕.fieldOpToCreateAnnihilateType φ`. -/
 def cons {φ : 𝓕.FieldOp} (ψ : 𝓕.fieldOpToCrAnType φ) (ψs : CrAnSection φs) :
@@ -112,6 +113,7 @@ def nilEquiv : CrAnSection (𝓕 := 𝓕) [] ≃ Unit where
   right_inv _ := by
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The creation and annihilation sections for a singleton list is given by
   a choice of `𝓕.fieldOpToCreateAnnihilateType φ`. If `φ` is a asymptotic state
   there is no choice here, else there are two choices. -/
@@ -165,6 +167,7 @@ lemma card_cons_eq {φ : 𝓕.FieldOp} {φs : List 𝓕.FieldOp} :
   rw [Fintype.ofEquiv_card consEquiv.symm]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma card_eq_mul : {φs : List 𝓕.FieldOp} → Fintype.card (CrAnSection φs) =
     2 ^ (List.countP 𝓕.statesIsPosition φs)
   | [] => by
@@ -264,18 +267,21 @@ def append {φs φs' : List 𝓕.FieldOp} (ψs : CrAnSection φs)
     (ψs' : CrAnSection φs') : CrAnSection (φs ++ φs') :=
   ⟨ψs.1 ++ ψs'.1, by simp [ψs.2, ψs'.2]⟩
 
+set_option backward.isDefEq.respectTransparency false in
 lemma append_assoc {φs φs' φs'' : List 𝓕.FieldOp} (ψs : CrAnSection φs)
     (ψs' : CrAnSection φs') (ψs'' : CrAnSection φs'') :
     append ψs (append ψs' ψs'') = congr (by simp) (append (append ψs ψs') ψs'') := by
   apply Subtype.ext
   simp [append]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma append_assoc' {φs φs' φs'' : List 𝓕.FieldOp} (ψs : CrAnSection φs)
     (ψs' : CrAnSection φs') (ψs'' : CrAnSection φs'') :
     (append (append ψs ψs') ψs'') = congr (by simp) (append ψs (append ψs' ψs'')) := by
   apply Subtype.ext
   simp [append]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma singletonEquiv_append_eq_cons {φs : List 𝓕.FieldOp} {φ : 𝓕.FieldOp}
     (ψs : CrAnSection φs) (ψ : 𝓕.fieldOpToCrAnType φ) :
     append (singletonEquiv.symm ψ) ψs = cons ψ ψs := by
@@ -364,6 +370,7 @@ def eraseIdxEquiv (n : ℕ) (φs : List 𝓕.FieldOp) (hn : n < φs.length) :
   appendEquiv.symm.trans <|
   congr (List.eraseIdx_eq_take_drop_succ φs n).symm
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma eraseIdxEquiv_apply_snd {n : ℕ} (ψs : CrAnSection φs) (hn : n < φs.length) :
     (eraseIdxEquiv n φs hn ψs).snd = eraseIdx n ψs := by
@@ -376,7 +383,6 @@ lemma eraseIdxEquiv_apply_snd {n : ℕ} (ψs : CrAnSection φs) (hn : n < φs.le
   simp only [Nat.succ_eq_add_one, le_add_iff_nonneg_right, zero_le, inf_of_le_left]
   exact Eq.symm (List.eraseIdx_eq_take_drop_succ ψs.1 n)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma eraseIdxEquiv_symm_eq_take_cons_drop {n : ℕ} (φs : List 𝓕.FieldOp) (hn : n < φs.length)
     (a : 𝓕.fieldOpToCrAnType φs[n]) (s : CrAnSection (φs.eraseIdx n)) :
     (eraseIdxEquiv n φs hn).symm ⟨a, s⟩ =
@@ -398,6 +404,7 @@ lemma eraseIdxEquiv_symm_eq_take_cons_drop {n : ℕ} (φs : List 𝓕.FieldOp) (
     exact Nat.le_of_succ_le hn
   rw [hn]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma eraseIdxEquiv_symm_getElem {n : ℕ} (φs : List 𝓕.FieldOp) (hn : n < φs.length)
     (a : 𝓕.fieldOpToCrAnType φs[n]) (s : CrAnSection (φs.eraseIdx n)) :

@@ -24,7 +24,7 @@ open NNReal
 abbrev DimEnergy : Type := Dimensionful (WithDim (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹) ℝ)
 
 namespace DimEnergy
-open UnitChoices Dimensionful CarriesDimension
+open LTMCTUnitChoices Dimensionful CarriesDimension
 
 /-- The dimensional energy corresponding to 1 joule, J. -/
 noncomputable def joule : DimEnergy := toDimensionful SI ⟨1⟩

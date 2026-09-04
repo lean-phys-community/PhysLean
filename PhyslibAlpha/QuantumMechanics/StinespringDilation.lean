@@ -54,7 +54,7 @@ def densityMatrix {R : Type*} [Ring R] [PartialOrder R] [StarRing R] (d : Type*)
   {ρ : Matrix d d R // ρ.PosSemidef ∧ ρ.trace = 1}
 
 /-- Density matrices are closed under real convex combinations. -/
-def densityMatrix.convex_comb {R : Type*} [RCLike R]
+def densityMatrix.convexComb {R : Type*} [RCLike R]
     {d : ℕ} (ρ₀ ρ₁ : densityMatrix (Fin d) (R := R)) {t : R}
     (hp₀ : 0 ≤ t) (hp₁ : 0 ≤ 1 - t) : densityMatrix (Fin d) (R := R) :=
   ⟨t • ρ₀.1 + (1 - t) • ρ₁.1, by
@@ -76,6 +76,13 @@ def stinespringOp {R : Type*} [Ring R]
     ∑ i, K i ⊗ₖ single i (0 : Fin 1) (1 : R)
   fun x y => V₀ x (y,0)
 
+/-- Entrywise formula for the Stinespring isometry: its `((x₁, x₂), y)` entry is `K x₂ x₁ y`. -/
+theorem stinespringOp_apply {R : Type*} [Ring R] {m r : Type*} [Fintype r] [DecidableEq r]
+    (K : r → Matrix m m R) (x : m × r) (y : m) :
+    stinespringOp K x y = K x.2 x.1 y := by
+  unfold stinespringOp
+  simp [Matrix.sum_apply, Matrix.kroneckerMap_apply, Matrix.single_apply]
+
 /-- The Stinespring dilation. -/
 def stinespringDilation {R : Type*} [Ring R] [StarRing R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
@@ -96,12 +103,12 @@ lemma stinespringOp_adjoint_mul_self {R : Type*} [Ring R] [StarRing R]
     (K : r → Matrix m m R) :
     ∑ i, star K i * K i = (stinespringOp K)ᴴ * stinespringOp K := by
   ext i j
-  unfold stinespringOp
   rw [Matrix.mul_apply]
   rw [Matrix.sum_apply]
-  simp only [Pi.star_apply, Matrix.mul_apply, star_apply, single, Fin.isValue, Matrix.sum_apply,
-    kroneckerMap_apply, of_apply, and_true, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
-    Finset.mem_univ, ↓reduceIte, conjTranspose_apply];
+  simp only [conjTranspose_apply]
+  simp only [stinespringOp, Pi.star_apply, Matrix.mul_apply, star_apply, single, Fin.isValue,
+    Matrix.sum_apply, kroneckerMap_apply, of_apply, and_true, mul_ite, mul_one, mul_zero,
+    Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte];
   erw [ Finset.sum_product, Finset.sum_comm ]
 
 /-- A useful identity for completely positive, trace non-increasing maps. -/
@@ -241,17 +248,17 @@ theorem complCard {R : Type*} [RCLike R] {m r : ℕ}
 /--
 See discussion at https://leanprover.zulipchat.com/#narrow/channel/217875-Is-there-code-for-X.3F/topic/succAbove.20and.20predAbove.20lemmas/with/584270574
 -/
-def Fin.predAbove_of_ne {n : ℕ} {k i : Fin n}
+def Fin.predAboveOfNe {n : ℕ} {k i : Fin n}
     (h : i ≠ k) : Fin (n - 1) := by
   by_cases H : i.1 > k.1
   · exact ⟨i.1 - 1, by omega⟩
   · exact ⟨i.1, by omega⟩
 
 /-- A "missing lemma" for `Fin` types. -/
-lemma Fin.predAbove_of_ne_injective (n : ℕ) (k x y : Fin n)
+lemma Fin.predAboveOfNe_injective (n : ℕ) (k x y : Fin n)
     (hx : x ≠ k) (hy : y ≠ k)
-    (heq : Fin.predAbove_of_ne hx = Fin.predAbove_of_ne hy) : x = y := by
-  unfold predAbove_of_ne at heq
+    (heq : Fin.predAboveOfNe hx = Fin.predAboveOfNe hy) : x = y := by
+  unfold predAboveOfNe at heq
   split_ifs at heq
   all_goals
   · simp only [mk.injEq] at heq
@@ -272,7 +279,7 @@ def onbPart {R : Type*} [RCLike R]
         ((exists_orthonormalBasis R theRangeᗮ).choose_spec.choose
         (Finset.equivOfCardEq (complCard hK z) ⟨w, Finset.mem_univ _⟩)).1.1
     apply this
-    exact (x.1, Fin.predAbove_of_ne hx)
+    exact (x.1, Fin.predAboveOfNe hx)
 
 /- The custom in quantum information theory is to use
 |e₁>< e₁| as ancillary; we allow an arbitrary (standard) basis vector.
@@ -310,7 +317,7 @@ lemma onbPart_inner {R : Type*} [RCLike R] {m r : ℕ} {K : Fin r → Matrix (Fi
                 have : x.2.1 ≠ z := Fin.val_ne_of_ne hx
                 have : y.2.1 = x.2.1 := by
                     suffices y.2 = x.2 by rw [this]
-                    apply Fin.predAbove_of_ne_injective
+                    apply Fin.predAboveOfNe_injective
                     omega
                 have : y.2 = x.2 := by omega
                 exact Prod.ext hyz this)
@@ -341,7 +348,7 @@ def Ud {R : Type*} [RCLike R] {m r : ℕ}
 
 /-- This generalization of Stinespring dilation has the right
 "shape" but otherwise nothing specific to it. -/
-def general_dilation {R : Type*}
+def generalDilation {R : Type*}
     {m r : Type*} [DecidableEq r]
     (z : r)
     (S : Matrix (m × r) m R)
@@ -354,7 +361,7 @@ def general_dilation {R : Type*}
 def dilation {R : Type*} [Ring R]
     {m r : Type*} [Fintype r] [DecidableEq r]
     (K : r → Matrix m m R) (z : r) (M : Matrix (m × r) (m × r) R) :
-    Matrix (m × r) (m × r) R := general_dilation z (stinespringOp K) (M)
+    Matrix (m × r) (m × r) R := generalDilation z (stinespringOp K) (M)
 
 
 
@@ -526,7 +533,7 @@ def stinespringUnitaryForm {R : Type*} [RCLike R] {m r : ℕ}
     tr₂ (U * (ρ ⊗ₖ (single z z 1)) * Uᴴ)
 
 /-- The Stinespring unitary form, general version. -/
-def stinespringUnitaryForm_e {R : Type*} [RCLike R] {m r : ℕ}
+def stinespringUnitaryFormE {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) (e : Matrix (Fin r) (Fin r) R)
     (ρ : Matrix (Fin m) (Fin m) R) :
@@ -541,17 +548,14 @@ theorem tracefree_version {R : Type*} [RCLike R]
     (ρ : Matrix m m R) :
     let K' := fun i x y => star <| K i y x; let U := (stinespringOp K');
     Uᴴ * (ρ ⊗ₖ (1 : Matrix r r R)) * U = stinespringForm K ρ := by
-  -- Since my proof broke in 4.27 -> 4.31, here's Aristotle's proof.
-  simp only [stinespringOp, star_def, Fin.isValue, stinespringForm, stinespringDilation];
+  show (stinespringOp fun i => (K i)ᴴ)ᴴ * (ρ ⊗ₖ (1 : Matrix r r R)) *
+      (stinespringOp fun i => (K i)ᴴ) = stinespringForm K ρ
   ext x y
-  simp only [Fin.isValue, Matrix.mul_apply, conjTranspose_apply, star_def, kroneckerMap_apply,
-    Matrix.one_apply, mul_ite, mul_one, mul_zero, tr₂]
-  ring_nf;
-  simp only [Fin.isValue, Matrix.sum_apply, kroneckerMap_apply, map_sum, map_mul,
-    RingHomCompTriple.comp_apply, RingHom.id_apply, Fintype.sum_prod_type, Finset.sum_ite_eq',
-    Finset.mem_univ, ↓reduceIte];
-  simp only [single, Fin.isValue, of_apply, and_true, MonoidWithZeroHom.map_ite_one_zero, mul_ite,
-    mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte];
+  simp only [stinespringForm, stinespringDilation, tr₂, Matrix.mul_apply]
+  simp only [conjTranspose_apply]
+  simp only [stinespringOp_apply, conjTranspose_apply, star_star, kroneckerMap_apply,
+    Matrix.one_apply, mul_ite, mul_one, mul_zero, Fintype.sum_prod_type,
+    Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
   exact Finset.sum_comm
 
 /-- A Heisberg picture / Schrödinger picture view of the Stinespring dilation. -/
@@ -575,7 +579,7 @@ def generalForm {R : Type*} [RCLike R]
     (z : r)
     (S : Matrix (m × r) m R)
     (M : Matrix (m × r) (m × r) R) :=
-    let U := general_dilation z S M
+    let U := generalDilation z S M
     fun ρ => tr₂ (U * (ρ ⊗ₖ (single z z 1)) * Uᴴ)
 
 /-- General form of the Stinespring dilation. -/
@@ -587,7 +591,7 @@ def stinespringGeneralForm {R : Type*} [RCLike R]
     fun ρ => tr₂ (U * (ρ ⊗ₖ (single z z 1)) * Uᴴ)
 
 /-- Even more general form of the Stinespring dilation. -/
-def stinespringGeneralForm_e {R : Type*} [RCLike R]
+def stinespringGeneralFormE {R : Type*} [RCLike R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
     (K : r → Matrix m m R) (z : r) (e : Matrix r r R)
     (M : Matrix (m × r) (m × r) R) :=
@@ -605,65 +609,25 @@ theorem unitaryForm_of_general {R : Type*} [RCLike R] {m r : ℕ}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) :
     stinespringGeneralForm K z (Ud hK z) =
     stinespringUnitaryForm hK z := by
-  unfold
-    stinespringUnitaryForm tr₂ Ud
-    stinespringGeneralForm dilation general_dilation tr₂
-  ext a b
-  congr
-  ext c
-  repeat rw [mul_apply]
-  repeat rw [Fintype.sum_prod_type]
-  congr
-  ext d
-  congr
-  ext e
-  repeat rw [mul_apply]
-  simp only [kroneckerMap_apply, ite_mul, dite_mul,
-    conjTranspose_apply, star_def]
-  repeat rw [Fintype.sum_prod_type]
-  congr
-  · ext f
-    congr
-    ext g
-    simp only [ite_eq_right_iff, left_eq_dite_iff, mul_eq_mul_right_iff, mul_eq_zero]
-    intro hg
-    subst g
-    intro h
-    simp at h ⊢
-  · split_ifs with g₀ <;> rfl
+  have h : dilation K z (Ud hK z) = Ud hK z := by
+    ext x y
+    by_cases hy : y.2 = z <;> simp [dilation, generalDilation, Ud, hy]
+  funext ρ
+  simp only [stinespringGeneralForm, stinespringUnitaryForm]
+  rw [h]
 
 /-- The Stinespring unitary form as a general form applied to the unitary dilation. -/
 theorem unitaryForm_of_general_e {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) (e : Matrix (Fin r) (Fin r) R) :
-    stinespringGeneralForm_e K z e (Ud hK z) =
-    stinespringUnitaryForm_e hK z e := by
-  unfold
-    stinespringUnitaryForm_e tr₂ Ud
-    stinespringGeneralForm_e dilation general_dilation tr₂
-  ext a b
-  congr
-  ext c
-  repeat rw [mul_apply]
-  repeat rw [Fintype.sum_prod_type]
-  congr
-  ext d
-  congr
-  ext e
-  repeat rw [mul_apply]
-  simp only [kroneckerMap_apply, ite_mul, dite_mul,
-    conjTranspose_apply, star_def]
-  repeat rw [Fintype.sum_prod_type]
-  congr
-  · ext f
-    congr
-    ext g
-    simp only [ite_eq_right_iff, left_eq_dite_iff, mul_eq_mul_right_iff, mul_eq_zero]
-    intro hg
-    subst g
-    intro h
-    simp at h ⊢
-  · split_ifs with g₀ <;> rfl
+    stinespringGeneralFormE K z e (Ud hK z) =
+    stinespringUnitaryFormE hK z e := by
+  have h : dilation K z (Ud hK z) = Ud hK z := by
+    ext x y
+    by_cases hy : y.2 = z <;> simp [dilation, generalDilation, Ud, hy]
+  funext ρ
+  simp only [stinespringGeneralFormE, stinespringUnitaryFormE]
+  rw [h]
 
 
 /--
@@ -677,25 +641,20 @@ lemma stinespringGeneralForm_works {R : Type*} [RCLike R] {m r : ℕ}
     (K : Fin r → Matrix (Fin m) (Fin m) R) (z : Fin r)
     (M : Matrix (Fin m × Fin r) (Fin m × Fin r) R) :
     stinespringGeneralForm K z M = krausApply K := by
-      -- my 4.27 proof failed in 4.31 so this is Aristotle:
-      unfold stinespringGeneralForm krausApply dilation general_dilation stinespringOp tr₂;
-      ext ρ i j;
-      simp only [Fin.isValue, Matrix.sum_apply, kroneckerMap_apply, Matrix.mul_apply, ite_mul,
-        conjTranspose_apply, star_def];
-      simp only [single, Fin.isValue, of_apply, and_true, mul_ite, mul_one, mul_zero,
-        Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Finset.sum_ite, not_and,
-        Finset.sum_const_zero, add_zero];
-      refine Finset.sum_congr rfl fun x _ => ?_
-      rw [ ← Finset.sum_subset
-        (Finset.subset_univ (Finset.image (fun y : Fin m => ( y, z ) ) Finset.univ))]
-      · rw [ Finset.sum_image ]
-        · simp only [and_true, Finset.sum_filter, ite_not, ↓reduceIte];
-          refine Finset.sum_congr rfl fun y _ => ?_
-          erw [ Finset.sum_product, Finset.sum_product ]
-          simp [ Finset.sum_ite, Finset.filter_eq', Finset.filter_ne' ];
-        · simp only [Finset.coe_univ, Set.injOn_univ];
-          exact fun a b h => by injection h;
-      · aesop
+      funext ρ
+      ext i j
+      simp only [stinespringGeneralForm, krausApply, tr₂, Matrix.sum_apply, Matrix.mul_apply,
+        conjTranspose_apply, Finset.sum_mul]
+      simp [dilation, generalDilation, stinespringOp_apply, kroneckerMap_apply,
+        Matrix.single_apply, apply_ite star, ite_and, Fintype.sum_prod_type, mul_ite, ite_mul,
+        Finset.sum_ite_eq]
+      simp only [@eq_comm _ z]
+      have hite : ∀ (c : Prop) [Decidable c] (A B C : R),
+          (if c then (if c then A else B) else (if c then C else 0)) = if c then A else 0 := by
+        intro c _ A B C
+        split_ifs <;> rfl
+      simp_rw [hite]
+      simp [Finset.sum_ite_eq']
 
 
 /--
@@ -719,13 +678,6 @@ def krausCompletion {R : Type*} [RCLike R] {m r : ℕ}
     Matrix (Fin m × Fin (r+1)) (Fin m) R := fun x => dite (x.2 < r)
   (fun H => stinespringOp K ⟨x.1, ⟨x.2, H⟩⟩)
   fun _ => (CFC.sqrt (1 - (stinespringOp K)ᴴ * (stinespringOp K)) : Matrix _ _ _) x.1
-
-/-- Entrywise formula for the Stinespring isometry: its `((x₁, x₂), y)` entry is `K x₂ x₁ y`. -/
-theorem stinespringOp_apply {R : Type*} [Ring R] {m r : Type*} [Fintype r] [DecidableEq r]
-    (K : r → Matrix m m R) (x : m × r) (y : m) :
-    stinespringOp K x y = K x.2 x.1 y := by
-  unfold stinespringOp
-  simp [Matrix.sum_apply, Matrix.kroneckerMap_apply, Matrix.single_apply]
 
 /-- The Gram matrix of the Stinespring isometry is `∑ i, (K i)ᴴ * K i`. -/
 theorem stinespringOp_gram {R : Type*} [RCLike R] {m r : ℕ}
@@ -893,8 +845,6 @@ theorem stinespringForm_eq {R : Type*} [RCLike R] {m r : ℕ}
     (K : Fin r → Matrix (Fin m) (Fin m) R)
     (ρ : Matrix (Fin m) (Fin m) R) :
     tr₂ (stinespringDilation K ρ) = krausApply K ρ := by
-  unfold tr₂ stinespringDilation krausApply
   ext i j
-  simp only [stinespringOp, Fin.isValue, Matrix.mul_apply, conjTranspose_apply, star_def]
-  simp [Matrix.mul_apply, Finset.sum_mul, Matrix.sum_apply, kroneckerMap_apply,
-    Matrix.single]
+  simp only [tr₂, stinespringDilation, krausApply, Matrix.sum_apply, Matrix.mul_apply,
+    conjTranspose_apply, stinespringOp_apply, Finset.sum_mul]

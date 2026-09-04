@@ -22,7 +22,7 @@ in Mathlib.
 @[expose] public section
 namespace Physlib.Fin
 
-open Fin
+open _root_.Physlib.Fin
 variable {n : Nat}
 
 /-- Given a `i` and `x` in `Fin n.succ.succ` returns an element of `Fin n.succ`
@@ -86,7 +86,7 @@ def finExtractOne {n : ℕ} (i : Fin (n + 1)) : Fin (n + 1) ≃ Fin 1 ⊕ Fin n 
 @[simp]
 lemma finExtractOne_apply_eq {n : ℕ} (i : Fin n.succ) :
     finExtractOne i i = Sum.inl 0 := by
-  rw [Equiv.apply_eq_iff_eq_symm_apply]
+  rw [← Equiv.eq_symm_apply]
   rfl
 
 lemma finExtractOne_symm_inr {n : ℕ} (i : Fin n.succ) :

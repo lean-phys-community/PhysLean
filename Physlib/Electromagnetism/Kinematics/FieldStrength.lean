@@ -199,7 +199,6 @@ as taking the field strength and then transforming the resulting tensor.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma toFieldStrength_equivariant {d} (A : ElectromagneticPotential d) (Λ : LorentzGroup d)
     (hf : Differentiable ℝ A) (x : SpaceTime d) :
     (Λ • A).toFieldStrength x = Λ • A.toFieldStrength (Λ⁻¹ • x) := by
@@ -349,6 +348,7 @@ These lemmas express the components of the field strength tensor using index eva
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Evaluating both tensor indices of the field strength gives the coefficient in the
 standard tensor-product basis. -/
 lemma toFieldStrength_eval_eq_basis_repr {d} (A : ElectromagneticPotential d)

@@ -29,7 +29,8 @@ namespace QuantumMechanics
 namespace OneDimension
 noncomputable section
 open Constants
-open HilbertSpace SchwartzMap
+open _root_.QuantumMechanics.OneDimension.HilbertSpace
+open SchwartzMap
 
 /-!
 

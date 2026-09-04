@@ -129,6 +129,13 @@ lemma off_diag_zero {μ ν : Fin 1 ⊕ Fin d} (h : μ ≠ ν) : η μ ν = 0 := 
 lemma η_diag_ne_zero {μ : Fin 1 ⊕ Fin d} : η μ μ ≠ 0 := by
   aesop (add safe forward as_diagonal)
 
+/-- Right multiplication of a row vector by the Minkowski matrix multiplies each component by
+the corresponding diagonal sign. -/
+lemma vecMul_apply (v : (Fin 1 ⊕ Fin d) → ℝ) (μ : Fin 1 ⊕ Fin d) :
+    (v ᵥ* minkowskiMatrix) μ = v μ * minkowskiMatrix μ μ := by
+  rw [as_diagonal, Matrix.vecMul_diagonal]
+  simp
+
 /-!
 
 ### A.4. Squaring the Minkowski matrix
@@ -179,6 +186,25 @@ We show the determinant of the Minkowski matrix is equal to `(-1)^d` where
 @[simp]
 lemma det_eq_neg_one_pow_d : (@minkowskiMatrix d).det = (- 1) ^ d := by
   simp [as_diagonal]
+
+/-- The product of all diagonal entries of the Minkowski matrix is `(-1) ^ d`. -/
+lemma prod_diagonal : ∏ μ : Fin 1 ⊕ Fin d, minkowskiMatrix μ μ = (-1) ^ d := by
+  rw [as_diagonal]
+  simp only [Matrix.diagonal_apply_eq]
+  rw [Fintype.prod_sum_type]
+  simp
+
+/-- Reindexing all diagonal entries injectively does not change their product. -/
+lemma prod_diagonal_comp_of_injective {v : Fin (d + 1) → Fin 1 ⊕ Fin d}
+    (hv : Function.Injective v) :
+    ∏ i, minkowskiMatrix (v i) (v i) = (-1) ^ d := by
+  have hcard : Fintype.card (Fin (d + 1)) = Fintype.card (Fin 1 ⊕ Fin d) := by
+    simp [Nat.add_comm]
+  have hbij : Function.Bijective v :=
+    (Fintype.bijective_iff_injective_and_card v).mpr ⟨hv, hcard⟩
+  let e : Fin (d + 1) ≃ Fin 1 ⊕ Fin d := Equiv.ofBijective v hbij
+  change ∏ i, minkowskiMatrix (e i) (e i) = (-1) ^ d
+  exact (Equiv.prod_comp e (fun μ => minkowskiMatrix μ μ)).trans prod_diagonal
 
 /-!
 

@@ -107,6 +107,7 @@ theorem measurementMap_apply_matrix (Λ : POVM X d) (m : Matrix d d ℂ) :
   rw [LinearMap.sum_apply]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 open HermitianMat in
 theorem measurementMap_apply_hermitianMat (Λ : POVM X d) (m : HermitianMat d ℂ) :
   Λ.measurementMap.toHPMap m = ∑ x : X,

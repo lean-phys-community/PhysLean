@@ -85,9 +85,9 @@ variable {𝓩 𝓩1 𝓩2 : Type} [AddCommGroup 𝓩] [AddCommGroup 𝓩1] [Dec
 
 -/
 
-/-- Given an additive monoid homomorphisms `f : 𝓩 →+ 𝓩1`, for a charge
-  `x : Charges 𝓩`, `x.map f` is the charge of `Charges 𝓩1` obtained by mapping the elements
-  of `x` by `f`. -/
+/-- Given an additive monoid homomorphisms `f : 𝓩 →+ 𝓩1`, for a charge spectrum
+  `x : ChargeSpectrum 𝓩`, `x.map f` is the charge spectrum in `ChargeSpectrum 𝓩1` obtained by
+  mapping the elements of `x` by `f`. -/
 def map (f : 𝓩 →+ 𝓩1) (x : ChargeSpectrum 𝓩) : ChargeSpectrum 𝓩1 where
   qHd := f <$> x.qHd
   qHu := f <$> x.qHu

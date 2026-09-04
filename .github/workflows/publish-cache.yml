@@ -1,0 +1,194 @@
+on:
+  push:
+    branches:
+      - master
+
+name: Publish build cache
+
+# Pulls the cache from the bucket and then does a build with the new changes that are being merged
+# Then it creates a new cache which is pushed to the web bucket where they can be accessed
+# by `lake exe get_cache`.
+
+jobs:
+  # `secrets` is not allowed in a job-level `if:` -- GitHub rejects the whole
+  # file. Gating on a `needs` output instead skips the build jobs when the
+  # bucket is not set up yet.
+  gate:
+    name: Check for cache credentials
+    runs-on: ubuntu-latest
+    outputs:
+      has_key: ${{ steps.check.outputs.has_key }}
+    steps:
+      - name: look for LAKE_CACHE_KEY
+        id: check
+        env:
+          LAKE_CACHE_KEY: ${{ secrets.LAKE_CACHE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -n "$LAKE_CACHE_KEY" ]; then
+            echo "has_key=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::LAKE_CACHE_KEY is not set, so the build cache will not be published. See docs/cache-setup.md."
+            echo "has_key=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  physlib:
+    name: Physlib + QuantumInfo
+    needs: gate
+    if: needs.gate.outputs.has_key == 'true'
+    runs-on: ubuntu-latest
+    env:
+      LAKE_CACHE_DIR: .lake/cache
+    steps:
+      # Full history so lake can look back for a commit with a cache,
+      # a shallow clone only has one so the restore below never finds anything
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Each job needs its own scope: Lake PUTs the revision mappings to
+      # <revisionEndpoint>/<scope>/<sha>.jsonl, so a shared scope would have
+      # one job overwrite the other's. The toolchain is in the scope because
+      # Lake ignores --toolchain for verbatim scopes.
+      # scripts/get_cache.lean builds the same strings -- keep them in step.
+      - name: compute cache scope
+        run: |
+          set -euo pipefail
+          TC="$(tr '/:' '--' < lean-toolchain | tr -d '[:space:]')"
+          echo "CACHE_SCOPE=physlib-master/$TC/physlib" >> "$GITHUB_ENV"
+
+      - name: Install elan
+        run: |
+          set -o pipefail
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
+          ~/.elan/bin/lean --version
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: build cache
+        run: |
+          lake exe cache get
+
+      # This reads the existing info in the bucket so that we only have to update whats changed
+      # If the bucket is empty we will have to build from scratch.
+      - name: restore Physlib's own cache
+        env:
+          LAKE_CONFIG: ${{ github.workspace }}/lake-cache.toml
+        run: |
+          lake cache get --scope="$CACHE_SCOPE" || echo "no existing cache to restore -- building from scratch"
+
+      - name: build Physlib
+        run: |
+          bash -o pipefail -c "env LEAN_ABORT_ON_PANIC=1 lake build -KCI | tee stdout.log"
+
+      # `--no-build` here does not build anything; it emits the
+      # input-to-output mappings for what was just built.
+      - name: stage build outputs for the cache
+        id: stage
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          mkdir -p ../lake-cache-staging
+          lake build --no-build -KCI -o .lake/outputs.jsonl
+          echo "mappings: $(wc -l < .lake/outputs.jsonl) entries"
+          lake cache stage .lake/outputs.jsonl ../lake-cache-staging
+          echo "staged: $(find ../lake-cache-staging -name '*.ltar' | wc -l) ltar files"
+
+      - name: publish to R2 cache
+        id: publish
+        if: steps.stage.outcome == 'success'
+        continue-on-error: true
+        env:
+          LAKE_CACHE_KEY_RAW: ${{ secrets.LAKE_CACHE_KEY }}
+          LAKE_CONFIG: ${{ github.workspace }}/lake-cache.toml
+        run: |
+          set -euo pipefail
+          # GitHub secrets commonly carry a trailing newline, which breaks the
+          # SigV4 signature. Trim it, and mask the value so it cannot surface
+          # in logs.
+          KEY="$(printf %s "$LAKE_CACHE_KEY_RAW" | sed -e 's/[[:space:]]*$//')"
+          echo "::add-mask::$KEY"
+          export LAKE_CACHE_KEY="$KEY"
+
+          lake cache put-staged ../lake-cache-staging \
+            --scope="$CACHE_SCOPE" \
+            --rev="${{ github.sha }}"
+
+      - name: warn if cache publish failed
+        if: steps.stage.outcome == 'failure' || steps.publish.outcome == 'failure'
+        run: echo "::warning::Physlib build cache was not published this run (staging or upload failed). Contributors will fall back to compiling from source until the next successful push."
+
+  physlib_alpha:
+    name: PhyslibAlpha
+    needs: gate
+    if: needs.gate.outputs.has_key == 'true'
+    runs-on: ubuntu-latest
+    env:
+      LAKE_CACHE_DIR: .lake/cache
+    steps:
+      # Full history, see the physlib job above
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Own scope, so this job does not overwrite the physlib job's mappings.
+      - name: compute cache scope
+        run: |
+          set -euo pipefail
+          TC="$(tr '/:' '--' < lean-toolchain | tr -d '[:space:]')"
+          echo "CACHE_SCOPE=physlib-master/$TC/alpha" >> "$GITHUB_ENV"
+
+      - name: Install elan
+        run: |
+          set -o pipefail
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
+          ~/.elan/bin/lean --version
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: build cache
+        run: |
+          lake exe cache get
+
+      # See the physlib job's "restore Physlib's own cache" step -- same
+      # idea, seeding from this job's own scope before its build.
+      - name: restore PhyslibAlpha's own cache
+        env:
+          LAKE_CONFIG: ${{ github.workspace }}/lake-cache.toml
+        run: |
+          lake cache get --scope="$CACHE_SCOPE" || echo "no existing cache to restore -- building from scratch"
+
+      - name: build PhyslibAlpha
+        run: |
+          bash -o pipefail -c "env LEAN_ABORT_ON_PANIC=1 lake build -KCI PhyslibAlpha | tee stdout.log"
+
+      # Stage the cache so it can be pushed to the bucket
+      - name: stage build outputs for the cache
+        id: stage
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          mkdir -p ../lake-cache-staging
+          lake build --no-build -KCI PhyslibAlpha -o .lake/outputs.jsonl
+          echo "mappings: $(wc -l < .lake/outputs.jsonl) entries"
+          lake cache stage .lake/outputs.jsonl ../lake-cache-staging
+          echo "staged: $(find ../lake-cache-staging -name '*.ltar' | wc -l) ltar files"
+
+      - name: publish to R2 cache
+        id: publish
+        if: steps.stage.outcome == 'success'
+        continue-on-error: true
+        env:
+          LAKE_CACHE_KEY_RAW: ${{ secrets.LAKE_CACHE_KEY }}
+          LAKE_CONFIG: ${{ github.workspace }}/lake-cache.toml
+        run: |
+          set -euo pipefail
+          KEY="$(printf %s "$LAKE_CACHE_KEY_RAW" | sed -e 's/[[:space:]]*$//')"
+          echo "::add-mask::$KEY"
+          export LAKE_CACHE_KEY="$KEY"
+
+          lake cache put-staged ../lake-cache-staging \
+            --scope="$CACHE_SCOPE" \
+            --rev="${{ github.sha }}"
+
+      - name: warn if cache publish failed
+        if: steps.stage.outcome == 'failure' || steps.publish.outcome == 'failure'
+        run: echo "::warning::PhyslibAlpha build cache was not published this run."

@@ -275,11 +275,13 @@ notation p "[" x₁:80 "↔" x₂ "]" => mix p x₁ x₂
 
 notation p "[" x₁:80 "↔" x₂ ":" M "]" => mix (inst := M) p x₁ x₂
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem mix_zero [inst : Mixable U T] (x₁ x₂ : T) : (0 : Prob) [ x₁ ↔ x₂ : inst] = x₂ := by
   apply inst.to_U_inj
   simp [mix, mix_ab]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem mix_one [inst : Mixable U T] (x₁ x₂ : T) : (1 : Prob) [ x₁ ↔ x₂ : inst] = x₁ := by
   apply inst.to_U_inj
@@ -313,6 +315,7 @@ theorem instPi.lem_1 {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)]
   use t d
   exact congrFun h d
 
+set_option backward.isDefEq.respectTransparency false in
 variable {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)]
   [inst : ∀i, Mixable (U i) (T i)] in
 /-- Mixable instance on Pi types. -/
@@ -340,6 +343,7 @@ theorem to_U_instPi (D : Type*) [inst : Mixable U T] {t : D → T} :
 
 end pi
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Mixable instances on subtypes (of other mixable types), assuming that they
  have the correct closure properties. -/
 @[reducible]
@@ -411,6 +415,7 @@ noncomputable def negLog : Prob → ENNReal :=
 scoped notation "—log " => negLog
 
 --TODO: Upgrade to `StrictAnti`. Even better: bundle negLog as `Prob ≃o ENNRealᵒᵈ`.
+set_option backward.isDefEq.respectTransparency false in
 theorem negLog_Antitone : Antitone negLog := by
   intro x y h
   dsimp [negLog]
@@ -435,6 +440,7 @@ theorem negLog_zero : —log (0 : Prob) = ⊤ := by
 theorem negLog_one : —log 1 = 0 := by
   simp [negLog]; rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem negLog_eq_top_iff {p : Prob} : —log p = ⊤ ↔ p = 0 := by
   simp [negLog]
@@ -443,6 +449,7 @@ theorem negLog_pos_ENNReal {p : Prob} (hp : p ≠ 0) : —log p = .ofNNReal ⟨-
     Left.nonneg_neg_iff.mpr (Real.log_nonpos p.2.1 p.2.2)⟩ := by
   simp [negLog, hp]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem negLog_pos_Real {p : Prob} : (—log p).toReal = -Real.log p := by
   rw [negLog]
@@ -450,6 +457,7 @@ theorem negLog_pos_Real {p : Prob} : (—log p).toReal = -Real.log p := by
   · simp [hp]
   · simp; rfl
 
+set_option backward.isDefEq.respectTransparency false in
 theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENNReal.ofReal x ≤ —log p := by
   by_cases hx : 0 ≤ x
   · rw [negLog]
@@ -473,12 +481,14 @@ theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENN
     · simp only [nonpos_iff_eq_zero, ofReal_eq_zero, le_of_not_ge hx]
     · exact _root_.zero_le
 
+set_option backward.isDefEq.respectTransparency false in
 @[aesop (rule_sets := [finiteness]) safe apply]
 theorem negLog_ne_top {p : Prob} (hp : 0 < p.val) : —log p ≠ ∞ := by
   have h1 := ne_of_gt hp
   simp_all only [unitInterval.coe_pos, ne_eq, Set.Icc.coe_eq_zero, negLog_eq_top_iff]
-  exact h1
+  exact not_false
 
+set_option backward.isDefEq.respectTransparency false in
 theorem negLog_eq_neg_ENNReal_log (p : Prob) : —log p = -ENNReal.log p := by
   rw [negLog]
   split_ifs with hp

@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Nikolai Kashcheev, Joseph Tooby-Smith
+Authors: Nikolai Kashcheev, Zhi Kai Pong, Joseph Tooby-Smith
 -/
 module
 
@@ -22,16 +22,27 @@ In this module we define and prove basic lemmas about derivatives of functions o
 
 - `deriv` : The derivative of a function `Time → M` at a given time.
 - `manifoldDeriv` : The derivative of a function from `Time` to a manifold.
+- `derivVec` : The derivative of a function from `Time` into a torsor, such as `Space d`,
+  valued in the vector space of displacements of that torsor.
+- `hasDerivAt_comp_toRealCLE_symm` : The time derivative as a `HasDerivAt` on `ℝ`, for a curve
+  reparametrised through the canonical equivalence `toRealCLE.symm : ℝ ≃L[ℝ] Time`.
+- `deriv_comp_toRealCLE_of_hasDerivAt` : Its converse, a `HasDerivAt` on `ℝ` read as the time
+  derivative of the curve pulled back to `Time` through `toRealCLE`.
+- `deriv_comp_neg` and `deriv_deriv_comp_neg` : The first and second time derivatives under the
+  reversal of time `t ↦ -t`.
 
 ## iii. Table of contents
 
 - A. The definition of the derivative
   - A.1. Derivatives of functions into vector spaces
-  - A.2. Derivatives of functions into manifolds
+  - A.2. The derivative through the canonical equivalence with `ℝ`
+  - A.3. Derivatives of functions into manifolds
+  - A.4. Derivatives of functions into torsors
 - B. Linearlity properties of the derivative
 - C. Derivative of constant functions
-- D. Smoothness properties
+- D. Smoothness properties and the reversal of time
 - E. Derivatives of components
+- F. Derivatives of trajectories into `Space`
 
 ## iv. References
 
@@ -68,7 +79,44 @@ lemma deriv_eq [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
 
 /-!
 
-### A.2. Derivatives of functions into manifolds
+### A.2. The derivative through the canonical equivalence with `ℝ`
+
+`Time` is identified with `ℝ` by the continuous linear equivalence `toRealCLE`. Precomposing a
+curve `w : Time → M` with `toRealCLE.symm : ℝ ≃L[ℝ] Time` gives a curve on `ℝ`, whose Mathlib
+derivative (`HasDerivAt`) at `τ` is the time derivative `∂ₜ w` evaluated at `toRealCLE.symm τ`.
+This is the bridge through which Mathlib's calculus and ODE theory on `ℝ` applies to curves on
+`Time`. Conversely, a `HasDerivAt` on `ℝ` at `toRealCLE t` is the time derivative at `t` of the
+curve pulled back to `Time` through `toRealCLE`.
+
+-/
+
+/-- The canonical equivalence `toRealCLE.symm : ℝ ≃L[ℝ] Time` sends `1 : ℝ` to `1 : Time`. -/
+lemma toRealCLE_symm_one : toRealCLE.symm (1 : ℝ) = (1 : Time) := by
+  simp [toRealCLE]
+
+/-- Bridge from the time derivative to `HasDerivAt`: if `w : Time → M` is differentiable at
+`toRealCLE.symm τ`, then the curve `τ ↦ w (toRealCLE.symm τ)` on `ℝ` has derivative
+`∂ₜ w (toRealCLE.symm τ)` at `τ`. -/
+lemma hasDerivAt_comp_toRealCLE_symm [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (w : Time → M) (τ : ℝ) (hw : DifferentiableAt ℝ w (toRealCLE.symm τ)) :
+    HasDerivAt (fun τ : ℝ => w (toRealCLE.symm τ)) (∂ₜ w (toRealCLE.symm τ)) τ := by
+  apply hw.hasFDerivAt.comp_hasDerivAt_of_eq τ _ rfl
+  exact Time.toRealCLE_symm_one ▸ toRealCLE.symm.hasFDerivAt.hasDerivAt
+
+/-- The converse of the bridge `hasDerivAt_comp_toRealCLE_symm`: if the curve `γ : ℝ → M` has
+derivative `v` at `toRealCLE t`, then the curve `t ↦ γ (toRealCLE t)` on `Time` has time
+derivative `v` at `t`. -/
+lemma deriv_comp_toRealCLE_of_hasDerivAt [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (γ : ℝ → M) (t : Time) (v : M) (h : HasDerivAt γ v (toRealCLE t)) :
+    ∂ₜ (fun s => γ (toRealCLE s)) t = v := by
+  rw [Time.deriv_eq, fderiv_fun_comp _ h.differentiableAt toRealCLE.differentiableAt,
+    toRealCLE.fderiv, ContinuousLinearMap.comp_apply, ContinuousLinearEquiv.coe_coe,
+    fderiv_eq_smul_deriv, h.deriv]
+  exact Eq.trans (by rfl) (Time.one_val ▸ one_smul _ v)
+
+/-!
+
+### A.3. Derivatives of functions into manifolds
 
 -/
 
@@ -103,6 +151,7 @@ lemma deriv_eq_manifoldDeriv [NormedAddCommGroup M] [NormedSpace ℝ M]
     deriv f t = manifoldDeriv 𝓘(ℝ, M) f t := by
   rw [deriv_eq_mfderiv, manifoldDeriv_eq]
 
+set_option backward.isDefEq.respectTransparency false in
 open Manifold in
 @[simp]
 lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
@@ -110,6 +159,45 @@ lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ
     [ChartedSpace H N] (n : N) :
     manifoldDeriv I (fun _ : Time => n) t = 0 := by
   simp [manifoldDeriv]
+
+/-!
+
+### A.4. Derivatives of functions into torsors
+
+A trajectory in physical space is a curve of points, and its velocity is a displacement per
+unit time, that is a vector. For a torsor `P` over a vector space `V`, for example
+`Space d` over `EuclideanSpace ℝ (Fin d)`, the derivative of a curve `f : Time → P` is
+therefore valued in `V` rather than in `P`. It is defined by differentiating the displacement
+curve `s ↦ f s -ᵥ f t`, which is `V`-valued, so that no origin of `P` is ever chosen. The
+reference point used to form the displacement is irrelevant, see `derivVec_eq_fderiv_vsub`.
+
+-/
+
+/-- The time derivative of a trajectory into a torsor `P` over a vector space `V`,
+valued in `V`. For a trajectory `f : Time → Space d` this is the velocity, a spatial vector in
+`EuclideanSpace ℝ (Fin d)` rather than a point of `Space d`. -/
+noncomputable def derivVec {V P : Type} [AddCommGroup V] [Module ℝ V] [TopologicalSpace V]
+    [AddTorsor V P] (f : Time → P) : Time → V :=
+  fun t => fderiv ℝ (fun s => f s -ᵥ f t) t 1
+
+@[inherit_doc derivVec]
+scoped notation "∂ₜᵥ" => derivVec
+
+lemma derivVec_eq {V P : Type} [AddCommGroup V] [Module ℝ V] [TopologicalSpace V]
+    [AddTorsor V P] (f : Time → P) (t : Time) :
+    ∂ₜᵥ f t = fderiv ℝ (fun s => f s -ᵥ f t) t 1 := rfl
+
+/-- The derivative of a trajectory into a torsor does not depend on the reference point used
+to form the displacement: any base point `p` gives the same derivative. The normed hypotheses on
+`V` here come from `fderiv_add_const`; the definition itself needs only a topological vector
+space. -/
+lemma derivVec_eq_fderiv_vsub {V P : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    [AddTorsor V P] (f : Time → P) (p : P) (t : Time) :
+    ∂ₜᵥ f t = fderiv ℝ (fun s => f s -ᵥ p) t 1 := by
+  have h : (fun s => f s -ᵥ f t) = fun s => (f s -ᵥ p) + (p -ᵥ f t) := by
+    funext s
+    rw [vsub_add_vsub_cancel]
+  rw [derivVec_eq, h, fderiv_add_const]
 
 /-!
 
@@ -172,9 +260,16 @@ lemma deriv_const [NormedAddCommGroup M] [NormedSpace ℝ M] (m : M) :
   rw [deriv]
   simp
 
+/-- A trajectory constant at a point of a torsor has zero derivative. -/
+@[simp]
+lemma derivVec_const {V P : Type} [AddCommGroup V] [Module ℝ V] [TopologicalSpace V]
+    [AddTorsor V P] (p : P) :
+    ∂ₜᵥ (fun _ => p) t = (0 : V) := by
+  simp [derivVec]
+
 /-!
 
-## D. Smoothness properties
+## D. Smoothness properties and the reversal of time
 
 -/
 
@@ -210,6 +305,25 @@ lemma deriv_contDiff_of_space {n} {M : Type} [NormedAddCommGroup M] [NormedSpace
     ContDiff ℝ n fun (x : Space d) => (∂ₜ fun t => f t x) t := by
   unfold deriv
   fun_prop
+
+/-- The chain rule for the time derivative under the reversal of time: the derivative of
+`t ↦ f (-t)` at `t` is minus the derivative of `f` at `-t`. -/
+lemma deriv_comp_neg {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f : Time → M) (t : Time) (hf : DifferentiableAt ℝ f (-t)) :
+    ∂ₜ (fun s => f (-s)) t = -∂ₜ f (-t) := by
+  rw [Time.deriv_eq, Time.deriv_eq, fderiv_fun_comp _ hf (by fun_prop), fderiv_fun_neg]
+  simp
+
+/-- The second derivative is unchanged by the reversal of time: for a smooth curve `f`, the second
+derivative of `t ↦ f (-t)` at `t` is the second derivative of `f` at `-t`, the two changes of sign
+cancelling. -/
+lemma deriv_deriv_comp_neg {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f : Time → M) (hf : ContDiff ℝ ∞ f) (t : Time) :
+    ∂ₜ (∂ₜ (fun s => f (-s))) t = ∂ₜ (∂ₜ f) (-t) := by
+  rw [← neg_neg (∂ₜ (∂ₜ f) (-t)), ← deriv_comp_neg _ _ (by fun_prop), ← Time.deriv_neg]
+  congr
+  ext
+  exact deriv_comp_neg f _ (hf.differentiable (by simp) _)
 
 /-!
 
@@ -260,5 +374,44 @@ lemma deriv_space {d : ℕ} {f : Time → Space d}
     (hf : Differentiable ℝ f) (t : Time) (i : Fin d) :
     deriv (fun s => f s i) t = deriv f t i :=
   (Space.fderiv_space_components i f hf t 1).symm
+
+/-!
+
+## F. Derivatives of trajectories into `Space`
+
+For a trajectory `f : Time → Space d` of points in space, the torsor derivative `∂ₜᵥ f` is
+valued in the displacement space `EuclideanSpace ℝ (Fin d)`. Componentwise it agrees with the
+time derivatives of the coordinates, and under the identification of `Space d` with its
+displacement space given by the (arbitrary) zero point it recovers the vector space derivative
+`∂ₜ f`. The latter bridges `∂ₜᵥ` to the existing `∂ₜ` API.
+
+Note that `Space d` carries two `AddTorsor` instances: the intended one over
+`EuclideanSpace ℝ (Fin d)`, and one over itself coming from the module structure on `Space d`.
+Instance resolution selects the former, so `∂ₜᵥ` of a trajectory in `Space d` is valued in
+`EuclideanSpace ℝ (Fin d)` as intended.
+
+-/
+
+/-- The components of the torsor derivative of a trajectory in `Space d` are the time
+derivatives of the coordinates of the trajectory. -/
+lemma derivVec_space {f : Time → Space d} (hf : Differentiable ℝ f) (t : Time) (i : Fin d) :
+    ∂ₜᵥ f t i = ∂ₜ (fun s => f s i) t := by
+  have hv : Differentiable ℝ (fun s => (f s -ᵥ f t : EuclideanSpace ℝ (Fin d))) := by
+    apply differentiable_euclid
+    intro j
+    simp only [Space.vsub_apply]
+    exact ((Space.eval_differentiable j).comp hf).sub_const (f t j)
+  rw [derivVec_eq, deriv_eq, ← fderiv_euclid hv t 1]
+  simp only [Space.vsub_apply]
+  rw [fderiv_sub_const]
+
+/-- The torsor derivative of a trajectory in `Space d` agrees with the vector space derivative
+`∂ₜ` under the identification of `Space d` with its displacement space given by the zero
+point. -/
+lemma derivVec_eq_deriv_vsub_zero {f : Time → Space d} (hf : Differentiable ℝ f) (t : Time) :
+    ∂ₜᵥ f t = ∂ₜ f t -ᵥ (0 : Space d) := by
+  ext i
+  rw [derivVec_space hf t i, deriv_space hf t i, Space.vsub_apply]
+  simp
 
 end Time

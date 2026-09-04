@@ -159,7 +159,7 @@ lemma ι_superCommuteF_ofCrAnOpF_ofCrAnOpF_bosonic_or_zero (φ ψ : 𝓕.CrAnFie
 lemma ι_superCommuteF_ofCrAnOpF_superCommuteF_ofCrAnOpF_ofCrAnOpF (φ1 φ2 φ3 : 𝓕.CrAnFieldOp) :
     ι [ofCrAnOpF φ1, [ofCrAnOpF φ2, ofCrAnOpF φ3]ₛF]ₛF = 0 := by
   apply ι_of_mem_fieldOpIdealSet
-  simp only [fieldOpIdealSet, exists_prop, exists_and_left, Set.mem_setOf_eq]
+  simp only [fieldOpIdealSet, exists_prop, exists_and_left, Set.mem_ofPred_eq]
   aesop
 
 lemma ι_superCommuteF_superCommuteF_ofCrAnOpF_ofCrAnOpF_ofCrAnOpF (φ1 φ2 φ3 : 𝓕.CrAnFieldOp) :
@@ -231,7 +231,7 @@ lemma bosonicProjF_mem_fieldOpIdealSet_or_zero (x : FieldOpFreeAlgebra 𝓕)
     (hx : x ∈ 𝓕.fieldOpIdealSet) :
     x.bosonicProjF.1 ∈ 𝓕.fieldOpIdealSet ∨ x.bosonicProjF = 0 := by
   have hx' := hx
-  simp only [fieldOpIdealSet, exists_prop, Set.mem_setOf_eq] at hx
+  simp only [fieldOpIdealSet, exists_prop, Set.mem_ofPred_eq] at hx
   rcases hx with ⟨φ1, φ2, φ3, rfl⟩ | ⟨φc, φc', hφc, hφc', rfl⟩ | ⟨φa, φa', hφa, hφa', rfl⟩ |
     ⟨φ, φ', hdiff, rfl⟩
   · rcases superCommuteF_superCommuteF_ofCrAnOpF_bosonic_or_fermionic φ1 φ2 φ3 with h | h
@@ -263,7 +263,7 @@ lemma fermionicProjF_mem_fieldOpIdealSet_or_zero (x : FieldOpFreeAlgebra 𝓕)
     (hx : x ∈ 𝓕.fieldOpIdealSet) :
     x.fermionicProjF.1 ∈ 𝓕.fieldOpIdealSet ∨ x.fermionicProjF = 0 := by
   have hx' := hx
-  simp only [fieldOpIdealSet, exists_prop, Set.mem_setOf_eq] at hx
+  simp only [fieldOpIdealSet, exists_prop, Set.mem_ofPred_eq] at hx
   rcases hx with ⟨φ1, φ2, φ3, rfl⟩ | ⟨φc, φc', hφc, hφc', rfl⟩ | ⟨φa, φa', hφa, hφa', rfl⟩ |
     ⟨φ, φ', hdiff, rfl⟩
   · rcases superCommuteF_superCommuteF_ofCrAnOpF_bosonic_or_fermionic φ1 φ2 φ3 with h | h

@@ -7,7 +7,6 @@ module
 
 public import Physlib.QuantumMechanics.Hydrogen.Basic
 public import Physlib.QuantumMechanics.Operators.Commutation
-public import Physlib.Meta.Linters.Sorry
 /-!
 
 # Laplace-Runge-Lenz vector
@@ -94,14 +93,32 @@ lemma lrlOperator_eq'' (ε : ℝˣ) (i : Fin H.d) : H.lrlOperator ε i =
 ## Angular momentum / LRL vector commutators
 -/
 
+/-- A supporting piece of `angularMomentum_commutation_lrl`: how `𝐋ᵢⱼ` commutes with the
+dot-product term `𝐋ₖ⬝ᵥ𝐩` appearing in `H.lrlOperator`'s expanded form (`lrlOperator_eq'`). -/
+lemma angularMomentum_commutation_Ldot_p (i j k : Fin H.d) :
+    ⁅𝐋[H.d] i j, 𝐋 k ⬝ᵥ 𝐩⁆ =
+      (I * ℏ) • (δ[i,k] • (𝐋 j ⬝ᵥ 𝐩) - δ[j,k] • (𝐋 i ⬝ᵥ 𝐩)) := by
+  simp only [dotProduct, mul_def, lie_sum, lie_leibniz,
+    angularMomentum_commutation_angularMomentum, angularMomentum_commutation_momentum,
+    comp_smul, smul_comp, comp_sub, sub_comp, add_comp]
+  simp only [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.smul_sum,
+    KroneckerDelta.sum_smul]
+  rw [angularMomentumOperator_antisymm k i, angularMomentumOperator_antisymm k j]
+  simp only [neg_comp]
+  module
+
 /-- `⁅𝐋ᵢⱼ, 𝐀(ε)ₖ⁆ = iℏ(δᵢₖ𝐀(ε)ⱼ - δⱼₖ𝐀(ε)ᵢ)` -/
-@[sorryful]
 lemma angularMomentum_commutation_lrl (ε : ℝˣ) (i j k : Fin H.d) : ⁅𝐋 i j, H.lrlOperator ε k⁆ =
     (I * ℏ) • (δ[i,k] • H.lrlOperator ε j - δ[j,k] • H.lrlOperator ε i) := by
-  sorry
+  simp_rw [H.lrlOperator_eq']
+  rw [lie_sub, lie_add, angularMomentum_commutation_Ldot_p H i j k, lie_smul,
+    angularMomentum_commutation_momentum, lie_smul, lie_leibniz,
+    angularMomentum_commutation_radiusRegPow, angularMomentum_commutation_position]
+  simp only [zero_comp, comp_sub, comp_smul, smul_sub]
+  module
 
 /-- `⁅𝐋ᵢⱼ, 𝐀(ε)²⁆ = 0` -/
-@[sorryful, simp]
+@[simp]
 lemma angularMomentum_commutation_lrlSqr (ε : ℝˣ) (i j : Fin H.d) :
     ⁅𝐋 i j, H.lrlOperator ε ⬝ᵥ H.lrlOperator ε⁆ = 0 := by
   simp only [dotProduct, mul_def, lie_sum, lie_leibniz, H.angularMomentum_commutation_lrl,
@@ -109,7 +126,7 @@ lemma angularMomentum_commutation_lrlSqr (ε : ℝˣ) (i j : Fin H.d) :
     Finset.sum_sub_distrib, sum_smul, sub_add_sub_cancel, sub_self, smul_zero]
 
 /-- `⁅𝐋², 𝐀(ε)²⁆ = 0` -/
-@[sorryful, simp]
+@[simp]
 lemma angularMomentumSqr_commutation_lrlSqr (ε : ℝˣ) :
     ⁅𝐋²[H.d], H.lrlOperator ε ⬝ᵥ H.lrlOperator ε⁆ = 0 := by
   simp [angularMomentumOperatorSqr, sum_lie, leibniz_lie]
@@ -494,6 +511,7 @@ private lemma sum_rxrx (d : ℕ) (ε : ℝˣ) : ∑ i, 𝐫₀[d] ε (-1) ∘L �
   ring_nf
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The square of the (regularized) LRL vector operator is related to the (regularized) Hamiltonian
   `𝐇(ε)` of the hydrogen atom, square of the angular momentum `𝐋²` and powers of `𝐫(ε)` as
   `𝐀(ε)² = 2m·𝐇(ε)(𝐋² + ¼ℏ²(d-1)²) + m²k²(𝟙 - ε²·𝐫(ε)⁻²) - ½(d-1)mkℏ²ε²𝐫(ε)⁻³`. -/

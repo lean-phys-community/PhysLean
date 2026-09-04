@@ -339,6 +339,7 @@ lemma crAnTimeOrderSign_crAnSection : {φs : List 𝓕.FieldOp} → (ψs : CrAnS
     exact congrArg₂ (· * ·) (koszulSignInsert_crAnTimeOrderRel_crAnSection h.1 ⟨ψs, h.2⟩)
       (crAnTimeOrderSign_crAnSection ⟨ψs, h.2⟩)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsert_crAnTimeOrderRel_crAnSection {φ : 𝓕.FieldOp} {ψ : 𝓕.CrAnFieldOp}
     (h : ψ.1 = φ) : {φs : List 𝓕.FieldOp} → (ψs : CrAnSection φs) →
     (List.orderedInsert 𝓕.crAnTimeOrderRel ψ ψs.1).map 𝓕.crAnFieldOpToFieldOp =

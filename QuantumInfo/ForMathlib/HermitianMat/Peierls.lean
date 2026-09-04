@@ -105,6 +105,7 @@ theorem peierls_inequality_ici (A : HermitianMat d ℂ) (g : ℝ → ℝ) (hg : 
     exact fun j => Matrix.unitaryGroup_row_norm (H A).eigenvectorUnitary j
   simp_all [trace_cfc_eq]
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 Joint convexity of the trace functional: for a convex function g,
 the map A ↦ tr(g(A)) is convex on the space of Hermitian matrices.
@@ -163,6 +164,7 @@ theorem trace_function_convex_univ (g : ℝ → ℝ) (hg : ConvexOn ℝ Set.univ
   simp_all only
   exact h1
 
+set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 /--
 Convexity of trace functions: if `g` is convex on `ℝ₊`, then `A ↦ Tr[g(A)]` is

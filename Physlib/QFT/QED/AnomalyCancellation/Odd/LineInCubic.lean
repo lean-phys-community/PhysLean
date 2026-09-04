@@ -36,27 +36,35 @@ open VectorLikeOddPlane
 in the basis through that point is in the cubic. -/
 def LineInCubic (S : (PureU1 (2 * n + 1)).LinSols) : Prop :=
   ∀ (g f : Fin n → ℚ) (_ : S.val = Pa g f) (a b : ℚ),
-  accCube (2 * n + 1) (a • P g + b • P! f) = 0
+  accCube (2 * n + 1) (a • Unshifted.planeCharges g + b • Shifted.planeCharges f) = 0
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The condition that a linear solution sits on a line between the two planes
   within the cubic expands into a on `accCubeTriLinSymm` applied to the points
   within the planes. -/
 lemma lineInCubic_expand {S : (PureU1 (2 * n + 1)).LinSols} (h : LineInCubic S) :
-    ∀ (g : Fin n → ℚ) (f : Fin n → ℚ) (_ : S.val = P g + P! f) (a b : ℚ),
-    3 * a * b * (a * accCubeTriLinSymm (P g) (P g) (P! f)
-    + b * accCubeTriLinSymm (P! f) (P! f) (P g)) = 0 := by
+    ∀ (g : Fin n → ℚ) (f : Fin n → ℚ)
+      (_ : S.val = Unshifted.planeCharges g + Shifted.planeCharges f)
+      (a b : ℚ),
+    3 * a * b *
+      (a * accCubeTriLinSymm (Unshifted.planeCharges g) (Unshifted.planeCharges g)
+          (Shifted.planeCharges f) +
+        b * accCubeTriLinSymm (Shifted.planeCharges f) (Shifted.planeCharges f)
+          (Unshifted.planeCharges g)) = 0 := by
   intro g f hS a b
   have h1 := h g f hS a b
-  change accCubeTriLinSymm.toCubic (a • P g + b • P! f) = 0 at h1
+  change accCubeTriLinSymm.toCubic
+    (a • Unshifted.planeCharges g + b • Shifted.planeCharges f) = 0 at h1
   simp only [TriLinearSymm.toCubic_add, HomogeneousCubic.map_smul,
     accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂, accCubeTriLinSymm.map_smul₃] at h1
-  erw [P_accCube, P!_accCube] at h1
+  erw [Unshifted.planeCharges_accCube, Shifted.planeCharges_accCube] at h1
   linear_combination h1
 
 lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n + 1)).LinSols} (h : LineInCubic S) :
-    ∀ (g : Fin n → ℚ) (f : Fin n → ℚ) (_ : S.val = P g + P! f),
-    accCubeTriLinSymm (P g) (P g) (P! f) = 0 := by
+    ∀ (g : Fin n → ℚ) (f : Fin n → ℚ)
+      (_ : S.val = Unshifted.planeCharges g + Shifted.planeCharges f),
+    accCubeTriLinSymm (Unshifted.planeCharges g) (Unshifted.planeCharges g)
+      (Shifted.planeCharges f) = 0 := by
   intro g f hS
   linear_combination 2 / 3 * (lineInCubic_expand h g f hS 1 1) -
       (lineInCubic_expand h g f hS 1 2) / 6
@@ -81,7 +89,9 @@ lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ + 1)).LinSols}
     (LIC : LineInCubicPerm S) :
     ∀ (j : Fin n.succ) (g f : Fin n.succ → ℚ) (_ : S.val = Pa g f),
       (S.val (oddShiftSnd j) - S.val (oddShiftFst j))
-      * accCubeTriLinSymm (P g) (P g) (basis!AsCharges j) = 0 := by
+      * accCubeTriLinSymm
+        (Unshifted.planeCharges g) (Unshifted.planeCharges g)
+        (Shifted.basisAsCharges j) = 0 := by
   intro j g f h
   obtain ⟨g', f', hall⟩ := span_basis_swap! j rfl g f h
   have h1 := line_in_cubic_P_P_P! (lineInCubicPerm_self LIC) g f h
@@ -92,12 +102,13 @@ lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ + 1)).LinSols}
 
 lemma P_P_P!_accCube' {S : (PureU1 (2 * n.succ.succ + 1)).LinSols}
     (f g : Fin n.succ.succ → ℚ) (hS : S.val = Pa f g) :
-    accCubeTriLinSymm (P f) (P f) (basis!AsCharges 0) =
+    accCubeTriLinSymm (Unshifted.planeCharges f) (Unshifted.planeCharges f)
+      (Shifted.basisAsCharges 0) =
     (S.val (oddShiftFst 0) + S.val (oddShiftSnd 0)) *
     (2 * S.val oddShiftZero + S.val (oddShiftFst 0) + S.val (oddShiftSnd 0)) := by
   rw [P_P_P!_accCube f 0, ← Pa_oddShiftShiftZero f g, ← hS]
   nth_rewrite 1 [show oddShiftFst (0 : Fin n.succ.succ) = oddFst 1 from rfl]
-  rw [P_oddFst]
+  rw [Unshifted.planeCharges_oddFst]
   have h1 := Pa_oddShiftShiftZero f g
   have h4 := Pa_oddShiftShiftSnd f g 0
   have h2 := Pa_oddShiftShiftFst f g 0

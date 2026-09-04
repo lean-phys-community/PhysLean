@@ -31,8 +31,10 @@ namespace HarmonicOscillator
 variable (Q : HarmonicOscillator)
 
 open Module Nat
-open Physlib
-open MeasureTheory HilbertSpace InnerProductSpace
+open Polynomial
+open MeasureTheory
+open _root_.QuantumMechanics.OneDimension.HilbertSpace
+open InnerProductSpace
 
 /-
 
@@ -359,6 +361,7 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
 open FourierTransform MeasureTheory Real Lp MemLp Filter Complex Topology
   ComplexInnerProductSpace ComplexConjugate
 
+set_option backward.isDefEq.respectTransparency false in
 /-- If `f` is a function `ℝ → ℂ` satisfying `MemHS f` such that it is orthogonal
   to all `eigenfunction n` then the fourier transform of
 

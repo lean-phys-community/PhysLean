@@ -144,7 +144,7 @@ lemma posDef_no_neg_weights {E : Type*} [AddCommGroup E] [Module ℝ E]
 theorem rankNeg_eq_zero {E : Type*} [AddCommGroup E]
     [Module ℝ E] [FiniteDimensional ℝ E] {q : QuadraticForm ℝ E} (hq : q.PosDef) :
     q.negDim = 0 := by
-  haveI : Invertible (2 : ℝ) := inferInstance
+  have : Invertible (2 : ℝ) := inferInstance
   unfold QuadraticForm.negDim
   have h_exists := equivalent_signType_weighted_sum_squared q
   let w := Classical.choose h_exists
@@ -347,8 +347,8 @@ lemma flatL_inj (g : PseudoRiemannianMetric E H M n I) (x : M) :
 lemma flatL_surj
     (g : PseudoRiemannianMetric E H M n I) (x : M) :
     Function.Surjective (g.flatL x) := by
-  haveI : FiniteDimensional ℝ (TangentSpace I x) := inst_tangent_findim x
-  haveI : T2Space (TangentSpace I x) := inferInstanceAs (T2Space E)
+  have : FiniteDimensional ℝ (TangentSpace I x) := inst_tangent_findim x
+  have : T2Space (TangentSpace I x) := inferInstanceAs (T2Space E)
   have h_finrank_eq : finrank ℝ (TangentSpace I x) = finrank ℝ (TangentSpace I x →L[ℝ] ℝ) :=
     Subspace.dual_finrank_eq.symm.trans (LinearMap.toContinuousLinearMap
       (𝕜 := ℝ) (E := TangentSpace I x) (F' := ℝ)).finrank_eq

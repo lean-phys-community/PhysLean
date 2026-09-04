@@ -57,7 +57,7 @@ lemma accQuad_α₁_α₂ (S : (PlusU1 n).LinSols) :
 lemma accQuad_α₁_α₂_zero (S : (PlusU1 n).LinSols) (h1 : α₁ C S = 0)
     (h2 : α₂ S = 0) (a b : ℚ) : accQuad (a • S + b • C.1).val = 0 := by
   erw [add_AFL_quad]
-  simp only [α₁, quadBiLin_toFun_apply, Fin.isValue, neg_mul, neg_eq_zero, mul_eq_zero,
+  simp only [α₁, neg_mul, neg_eq_zero, mul_eq_zero,
     OfNat.ofNat_ne_zero, false_or, α₂, HomogeneousQuadratic, accQuad] at h1 h2
   simp [h1, h2]
 

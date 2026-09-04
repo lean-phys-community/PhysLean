@@ -78,9 +78,13 @@ lemma div_self (x : LengthUnit) :
 
 lemma div_symm (x y : LengthUnit) :
     x / y = (y / x)⁻¹ := NNReal.eq <| by
-  rw [div_eq_val, inv_eq_one_div, div_eq_val]
-  simp only [one_div, NNReal.coe_inv]
-  rw [toReal, inv_div]
+  show x.val / y.val = (y.val / x.val)⁻¹
+  rw [inv_div]
+
+/-- The unit-ratio cocycle at `ℝ≥0` (the un-coerced form of `div_mul_div_coe`). -/
+lemma div_mul_div (x y z : LengthUnit) : (x / y) * (y / z) = x / z := NNReal.eq <| by
+  show x.val / y.val * (y.val / z.val) = x.val / z.val
+  rw [div_mul_div_comm, mul_comm x.val y.val, mul_div_mul_left _ _ y.val_ne_zero]
 
 @[simp]
 lemma div_mul_div_coe (x y z : LengthUnit) :
@@ -102,6 +106,7 @@ def scale (r : ℝ) (x : LengthUnit) (hr : 0 < r := by norm_num) : LengthUnit :=
 lemma scale_div_self (x : LengthUnit) (r : ℝ) (hr : 0 < r) :
     scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
   simp [scale, div_eq_val]
+  rfl
 
 @[simp]
 lemma self_div_scale (x : LengthUnit) (r : ℝ) (hr : 0 < r) :
@@ -118,9 +123,8 @@ lemma scale_one (x : LengthUnit) : scale 1 x = x := by
 lemma scale_div_scale (x1 x2 : LengthUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :
     scale r1 x1 hr1 / scale r2 x2 hr2 = (⟨r1, le_of_lt hr1⟩ / ⟨r2, le_of_lt hr2⟩) * (x1 / x2) := by
   refine NNReal.eq ?_
-  simp [scale, div_eq_val]
-  rw [toReal]
-  field_simp
+  show r1 * x1.val / (r2 * x2.val) = r1 / r2 * (x1.val / x2.val)
+  rw [div_mul_div_comm]
 
 @[simp]
 lemma scale_scale (x : LengthUnit) (r1 r2 : ℝ) (hr1 : 0 < r1) (hr2 : 0 < r2) :
@@ -222,10 +226,17 @@ noncomputable def parsecs : LengthUnit := scale (648000/Real.pi) astronomicalUni
 
 /-- There are exactly 1760 yards in a mile. -/
 lemma miles_div_yards : miles / yards = (⟨1760, by norm_num⟩ : ℝ≥0) :=
-  NNReal.eq <| by simp [miles, yards]; rw [toReal]; norm_num
+  NNReal.eq <| by
+    simp [miles, yards]
+    show (1609.344 : ℝ) / 0.9144 = ((⟨1760, by norm_num⟩ : ℝ≥0) : ℝ)
+    push_cast
+    norm_num
 
 /-- There are exactly 220 yards in a furlong. -/
 lemma furlongs_div_yards : furlongs / yards = (⟨220, by norm_num⟩ : ℝ≥0) := NNReal.eq <| by
-  simp [furlongs, yards]; rw [toReal]; norm_num
+  simp [furlongs, yards]
+  show (201.168 : ℝ) / 0.9144 = ((⟨220, by norm_num⟩ : ℝ≥0) : ℝ)
+  push_cast
+  norm_num
 
 end LengthUnit

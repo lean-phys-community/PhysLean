@@ -289,7 +289,7 @@ lemma threeDimPointParticle_div_electricField {𝓕} (q : ℝ) (r₀ : Space 3) 
       (IsDistBounded.zpow_smul_repr_self (- 3 : ℤ) (by omega))))
   · ext η
     simp [distTranslate_ofFunction]
-  simp only [Int.reduceNeg, zpow_neg, one_div]
+  simp only [Int.reduceNeg, zpow_neg, zpow_ofNat, one_div]
   rw [constantTime_distSpaceDiv, distDiv_distTranslate, h1]
   simp only [map_smul, smul_smul]
   ext η

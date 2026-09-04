@@ -288,7 +288,7 @@ lemma ι_timeOrderF_superCommuteF_ne_time {φ ψ : 𝓕.CrAnFieldOp}
 
 /-!
 
-## Defining time order for `FiedOpAlgebra`.
+## Defining time order for `FieldOpFreeAlgebra`.
 
 -/
 
@@ -301,7 +301,7 @@ lemma ι_timeOrderF_zero_of_mem_ideal (a : 𝓕.FieldOpFreeAlgebra)
   apply AddSubgroup.closure_induction
   · rintro x ⟨_, ⟨a, ha, c, hc, rfl⟩, b, hb, rfl⟩
     simp only [p]
-    simp only [fieldOpIdealSet, exists_prop, exists_and_left, Set.mem_setOf_eq] at hc
+    simp only [fieldOpIdealSet, exists_prop, exists_and_left, Set.mem_ofPred_eq] at hc
     rcases hc with ⟨φa, φa', hφa, hφa', rfl⟩ | ⟨φa, hφa, φb, hφb, rfl⟩ |
       ⟨φa, hφa, φb, hφb, rfl⟩ | ⟨φa, φb, hdiff, rfl⟩
     · simp
@@ -328,6 +328,7 @@ lemma ι_timeOrderF_eq_of_equiv (a b : 𝓕.FieldOpFreeAlgebra) (h : a ≈ b) :
   rw [← sub_eq_zero, ← map_sub, ← map_sub]
   exact ι_timeOrderF_zero_of_mem_ideal _ ((equiv_iff_sub_mem_ideal a b).mp h)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a field specification `𝓕`, `timeOrder` is the linear map
 
 `WickAlgebra 𝓕 →ₗ[ℂ] WickAlgebra 𝓕`

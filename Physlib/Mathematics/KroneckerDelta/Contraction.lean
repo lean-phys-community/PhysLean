@@ -36,8 +36,8 @@ matrix determinant lemma when `det A` is a unit and Kronecker-delta matrices are
 
 - `generalizedKroneckerDelta_sum_snoc` : summing over one shared index lowers the rank by one.
 - `sum_generalizedKroneckerDelta_mul_self`, `sum_generalizedKroneckerDelta_mul_cons`,
-  `sum_generalizedKroneckerDelta_mul_cons₂` : the fully-, singly-, and doubly-free symbol-level
-  contractions over `Fin 4`.
+  `sum_generalizedKroneckerDelta_mul_snoc`, `sum_generalizedKroneckerDelta_mul_cons₂` : the
+  fully-, singly-, and doubly-free symbol-level contractions over `Fin 4`.
 
 ## iii. Table of contents
 
@@ -307,6 +307,23 @@ lemma sum_generalizedKroneckerDelta_mul_cons (σ τ : Fin 4) :
   rw [Finset.sum_congr rfl fun h _ =>
       generalizedKroneckerDelta_mul (Fin.cons σ h) (Fin.cons τ h),
     sum_generalizedKroneckerDelta_cons σ τ 3]
+  norm_num [Finset.prod_range_succ]
+
+/-- Symbol-level triple contraction with the free index in the last slot. -/
+lemma sum_generalizedKroneckerDelta_mul_snoc (σ τ : Fin 4) :
+    ∑ h : Fin 3 → Fin 4,
+        generalizedKroneckerDelta (Fin.snoc h σ) id * generalizedKroneckerDelta (Fin.snoc h τ) id =
+      6 * ((kroneckerDelta σ τ : ℕ) : ℤ) := by
+  rw [Finset.sum_congr rfl fun h _ => generalizedKroneckerDelta_mul (Fin.snoc h σ) (Fin.snoc h τ)]
+  have hrotate (h : Fin 3 → Fin 4) :
+      generalizedKroneckerDelta (Fin.snoc h σ) (Fin.snoc h τ) =
+        generalizedKroneckerDelta (Fin.cons σ h) (Fin.cons τ h) := by
+    rw [Fin.snoc_eq_cons_rotate, Fin.snoc_eq_cons_rotate]
+    change generalizedKroneckerDelta ((Fin.cons σ h) ∘ finRotate (3 + 1))
+      ((Fin.cons τ h) ∘ finRotate (3 + 1)) =
+        generalizedKroneckerDelta (Fin.cons σ h) (Fin.cons τ h)
+    exact generalizedKroneckerDelta_comp_perm _ _ _
+  rw [Finset.sum_congr rfl fun h _ => hrotate h, sum_generalizedKroneckerDelta_cons σ τ 3]
   norm_num [Finset.prod_range_succ]
 
 /-- Symbol-level double contraction, two free pairs. -/

@@ -25,6 +25,7 @@ open BigOperators
 
 variable {n : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The family universal maps on `LinSols`. -/
 def familyUniversalLinear (n : ℕ) :
     (SM 1).LinSols →ₗ[ℚ] (SM n).LinSols where
@@ -35,6 +36,7 @@ def familyUniversalLinear (n : ℕ) :
   map_add' S T := ACCSystemLinear.LinSols.ext ((familyUniversal n).map_add' _ _)
   map_smul' a S := ACCSystemLinear.LinSols.ext ((familyUniversal n).map_smul' _ _)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The family universal maps on `QuadSols`. -/
 def familyUniversalQuad (n : ℕ) :
     (SM 1).QuadSols → (SM n).QuadSols := fun S =>
@@ -43,6 +45,7 @@ def familyUniversalQuad (n : ℕ) :
     (by rw [familyUniversal_accSU2, SU2Sol S.1, mul_zero])
     (by rw [familyUniversal_accSU3, SU3Sol S.1, mul_zero])
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The family universal maps on `Sols`. -/
 def familyUniversalAF (n : ℕ) :
     (SM 1).Sols → (SM n).Sols := fun S =>

@@ -420,6 +420,7 @@ lemma conj_posDef [DecidableEq n] (hA : A.mat.PosDef) (hN : IsUnit N) :
   simp only [conj_apply_mat, mulVec_mulVec, Matrix.mul_assoc]
   simp [dotProduct_mulVec, mulVec_conjTranspose]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma inv_conj [DecidableEq n] {M : Matrix n n 𝕜} (hM : IsUnit M) :
     (A.conj M)⁻¹ = A⁻¹.conj (M⁻¹)ᴴ := by
   have h_inv : (M⁻¹)ᴴ * Mᴴ = 1 := by
@@ -485,6 +486,7 @@ theorem ker_sum [DecidableEq n] (f : ι → HermitianMat n 𝕜) (hf : ∀ i, 0 
   · intro h
     simp [Matrix.sum_mulVec, h]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem ker_conj [DecidableEq n] (hA : 0 ≤ A) (B : Matrix n n 𝕜) :
     (A.conj B).ker = Submodule.comap (Matrix.toEuclideanLin B.conjTranspose) A.ker := by
 
@@ -680,11 +682,13 @@ example (M : Matrix m n ℂ) : 0 ≤ M.conjTranspose * M := by positivity
 example (M : Matrix n m ℂ) : 0 ≤ M * M.conjTranspose := by positivity
 
 -- Test: ⟨Mᴴ * M, _⟩ nonneg as HermitianMat
+set_option backward.isDefEq.respectTransparency false in
 example (M : Matrix m n ℂ) :
     (0 : HermitianMat n ℂ) ≤ ⟨M.conjTranspose * M, Matrix.isHermitian_conjTranspose_mul_self M⟩ := by
   positivity
 
 -- Test: ⟨M * Mᴴ, _⟩ nonneg as HermitianMat
+set_option backward.isDefEq.respectTransparency false in
 example (M : Matrix n m ℝ) :
     (0 : HermitianMat n ℝ) ≤ ⟨M * M.conjTranspose, Matrix.isHermitian_mul_conjTranspose_self M⟩ := by
   positivity

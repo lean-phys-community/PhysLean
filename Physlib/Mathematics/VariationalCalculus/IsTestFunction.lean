@@ -281,7 +281,7 @@ lemma IsTestFunction.adjFDeriv {f : X → U} [InnerProductSpace' ℝ X]
 lemma IsTestFunction.divergence {f : X → X} [FiniteDimensional ℝ X] (hf : IsTestFunction f) :
     IsTestFunction (fun x => divergence ℝ f x) := by
   obtain ⟨s, ⟨bX⟩⟩ := Basis.exists_basis ℝ X
-  haveI : Fintype s := FiniteDimensional.fintypeBasisIndex bX
+  have : Fintype s := FiniteDimensional.fintypeBasisIndex bX
   conv_rhs =>
     enter [x]
     rw [divergence_eq_sum_fderiv' bX]

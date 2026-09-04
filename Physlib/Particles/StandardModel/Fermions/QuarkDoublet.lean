@@ -29,8 +29,6 @@ open TensorProduct
 
 TODO "Add other fermions similar to this file with the names:
  - UpSinglet (3, 1)_{4} (right-handed)
- - DownSinglet (3, 1)_{-2} (right-handed)
- - LeptonDoublet (1, 2)_{-3} (left-handed)
  - LeptonSinglet (1, 1)_{-6} (right-handed)"
 
 /-- The vector space of a quark field in the Standard Model.

@@ -23,6 +23,7 @@ namespace PureU1
 variable {n : ℕ}
 namespace Three
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cube_for_linSol' (S : (PureU1 3).LinSols) :
     3 * S.val (0 : Fin 3) * S.val (1 : Fin 3) * S.val (2 : Fin 3) = 0 ↔
     (PureU1 3).cubicACC S.val = 0 := by

@@ -6,7 +6,9 @@ Overview: |
     The key data structure is `RigidBody d`, a rigid body in `d` dimensions specified by
     its mass distribution (a linear map from smooth functions on `Space d` to `ℝ`). The API
     provides the body's total mass, centre of mass and inertia tensor, and works out the
-    solid sphere as a concrete example.
+    solid sphere as a concrete example. The inertia tensor is also available about an arbitrary
+    point, and the parallel-axis theorem expresses it in terms of the inertia tensor about the
+    centre of mass.
 
     A rigid body *in motion*, `RigidBodyMotion d`, additionally records the centre-of-mass
     trajectory and the time-dependent orientation. From these the API builds the
@@ -48,6 +50,14 @@ Requirements:
   - description: The inertia tensor of the rigid body is symmetric.
     done: true
     location: Physlib/ClassicalMechanics/RigidBody/Basic.lean (RigidBody.inertiaTensor_symmetric)
+
+  - description: >
+      The API allows the calculation of the inertia tensor about an arbitrary point, and contains
+      the parallel-axis theorem relating it to the inertia tensor about the centre of mass.
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/RigidBody/Basic.lean
+      (RigidBody.inertiaTensorAbout, RigidBody.inertiaTensorAbout_eq_centerOfMass_add_pointMass)
 
   - description: >
       The API provides the solid sphere as a worked example, with its total mass and centre

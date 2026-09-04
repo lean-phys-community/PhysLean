@@ -426,13 +426,16 @@ end Pure
 
 -/
 
-noncomputable instance : SMul G (S.Tensor c) where
+/- The action on `S.Tensor c` is given priority above `Tensorial.smulAction` (which has
+  `priority := high` so that it beats Mathlib's left action on tensor products), so that for a
+  bare tensor `g • t` elaborates to this instance, as used in the `*_equivariant` lemmas. -/
+noncomputable instance (priority := high + 1) instSMul : SMul G (S.Tensor c) where
   smul g t := PiTensorProduct.map (fun i => rep (c i) g) t
 
 lemma actionT_eq {g : G} {t : S.Tensor c} : g • t =
     PiTensorProduct.map (fun i => rep (c i) g) t := rfl
 
-noncomputable instance actionT : MulAction G (S.Tensor c) where
+noncomputable instance (priority := high + 1) actionT : MulAction G (S.Tensor c) where
   one_smul t := by
     simp [actionT_eq]
   mul_smul g g' t := by
@@ -464,9 +467,15 @@ lemma actionT_neg {g : G} {t : S.Tensor c} :
   simp only [map_neg, neg_inj]
   rfl
 
-noncomputable instance : DistribMulAction G (S.Tensor c) where
+noncomputable instance (priority := high + 1) : DistribMulAction G (S.Tensor c) where
   smul_zero g := by simp [actionT_zero]
   smul_add g t1 t2 := by simp [actionT_add]
+
+instance : SMulCommClass k G (S.Tensor c) where
+  smul_comm _ _ _ := actionT_smul.symm
+
+-- `SMulCommClass.symm` is not registered as an instance, as it would cause a loop
+instance : SMulCommClass G k (S.Tensor c) := SMulCommClass.symm _ _ _
 
 
 /-!
@@ -515,7 +524,6 @@ lemma permT_pure {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     PiTensorProduct.reindex_tprod, PiTensorProduct.map_tprod]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.permP_id_self {n : ℕ} {c : Fin n → C} (p : Pure S c) :
     Pure.permP (id : Fin n → Fin n) (by simp : IsReindexing c c id) p = p := by
@@ -567,7 +575,6 @@ lemma permT_congr {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   subst hmap htensor
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.permP_permP {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2 : Fin m2 → C}
     {σ : Fin m1 → Fin n} {σ2 : Fin m2 → Fin m1} (h : IsReindexing c c1 σ)
@@ -627,6 +634,12 @@ lemma permT_eq_zero_iff {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   rwa [permT_permT, map_zero, permT_congr_eq_id] at h2
   funext x
   simp [IsReindexing.inv_apply_apply]
+
+/-- `permT` is injective. -/
+lemma permT_injective {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) :
+    Function.Injective (permT (S := S) σ h) :=
+  (injective_iff_map_eq_zero' _).mpr (permT_eq_zero_iff h)
 
 /-!
 ## field

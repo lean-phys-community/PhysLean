@@ -1,8 +1,3 @@
-> [!NOTE]
-> Things look different? We've recently undergone a name change and move from /lean-phys-community/PhysLean
-> to /leanprover-community/physlib. Same repo, different location and name. This shouldn't affect
-> the average user, but please be patient as we update things.
-
 
 <div align="center">
 <img src="./docs/Physlib-logo.jpeg" alt="Physlib logo" width="500">
@@ -23,13 +18,60 @@
 
 
 [![](https://img.shields.io/badge/View_The-Stats-blue)](https://physlib.io/Stats)
-[![](https://img.shields.io/badge/Lean-v4.32.0-blue)](https://github.com/leanprover/lean4/releases/tag/v4.32.0)
+[![](https://img.shields.io/badge/Lean-v4.33.0-blue)](https://github.com/leanprover/lean4/releases/tag/v4.33.0)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/leanprover-community/physlib)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/leanprover-community/physlib)
 [![api_docs](https://img.shields.io/badge/doc-API_docs-blue)](https://physlib.io/docs/)
 
 </div>
 
+<table>
+<tr>
+<td colspan="3" align="center">
+
+<sub><b>UPSTREAM</b></sub> · [**Mathlib**](https://github.com/leanprover-community/mathlib4) ↑
+
+</td>
+</tr>
+<tr>
+<td colspan="3" align="center">
+
+<sub><b>THIS REPOSITORY</b></sub>
+
+</td>
+</tr>
+<tr>
+<td width="33%" valign="top">
+
+### [**Physlib**](./Physlib)
+
+The core library — physics digitalizations reviewed and curated to a high standard, built for long-term reuse, readability, trust, and maintenance.
+
+</td>
+<td width="33%" valign="top">
+
+###  [**PhyslibAlpha**](./PhyslibAlpha)
+
+PhyslibAlpha exists for the rapid development of physics digitalizations, enabled by a lighter review process built to handle large-scale, human- or AI-generated contributions.
+
+</td>
+<td width="33%" valign="top">
+
+### [**QuantumInfo**](./QuantumInfo)
+
+Quantum information theory. Currently a distinct codebase with its own conventions and review norms; work is underway to bring it closer to Physlib.
+
+</td>
+</tr><tr>
+<td colspan="3" align="center"></td></tr>
+<tr>
+<td colspan="3" align="center">
+
+<sub><b>ADJACENT</b></sub> · [**CSLib**](https://github.com/leanprover/cslib) →
+
+</td>
+</tr>
+</table>
 
 ## Requirements of the project
 
@@ -90,9 +132,12 @@ or
 
 - Clone this repository (or download the repository as a Zip file)
 - Open a terminal at the top-level in the corresponding directory.
-- Run `lake exe cache get`. The command `lake` should have been installed when you installed Lean.
+- Run `lake exe get_cache` to download the cached artifacts from the internet. This will speed up the next step drastically. Do not worry if it fails, you can still run `lake build`, it will just be much slower.
 - Run `lake build`.
 - Open the directory (not a single file) in Visual Studio Code (or another Lean compatible code editor).
+
+Once set up, `lake build` only recompiles files you have actually changed, plus
+anything importing them.
 
 At the moment Physlib is divided into two essentially disjoint halves, `Physlib` and `QuantumInfo`.
 These were two repositories that merged in an effort to create a more cohesive ecosystem for physics

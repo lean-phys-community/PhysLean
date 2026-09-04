@@ -11,6 +11,9 @@ public import Physlib.Mathematics.SpecialFunctions.PhysHermite
 
 # Eigenfunction of the Harmonic Oscillator
 
+Note: These eigenfunctions have been generalized to `d` dimensions in
+`QuantumMechanics/HarmonicOscillator/Eigenstates.lean`.
+
 -/
 
 @[expose] public section
@@ -22,7 +25,9 @@ namespace HarmonicOscillator
 
 variable (Q : HarmonicOscillator)
 
-open Nat Physlib HilbertSpace MeasureTheory Constants
+open Nat Polynomial
+open _root_.QuantumMechanics.OneDimension.HilbertSpace
+open MeasureTheory Constants
 
 /-- The `n`th eigenfunction of the Harmonic oscillator is defined as the function `ℝ → ℂ`
   taking `x : ℝ` to
@@ -129,7 +134,7 @@ lemma eigenfunction_square_integrable (n : ℕ) :
   conv =>
     enter [1, x]
     rw [eigenfunction_point_norm_sq]
-    rw [physHermite_pow, h0]
+    rw [← map_pow, h0]
     enter [2, 1, 1, 1]
     rw [← one_div_mul_eq_div]
   apply MeasureTheory.Integrable.const_mul
@@ -169,7 +174,7 @@ lemma eigenfunction_parity (n : ℕ) :
   simp only [parityOperator, LinearMap.coe_mk, AddHom.coe_mk, Pi.mul_apply, Pi.pow_apply,
     Pi.neg_apply, Pi.one_apply]
   rw [show -x / Q.ξ = - (x / Q.ξ) by ring]
-  rw [← physHermite_eq_aeval, physHermite_parity]
+  rw [physHermite_neg]
   simp only [Complex.ofReal_mul, Complex.ofReal_pow, Complex.ofReal_neg, Complex.ofReal_one]
   ring_nf
 

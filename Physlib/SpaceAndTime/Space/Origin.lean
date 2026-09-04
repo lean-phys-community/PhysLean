@@ -6,7 +6,6 @@ Authors: Shaopeng Zhu, Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.Space.Basic
-public import Mathlib.Analysis.Normed.Affine.Isometry
 
 /-!
 # The origin of `Space` and the Euclidean chart

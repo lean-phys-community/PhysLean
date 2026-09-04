@@ -120,6 +120,7 @@ The trace functional is invariant under joint unitary conjugation:
 This corresponds to equation (2.3) in the paper.
 Proved using `rpow_conj_unitary` (f(UXU†) = U f(X) U†) and `conj_conj`.
 -/
+set_option backward.isDefEq.respectTransparency false in
 theorem sandwichedTraceFunctional_conj_unitary_hermitian
     (U : Matrix.unitaryGroup d ℂ) (A B : HermitianMat d ℂ) :
     let γ := (1 - α) / (2 * α)
@@ -138,8 +139,8 @@ theorem sandwichedTraceFunctional_conj_unitary_hermitian
 /-- The trace functional is invariant under joint unitary conjugation of MStates. -/
 theorem sandwichedTraceFunctional_conj_unitary_MState
     (U : Matrix.unitaryGroup d ℂ) (ρ σ : MState d) :
-    Q̃_ α(ρ.U_conj U‖σ.U_conj U) = Q̃_ α(ρ‖σ) := by
-  unfold sandwichedTraceFunctional MState.U_conj
+    Q̃_ α(ρ.uConj U‖σ.uConj U) = Q̃_ α(ρ‖σ) := by
+  unfold sandwichedTraceFunctional MState.uConj
   exact sandwichedTraceFunctional_conj_unitary_hermitian U ρ.M σ.M
 
 /-! ## Joint Convexity for α > 1
@@ -871,7 +872,7 @@ Helper lemmas for constructing MStates via the twirling argument. -/
 on the `B` system. This is `(1_A ⊗ V) ρ_AB (1_A ⊗ V)†`. -/
 def MState.conjTensorUnitary (ρ : MState (dA × dB)) (V : Matrix.unitaryGroup dB ℂ) :
     MState (dA × dB) :=
-  ρ.U_conj ((1 : Matrix.unitaryGroup dA ℂ) ⊗ᵤ V)
+  ρ.uConj ((1 : Matrix.unitaryGroup dA ℂ) ⊗ᵤ V)
 
 /-- The twirled MState: averaging conjugation by `1_A ⊗ V_i` over all elements of
 the twirling set gives `ρ_A ⊗ uniform_B`. We state the HermitianMat-level
@@ -979,7 +980,7 @@ lemma twirling_general_matrix
 /-- The MState obtained by conjugating a bipartite state by `1_A ⊗ V`. -/
 def MState.conjTensorUnitary' (ρ : MState (dA × dB)) (V : Matrix.unitaryGroup dB ℂ) :
     MState (dA × dB) :=
-  ρ.U_conj ((1 : Matrix.unitaryGroup dA ℂ) ⊗ᵤ V)
+  ρ.uConj ((1 : Matrix.unitaryGroup dA ℂ) ⊗ᵤ V)
 
 -- Entry-level form of the conjTensorUnitary.
 lemma conjTensorUnitary'_entry (ρ : MState (dA × dB)) (V : Matrix.unitaryGroup dB ℂ)
@@ -1085,8 +1086,8 @@ theorem sandwichedTraceFunctional_mono_traceRight [Nonempty dB]
     Q̃_ α(ρ.traceRight‖σ.traceRight) ≤ Q̃_ α(ρ‖σ) := by
   -- Obtain the twirling unitaries
   obtain ⟨κ, hκ_fin, hκ_ne, V, hV⟩ := exists_twirling_unitaries (dB := dB)
-  letI : Fintype κ := hκ_fin
-  letI : Nonempty κ := hκ_ne
+  let : Fintype κ := hκ_fin
+  let : Nonempty κ := hκ_ne
   -- By unitary invariance, Q̃_α(ρ‖σ) = Q̃_α(V_i ρ V_i†‖V_i σ V_i†) for each i
   have h_inv (i) : Q̃_ α(ρ.conjTensorUnitary (V i)‖σ.conjTensorUnitary (V i)) = Q̃_ α(ρ‖σ) :=
     sandwichedTraceFunctional_conj_tensorUnitary ρ σ (V i)
@@ -1226,13 +1227,14 @@ theorem sandwichedRenyiEntropy_mono_traceRight [Nonempty dB]
 /-
 The sandwiched Rényi divergence is invariant under unitary conjugation.
 -/
+set_option backward.isDefEq.respectTransparency false in
 set_option maxHeartbeats 400000 in
 theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
     (U : Matrix.unitaryGroup d ℂ) :
-    D̃_ α(ρ.U_conj U‖σ.U_conj U) = D̃_ α(ρ‖σ) := by
+    D̃_ α(ρ.uConj U‖σ.uConj U) = D̃_ α(ρ‖σ) := by
   -- Since unitary conjugation preserves the kernel, the condition σ.M.ker ≤ ρ.M.ker is
-  -- equivalent to (σ.U_conj U).M.ker ≤ (ρ.U_conj U).M.ker.
-  have h_kernel : σ.M.ker ≤ ρ.M.ker ↔ (σ.U_conj U).M.ker ≤ (ρ.U_conj U).M.ker := by
+  -- equivalent to (σ.uConj U).M.ker ≤ (ρ.uConj U).M.ker.
+  have h_kernel : σ.M.ker ≤ ρ.M.ker ↔ (σ.uConj U).M.ker ≤ (ρ.uConj U).M.ker := by
     have hk (A : HermitianMat d ℂ) : (A.conj U.val).ker = A.ker.map (U.val.toEuclideanLin) := by
       ext x
       simp [conj]
@@ -1260,7 +1262,7 @@ theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
           simp_all [Matrix.mul_apply, Matrix.one_apply]
         simp_all [mul_assoc, Finset.sum_mul]
         intro x; rw [Finset.sum_comm]; simp_all [← Finset.mul_sum]
-    simp [hk, MState.U_conj]
+    simp [hk, MState.uConj]
     constructor <;> intro h <;> simp_all [SetLike.le_def]
     · exact fun x hx => ⟨x, h hx, rfl⟩
     · intro x hx
@@ -1271,7 +1273,7 @@ theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
         exact PiLp.ext (congrFun hy')
       exact hy
   by_cases h : σ.M.ker ≤ ρ.M.ker <;> simp_all [SandwichedRelRentropy]
-  split_ifs <;> simp_all [MState.U_conj]
+  split_ifs <;> simp_all [MState.uConj]
   · congr 1
     rw [inner_sub_right, inner_sub_right]
     grind only [log_conj_unitary, inner_conj_unitary]
@@ -1349,7 +1351,7 @@ theorem sandwichedRenyiEntropy_DPI_gt_one (hα : 1 < α) (ρ σ : MState d₁) (
     D̃_ α(Φ ρ‖Φ σ) ≤ D̃_ α(ρ‖σ) := by
   have _ : Nonempty d₁ := ρ.nonempty
   have _ : Nonempty d₂ := (Φ ρ).nonempty
-  haveI : Inhabited d₂ := Classical.inhabited_of_nonempty ‹_›
+  have : Inhabited d₂ := Classical.inhabited_of_nonempty ‹_›
   let ψ₀ : Ket (d₂ × d₂) := Ket.basis default
   let τ := MState.pure ψ₀
   obtain ⟨U, hU⟩ := Φ.purify_IsUnitary
@@ -1363,13 +1365,13 @@ theorem sandwichedRenyiEntropy_DPI_gt_one (hα : 1 < α) (ρ σ : MState d₁) (
         have h_trace (ξ) : Φ ξ = (Φ.purify ((prep ∘ₘ append) ξ)).traceLeft.traceLeft := by
           exact congr($Φ.purify_trace ξ)
         rw [h_trace ρ, h_trace σ]
-    _ = D̃_ α(((ρ ⊗ᴹ τ).U_conj U).traceLeft.traceLeft‖
-             ((σ ⊗ᴹ τ).U_conj U).traceLeft.traceLeft) := by
-        have h_app (ξ) : Φ.purify ξ = ξ.U_conj U := congr($hU ξ)
+    _ = D̃_ α(((ρ ⊗ᴹ τ).uConj U).traceLeft.traceLeft‖
+             ((σ ⊗ᴹ τ).uConj U).traceLeft.traceLeft) := by
+        have h_app (ξ) : Φ.purify ξ = ξ.uConj U := congr($hU ξ)
         rw [prep_append_eq_tensor_pure ρ, prep_append_eq_tensor_pure σ, h_app, h_app]
-    _ ≤ D̃_ α(((ρ ⊗ᴹ τ).U_conj U).traceLeft‖((σ ⊗ᴹ τ).U_conj U).traceLeft) :=
+    _ ≤ D̃_ α(((ρ ⊗ᴹ τ).uConj U).traceLeft‖((σ ⊗ᴹ τ).uConj U).traceLeft) :=
         sandwichedRenyiEntropy_mono_traceLeft hα ..
-    _ ≤ D̃_ α((ρ ⊗ᴹ τ).U_conj U‖(σ ⊗ᴹ τ).U_conj U) :=
+    _ ≤ D̃_ α((ρ ⊗ᴹ τ).uConj U‖(σ ⊗ᴹ τ).uConj U) :=
         sandwichedRenyiEntropy_mono_traceLeft hα ..
     _ = D̃_ α(ρ ⊗ᴹ τ‖σ ⊗ᴹ τ) :=
         sandwichedRenyiEntropy_conj_unitary (by positivity) _ _ _

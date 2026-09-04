@@ -504,11 +504,6 @@ lagrangian, using that the gradient scales with the constant `exp (γ/m * t)`.
 
 -/
 
-private lemma gradient_const_mul {f : EuclideanSpace ℝ (Fin 1) → ℝ} {x : EuclideanSpace ℝ (Fin 1)}
-    (c : ℝ) (hf : DifferentiableAt ℝ f x) :
-    gradient (fun y => c * f y) x = c • gradient f x := by
-  simp [gradient, fderiv_const_mul hf, map_smul]
-
 lemma gradient_lagrangian_position_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) :
     gradient (fun x => S.lagrangian t x v) x = -(exp (S.γ / S.m * t) * S.k) • x := by
   have hf : DifferentiableAt ℝ (fun y => S.toHarmonicOscillator.lagrangian t y v) x := by

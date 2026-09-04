@@ -79,6 +79,7 @@ informal_lemma ageGap_nonneg where
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The twin paradox in which:
 - Twin A starts at `0` and travels at constant
   speed to `[15, 0, 0, 0]`.
@@ -96,7 +97,7 @@ def example1 : InstantaneousTwinParadox where
   endPoint_causallyFollows_startPoint := by
     simp [causallyFollows]
     left
-    simp only [interiorFutureLightCone, sub_zero, Fin.isValue, Set.mem_setOf_eq, Nat.ofNat_pos,
+    simp only [interiorFutureLightCone, sub_zero, Fin.isValue, Set.mem_ofPred_eq, Nat.ofNat_pos,
       and_true]
     refine (timeLike_iff_norm_sq_pos _).mpr ?_
     rw [minkowskiProduct_toCoord]
@@ -104,7 +105,7 @@ def example1 : InstantaneousTwinParadox where
   twinBMid_causallyFollows_startPoint := by
     simp only [causallyFollows]
     left
-    simp only [interiorFutureLightCone, sub_zero, Fin.isValue, Set.mem_setOf_eq]
+    simp only [interiorFutureLightCone, sub_zero, Fin.isValue, Set.mem_ofPred_eq]
     norm_num
     refine (timeLike_iff_norm_sq_pos _).mpr ?_
     rw [minkowskiProduct_toCoord]
@@ -120,10 +121,12 @@ def example1 : InstantaneousTwinParadox where
     simp [Fin.sum_univ_three]
     norm_num
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma example1_properTimeTwinA : example1.properTimeTwinA = 15 := by
   simp [properTimeTwinA, example1, properTime, minkowskiProduct_toCoord]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma example1_properTimeTwinB : example1.properTimeTwinB = 9 := by
   simp [properTimeTwinB, properTime, example1, minkowskiProduct_toCoord, Fin.sum_univ_three]

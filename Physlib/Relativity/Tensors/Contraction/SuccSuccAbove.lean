@@ -231,12 +231,44 @@ lemma succSuccAbove_natAdd_apply_castAdd {n n1 : ℕ}
   simp only [Fin.ext_iff, succSuccAbove_val, natAdd, castAdd]
   grind (splits := 20)
 
+/-- Reinserting a left-block survivor `a` after removing the `i`-th slot of the left block and the
+  `j`-th slot of the right block of `Fin ((nA + 1) + (nB + 1))`, the removal read at the contracted
+  length `(nA + nB) + 1 + 1`. Unlike `succSuccAbove_natAdd_apply_castAdd` the two holes straddle the
+  two blocks, so the statement carries the reshaping `Fin.cast`s. -/
+lemma succSuccAbove_castAdd_natAdd_apply_castAdd {nA nB : ℕ} (i : Fin (nA + 1)) (j : Fin (nB + 1))
+    (a : Fin nA) :
+    Fin.cast (show (nA + nB) + 1 + 1 = (nA + 1) + (nB + 1) by omega)
+        ((Fin.cast (show (nA + 1) + (nB + 1) = (nA + nB) + 1 + 1 by omega)
+            (Fin.castAdd (nB + 1) i)).succSuccAbove
+          (Fin.cast (show (nA + 1) + (nB + 1) = (nA + nB) + 1 + 1 by omega)
+            (Fin.natAdd (nA + 1) j)) (Fin.castAdd nB a))
+      = Fin.castAdd (nB + 1) (i.succAbove a) := by
+  apply Fin.ext
+  simp only [Fin.succSuccAbove_val, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd,
+    Fin.succAbove, Fin.lt_def, Fin.val_castSucc, Fin.val_succ, apply_ite Fin.val]
+  split_ifs <;> omega
+
+/-- Reinserting a right-block survivor, the mirror of
+  `Fin.succSuccAbove_castAdd_natAdd_apply_castAdd`. -/
+lemma succSuccAbove_castAdd_natAdd_apply_natAdd {nA nB : ℕ} (i : Fin (nA + 1)) (j : Fin (nB + 1))
+    (a : Fin nB) :
+    Fin.cast (show (nA + nB) + 1 + 1 = (nA + 1) + (nB + 1) by omega)
+        ((Fin.cast (show (nA + 1) + (nB + 1) = (nA + nB) + 1 + 1 by omega)
+            (Fin.castAdd (nB + 1) i)).succSuccAbove
+          (Fin.cast (show (nA + 1) + (nB + 1) = (nA + nB) + 1 + 1 by omega)
+            (Fin.natAdd (nA + 1) j)) (Fin.natAdd nA a))
+      = Fin.natAdd (nA + 1) (j.succAbove a) := by
+  apply Fin.ext
+  simp only [Fin.succSuccAbove_val, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd, Fin.succAbove,
+    Fin.lt_def, Fin.val_castSucc, Fin.val_succ, apply_ite Fin.val]
+  split_ifs <;> omega
+
 lemma succSuccAbove_natAdd_image_range_castAdd {n n1 : ℕ}
     (i j : Fin (n + 1 + 1)) :
     (succSuccAbove (n := n1 + n) (Fin.natAdd n1 i) (Fin.natAdd n1 j)) ''
     (Set.range (Fin.castAdd (m := n) (n := n1))) = {i | i.1 < n1} := by
   ext a
-  simp only [Set.mem_image, Set.mem_range, exists_exists_eq_and, Set.mem_setOf_eq]
+  simp only [Set.mem_image, Set.mem_range, exists_exists_eq_and, Set.mem_ofPred_eq]
   conv_lhs =>
     enter [1, b]
     rw [succSuccAbove_natAdd_apply_castAdd i j]
@@ -397,5 +429,17 @@ lemma funPredPredAbove_id { n1 : ℕ} (i j : Fin (n1 + 1 + 1)) (hij : i ≠ j) :
     funPredPredAbove i j hij id (Function.bijective_id) = id := by
   ext1 m
   simp [funPredPredAbove]
+
+/-- Pointwise form of commuting deletion of one slot with deletion of a pair. -/
+lemma succSuccAbove_succAbove_comm_apply {n : ℕ} (i j : Fin (n + 1 + 1 + 1))
+    (k : Fin (n + 1)) (m : Fin n) :
+    (i.succSuccAbove j k).succAbove
+        (((Fin.predAbove 0 (i.succSuccAbove j k)).predAbove i).succSuccAbove
+          ((Fin.predAbove 0 (i.succSuccAbove j k)).predAbove j) m) =
+      i.succSuccAbove j (k.succAbove m) := by
+  apply Fin.val_injective
+  simp only [Fin.succSuccAbove, Fin.succAbove, Fin.predAbove, Fin.lt_def, Fin.val_castSucc,
+    Fin.val_succ, Fin.castPred, apply_ite Fin.val]
+  grind (splits := 60)
 
 end Fin

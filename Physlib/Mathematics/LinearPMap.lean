@@ -157,8 +157,8 @@ lemma sum_domain : (sum f).domain = ⨅ a, (f a).domain := rfl
 lemma sum_domain_le (a : α) : (sum f).domain ≤ (f a).domain := fun _ _ ↦ by simp_all [sum, mem_iInf]
 
 @[simp]
-lemma sum_apply (ψ : (sum f).domain) : sum f ψ = ∑ a, f a ⟨ψ, sum_domain_le f a ψ.2⟩ := by
-  simp [sum, inclusion_apply]
+lemma sum_apply (ψ : (sum f).domain) : sum f ψ = ∑ a, f a ⟨ψ, sum_domain_le f a ψ.2⟩ :=
+  LinearMap.sum_apply Finset.univ (fun a ↦ (f a).toFun ∘ₗ inclusion (sum_domain_le f a)) ψ
 
 end Sums
 
@@ -176,9 +176,9 @@ variable {v : F →ₗ.[R] G} {u : E →ₗ.[R] F}
   `x : f.domain` for which `f x ∈ g.domain`. -/
 def compRestricted : E →ₗ.[R] G :=
   g.comp (f.domRestrict <| (g.domain.comap f.toFun).map f.domain.subtype) (by
-    intro ⟨x, h, _⟩
-    simp only [map_coe, subtype_apply, comap_coe, Set.mem_image, Set.mem_preimage,
-      toFun_eq_coe, SetLike.mem_coe] at h
+    intro x
+    have h : (x : E) ∈ (g.domain.comap f.toFun).map f.domain.subtype := x.2.1
+    simp only [mem_map, mem_comap, toFun_eq_coe, subtype_apply] at h
     obtain ⟨y, hy, hy'⟩ := h
     rw [domRestrict_apply hy'.symm]
     exact hy)

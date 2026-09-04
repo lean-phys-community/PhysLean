@@ -34,14 +34,14 @@ class IsMaximalSelfAdjoint (R : outParam Type*) (α : Type*) [Star α] [Star R] 
   selfadj_algebra : ∀ {a : α}, IsSelfAdjoint a → algebraMap _ _ (selfadjMap a) = a
 
 /-- Every `TrivialStar` `CommSemiring` is its own maximal self adjoints. -/
-instance instTrivialStar_IsMaximalSelfAdjoint {R} [Star R] [TrivialStar R] [CommSemiring R] :
+instance instTrivialStarIsMaximalSelfAdjoint {R} [Star R] [TrivialStar R] [CommSemiring R] :
     IsMaximalSelfAdjoint R R where
   selfadjMap := AddMonoidHom.id R
   selfadj_smul _ __ := rfl
   selfadj_algebra {_} _ := rfl
 
 /-- ℝ is the maximal self adjoint elements over RCLike -/
-instance instRCLike_IsMaximalSelfAdjoint {α} [RCLike α] : IsMaximalSelfAdjoint ℝ α where
+instance instRCLikeIsMaximalSelfAdjoint {α} [RCLike α] : IsMaximalSelfAdjoint ℝ α where
   selfadjMap := RCLike.re
   selfadj_smul := RCLike.smul_re
   selfadj_algebra := RCLike.conj_eq_iff_re.mp

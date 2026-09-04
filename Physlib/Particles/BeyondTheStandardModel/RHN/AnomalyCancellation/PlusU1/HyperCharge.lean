@@ -55,6 +55,7 @@ namespace Y
 
 variable {n : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 lemma on_quadBiLin (S : (PlusU1 n).Charges) :
     quadBiLin (Y n).val S = accYY S := by
   erw [familyUniversal_quadBiLin]
@@ -86,6 +87,7 @@ def addQuad (S : (PlusU1 n).QuadSols) (a b : ℚ) : (PlusU1 n).QuadSols :=
 lemma addQuad_zero (S : (PlusU1 n).QuadSols) (a : ℚ) : addQuad S a 0 = a • S := by
   simp only [addQuad, linearToQuad, zero_smul, add_zero]; rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma on_cubeTriLin (S : (PlusU1 n).Charges) :
     cubeTriLin (Y n).val (Y n).val S = 6 * accYY S := by
   erw [familyUniversal_cubeTriLin']
@@ -99,6 +101,7 @@ lemma on_cubeTriLin_AFL (S : (PlusU1 n).LinSols) :
   rw [on_cubeTriLin, YYsol S]
   with_unfolding_all rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma on_cubeTriLin' (S : (PlusU1 n).Charges) :
     cubeTriLin (Y n).val S S = 6 * accQuad S := by
   erw [familyUniversal_cubeTriLin]
@@ -123,6 +126,7 @@ lemma add_AFL_cube (S : (PlusU1 n).LinSols) (a b : ℚ) :
     add_zero, Y_val, mul_zero]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma add_AFQ_cube (S : (PlusU1 n).QuadSols) (a b : ℚ) :
     accCube (a • S.val + b • (Y n).val) = a ^ 3 * accCube S.val := by
   rw [add_AFL_cube, cubeTriLin.swap₃, on_cubeTriLin'_ALQ]

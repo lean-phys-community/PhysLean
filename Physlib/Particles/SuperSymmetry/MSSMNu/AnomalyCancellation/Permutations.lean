@@ -56,6 +56,7 @@ lemma chargeMap_toSpecies (f : PermGroup) (S : MSSMCharges.Charges) (j : Fin 6) 
     toSMSpecies j (chargeMap f S) = toSMSpecies j S ∘ f j :=
   toSMSpecies_toSpecies_inv _ _
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The representation of `permGroup` acting on the vector space of charges. -/
 @[simp]
 def repCharges : Representation ℚ PermGroup (MSSMCharges).Charges where
@@ -96,6 +97,7 @@ lemma Hd_invariant (f : PermGroup) (S : MSSMCharges.Charges) :
 lemma Hu_invariant (f : PermGroup) (S : MSSMCharges.Charges) :
     Hu (repCharges f S) = Hu S := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accGrav_invariant (f : PermGroup) (S : MSSMCharges.Charges) :
     accGrav (repCharges f S) = accGrav S :=
   accGrav_ext
@@ -103,6 +105,7 @@ lemma accGrav_invariant (f : PermGroup) (S : MSSMCharges.Charges) :
     (Hd_invariant f S)
     (Hu_invariant f S)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accSU2_invariant (f : PermGroup) (S : MSSMCharges.Charges) :
     accSU2 (repCharges f S) = accSU2 S :=
   accSU2_ext
@@ -110,11 +113,13 @@ lemma accSU2_invariant (f : PermGroup) (S : MSSMCharges.Charges) :
     (Hd_invariant f S)
     (Hu_invariant f S)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accSU3_invariant (f : PermGroup) (S : MSSMCharges.Charges) :
     accSU3 (repCharges f S) = accSU3 S :=
   accSU3_ext
     (by simpa using toSpecies_sum_invariant 1 f S)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accYY_invariant (f : PermGroup) (S : MSSMCharges.Charges) :
     accYY (repCharges f S) = accYY S :=
   accYY_ext

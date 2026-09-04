@@ -138,7 +138,7 @@ lemma constantEB_vectorPotential {c : SpeedOfLight}
     (constantEB c E₀ B₀ B₀_antisymm).vectorPotential c = fun _ x => WithLp.toLp 2 fun i =>
       (1 / 2) * ∑ j, B₀ (i, j) * x j := by
   ext t x i
-  simp [vectorPotential, timeSlice, constantEB, space_toCoord_symm, Equiv.coe_fn_mk,
+  simp [vectorPotential, timeSlice, constantEB, Equiv.coe_fn_mk,
     Function.curry_apply, Function.comp_apply]
 
 /-!

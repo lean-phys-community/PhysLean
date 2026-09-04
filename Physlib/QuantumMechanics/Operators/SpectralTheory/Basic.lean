@@ -324,7 +324,7 @@ lemma defectNumber_eq (T : H →ₗ.[ℂ] H) (z : ℂ) :
 lemma IsClosed.defectNumber_eq_zero_iff [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosed) {z : ℂ} (hz : z ∈ T.regularityDomain) :
     T.defectNumber z = 0 ↔ (T - z • 1).toFun.range = ⊤ := by
-  haveI := hT.sub_range_isClosed hz -- needed for HasOrthogonalProjection
+  have := hT.sub_range_isClosed hz -- needed for HasOrthogonalProjection
   exact rank_eq_zero.trans orthogonal_eq_bot_iff
 
 /-- `T` and `T.closure` have the same defect number at points in their regularity domain. -/
@@ -355,7 +355,7 @@ lemma IsClosed.exists_inner_eq_zero_of_defectNumber_lt [CompleteSpace H]
     ∃ x : T.domain, x ≠ 0 ∧ ⟪T x - z₁ • x, T x - z₂ • x⟫_ℂ = 0 := by
   obtain ⟨y, h_inf, hy⟩ := (Submodule.ne_bot_iff _).mp (inf_ne_bot_of_rank_lt h)
   obtain ⟨hy₁, hy₂⟩ := mem_inf.mp h_inf
-  haveI := hT.sub_range_isClosed hz₁ -- needed for `orthogonal_orthogonal`
+  have := hT.sub_range_isClosed hz₁ -- needed for `orthogonal_orthogonal`
   simp only [deficiencySubspace_coe, orthogonal_orthogonal] at hy₁ hy₂
   obtain ⟨⟨x, hx⟩, hxy⟩ := hy₁
   refine ⟨⟨x, hx.1⟩, fun h ↦ hy ?_, ?_⟩
@@ -397,7 +397,7 @@ lemma IsClosable.defectNumber_const [CompleteSpace H]
     T.defectNumber z₁ = T.defectNumber z₂ := by
   by_cases hz₁ : z₁ ∈ T.regularityDomain
   · have h_joined : JoinedIn T.regularityDomain z₁ z₂ := by
-      haveI := T.regularityDomain_isOpen.locallyPathConnectedSpace
+      have := T.regularityDomain_isOpen.locallyPathConnectedSpace
       have hz₂ : z₂ ∈ T.regularityDomain := connectedComponentIn_subset _ _ hz
       apply (joinedIn_iff_joined hz₁ hz₂).mpr
       rw [← mem_pathComponent_iff, pathComponent_eq_connectedComponent]
@@ -599,7 +599,7 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ (Θ T) := by
     obtain ⟨r, hr, hrt⟩ := (hg₀ ▸ hg₁ ▸ intermediate_value_Icc zero_le_one hg_cont.continuousOn) ht
     rw [← htc, ← hrt]
     refine ⟨‖f r‖⁻¹ • f r, ?_, ?_⟩
-    · simp only [mem_setOf_eq, norm_smul, norm_inv, norm_norm]
+    · simp only [Set.mem_ofPred_eq, norm_smul, norm_inv, norm_norm]
       exact inv_mul_cancel₀ (norm_ne_zero_iff.mpr (hf r))
     · have hf_sq : ofReal (‖f r‖ ^ 2) ≠ 0 := by simp [hf]
       simp_rw [← Complex.coe_smul, map_smul, SetLike.val_smul, inner_smul_left,inner_smul_right,
@@ -659,7 +659,7 @@ lemma resolventSet_subset_regularityDomain (T : H →ₗ.[ℂ] H) : ρ T ⊆ T.r
 lemma IsClosed.resolventSet_eq [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsClosed) :
     ρ T = {z : ℂ | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤} := by
   ext z
-  rw [mem_resolventSet_iff, mem_setOf_eq, and_congr_right_iff, and_iff_left_iff_imp]
+  rw [mem_resolventSet_iff, Set.mem_ofPred_eq, and_congr_right_iff, and_iff_left_iff_imp]
   intro h_ker h_range
   refine continuous_of_isClosed_domain ?_ ?_
   · apply (inverse_closed_iff h_ker).mpr

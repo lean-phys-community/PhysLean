@@ -16,7 +16,7 @@ if the line through that point and through the two different planes formed by th
 `LinSols` lies in the cubic.
 
 We show that for a solution all its permutations satisfy this property, then there exists
-a permutation for which it lies in the plane spanned by the first part of the basis.
+a permutation for which it lies in the unshifted plane.
 
 The main reference for this file is:
 
@@ -37,30 +37,40 @@ open VectorLikeEvenPlane
 in the basis through that point is in the cubic. -/
 def LineInCubic (S : (PureU1 (2 * n.succ)).LinSols) : Prop :=
   ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = Pa g f) (a b : ℚ),
-  accCube (2 * n.succ) (a • P g + b • P! f) = 0
+  accCube (2 * n.succ) (a • Unshifted.planeCharges g + b • Shifted.planeCharges f) = 0
 
 set_option backward.isDefEq.respectTransparency false in
 lemma lineInCubic_expand {S : (PureU1 (2 * n.succ)).LinSols} (h : LineInCubic S) :
     ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = Pa g f) (a b : ℚ),
-    3 * a * b * (a * accCubeTriLinSymm (P g) (P g) (P! f)
-    + b * accCubeTriLinSymm (P! f) (P! f) (P g)) = 0 := by
+    3 * a * b *
+      (a * accCubeTriLinSymm (Unshifted.planeCharges g)
+          (Unshifted.planeCharges g) (Shifted.planeCharges f) +
+        b * accCubeTriLinSymm (Shifted.planeCharges f)
+          (Shifted.planeCharges f) (Unshifted.planeCharges g)) = 0 := by
   intro g f hS a b
   have h1 := h g f hS a b
-  change accCubeTriLinSymm.toCubic (a • P g + b • P! f) = 0 at h1
+  change accCubeTriLinSymm.toCubic
+    (a • Unshifted.planeCharges g + b • Shifted.planeCharges f) = 0 at h1
   simp only [TriLinearSymm.toCubic_add, HomogeneousCubic.map_smul,
     accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂, accCubeTriLinSymm.map_smul₃] at h1
-  erw [P_accCube, P!_accCube] at h1
+  erw [Unshifted.planeCharges_accCube, Shifted.planeCharges_accCube] at h1
   linear_combination h1
 
 /--
 This lemma states that for a given `S` of type `(PureU1 (2 * n.succ)).AnomalyFreeLinear` and
 a proof `h` that the line through `S` lies on a cubic curve,
-for any functions `g : Fin n.succ → ℚ` and `f : Fin n → ℚ`, if `S.val = P g + P! f`,
-then `accCubeTriLinSymm.toFun (P g, P g, P! f) = 0`.
+for any functions `g : Fin n.succ → ℚ` and `f : Fin n → ℚ`, if
+`S.val = Unshifted.planeCharges g + Shifted.planeCharges f`,
+then
+`accCubeTriLinSymm.toFun (Unshifted.planeCharges g, Unshifted.planeCharges g,
+  Shifted.planeCharges f) = 0`.
 -/
-lemma line_in_cubic_P_P_P! {S : (PureU1 (2 * n.succ)).LinSols} (h : LineInCubic S) :
-    ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = P g + P! f),
-    accCubeTriLinSymm (P g) (P g) (P! f) = 0 := by
+lemma line_in_cubic_unshifted_unshifted_shifted
+    {S : (PureU1 (2 * n.succ)).LinSols} (h : LineInCubic S) :
+    ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ)
+      (_ : S.val = Unshifted.planeCharges g + Shifted.planeCharges f),
+    accCubeTriLinSymm (Unshifted.planeCharges g) (Unshifted.planeCharges g)
+      (Shifted.planeCharges f) = 0 := by
   intro g f hS
   linear_combination 2 / 3 * (lineInCubic_expand h g f hS 1 1) -
     (lineInCubic_expand h g f hS 1 2) / 6
@@ -88,24 +98,26 @@ lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ)).LinSols}
     (LIC : LineInCubicPerm S) :
     ∀ (j : Fin n) (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = Pa g f),
       (S.val (evenShiftSnd j) - S.val (evenShiftFst j))
-      * accCubeTriLinSymm (P g) (P g) (basis!AsCharges j) = 0 := by
+      * accCubeTriLinSymm (Unshifted.planeCharges g) (Unshifted.planeCharges g)
+        (Shifted.basisAsCharges j) = 0 := by
   intro j g f h
   obtain ⟨g', f', hall⟩ := span_basis_swap! j rfl g f h
-  have h1 := line_in_cubic_P_P_P! (lineInCubicPerm_self LIC) g f h
-  have h2 := line_in_cubic_P_P_P!
+  have h1 := line_in_cubic_unshifted_unshifted_shifted (lineInCubicPerm_self LIC) g f h
+  have h2 := line_in_cubic_unshifted_unshifted_shifted
     (lineInCubicPerm_self (lineInCubicPerm_permute LIC
     (Equiv.swap (evenShiftFst j) (evenShiftSnd j)))) g' f' hall.1
   rw [hall.2.1, hall.2.2, accCubeTriLinSymm.map_add₃, h1, accCubeTriLinSymm.map_smul₃] at h2
   simpa using h2
 
-lemma P_P_P!_accCube' {S : (PureU1 (2 * n.succ.succ)).LinSols}
+lemma unshifted_unshifted_shifted_accCube' {S : (PureU1 (2 * n.succ.succ)).LinSols}
     (f : Fin n.succ.succ → ℚ) (g : Fin n.succ → ℚ) (hS : S.val = Pa f g) :
-    accCubeTriLinSymm (P f) (P f) (basis!AsCharges (Fin.last n)) =
+    accCubeTriLinSymm (Unshifted.planeCharges f) (Unshifted.planeCharges f)
+      (Shifted.basisAsCharges (Fin.last n)) =
     - (S.val (evenShiftSnd (Fin.last n)) + S.val (evenShiftFst (Fin.last n))) *
     (2 * S.val evenShiftLast +
     S.val (evenShiftSnd (Fin.last n)) + S.val (evenShiftFst (Fin.last n))) := by
-  rw [P_P_P!_accCube f (Fin.last n), hS, Pa_evenShiftSnd, Pa_evenShiftFst, Pa_evenShiftLast,
-    Fin.succ_last]
+  rw [unshifted_unshifted_shifted_accCube f (Fin.last n), hS, Pa_evenShiftSnd,
+    Pa_evenShiftFst, Pa_evenShiftLast, Fin.succ_last]
   ring
 
 lemma lineInCubicPerm_last_cond {S : (PureU1 (2 * n.succ.succ)).LinSols}
@@ -115,7 +127,7 @@ lemma lineInCubicPerm_last_cond {S : (PureU1 (2 * n.succ.succ)).LinSols}
       (S.val evenShiftLast))) := by
   obtain ⟨g, f, hfg⟩ := span_basis S
   have h1 := lineInCubicPerm_swap LIC (Fin.last n) g f hfg
-  rw [P_P_P!_accCube' g f hfg] at h1
+  rw [unshifted_unshifted_shifted_accCube' g f hfg] at h1
   simp only [Nat.succ_eq_add_one, neg_add_rev, mul_eq_zero] at h1
   rcases h1 with h1 | h1 | h1
   · exact Or.inl (by linear_combination h1)
@@ -144,8 +156,8 @@ theorem lineInCubicPerm_vectorLike {S : (PureU1 (2 * n.succ.succ)).Sols}
 theorem lineInCubicPerm_in_plane (S : (PureU1 (2 * n.succ.succ)).Sols)
     (LIC : LineInCubicPerm S.1.1) : ∃ (M : (FamilyPermutations (2 * n.succ.succ)).group),
     (FamilyPermutations (2 * n.succ.succ)).linSolRep M S.1.1
-    ∈ Submodule.span ℚ (Set.range basis) :=
-  vectorLikeEven_in_span S.1.1 (lineInCubicPerm_vectorLike LIC)
+    ∈ Submodule.span ℚ (Set.range Unshifted.basis) :=
+  Unshifted.vectorLikeEven_in_span S.1.1 (lineInCubicPerm_vectorLike LIC)
 
 end Even
 end PureU1

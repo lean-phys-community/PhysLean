@@ -78,6 +78,7 @@ theorem projector_ker : (projector S).ker = Sᗮ := by
     Matrix.toLpLin_eq_toLin, Matrix.toLin_toMatrix]
   exact Submodule.starProjection_apply_eq_zero_iff (K := S)
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem trace_projector : (projector S).trace = (Module.finrank 𝕜 S : ℝ) := by
   suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjectionOnto).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = Module.finrank 𝕜 S by
@@ -140,7 +141,6 @@ theorem projector_eq_sum_rankOne (b : OrthonormalBasis ι 𝕜 S) :
   convert! congr_arg ( fun x : EuclideanSpace ( _ ) n => x i ) ( h_proj j ) using 1
   simp [ Matrix.sum_apply, mul_comm ]
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The projector onto the support of A is the sum of the projections onto the eigenvectors with non-zero eigenvalues.
 -/

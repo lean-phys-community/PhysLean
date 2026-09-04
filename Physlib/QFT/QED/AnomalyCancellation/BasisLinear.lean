@@ -23,6 +23,7 @@ open BigOperators Module
 variable {n : ℕ}
 namespace BasisLinear
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The basis elements as charges, defined to have a `1` in the `j`th position and a `-1` in the
 last position. -/
 def asCharges (j : Fin n) : (PureU1 n.succ).Charges :=
@@ -32,10 +33,12 @@ def asCharges (j : Fin n) : (PureU1 n.succ).Charges :=
         - 1
       else 0)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma asCharges_eq_castSucc (j : Fin n) :
     asCharges j (Fin.castSucc j) = 1 := by
   simp [asCharges]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma asCharges_ne_castSucc {k j : Fin n} (h : k ≠ j) :
     asCharges k ⟨j, by simp⟩= 0 := by
   simp [asCharges, Fin.ext_iff]
@@ -68,6 +71,7 @@ lemma sum_of_vectors {n : ℕ} (f : Fin k → (PureU1 n).LinSols) (j : Fin n) :
     (∑ i : Fin k, (f i)).1 j = (∑ i : Fin k, (f i).1 j) :=
   sum_of_anomaly_free_linear (fun i => f i) j
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The coordinate map for the basis. -/
 noncomputable
 def coordinateMap : (PureU1 n.succ).LinSols ≃ₗ[ℚ] Fin n →₀ ℚ where

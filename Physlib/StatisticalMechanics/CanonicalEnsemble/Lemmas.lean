@@ -406,7 +406,7 @@ theorem energyVariance_eq_meanSquareEnergy_sub_meanEnergy_sq
 -- We define functions from ℝ to handle derivatives smoothly, using Real.toNNReal
 
 /-- The mean energy as a function of the real-valued temperature t. -/
-noncomputable def meanEnergy_T (𝓒 : CanonicalEnsemble ι) (t : ℝ) : ℝ :=
+noncomputable def meanEnergyT (𝓒 : CanonicalEnsemble ι) (t : ℝ) : ℝ :=
   𝓒.meanEnergy (Temperature.ofNNReal (Real.toNNReal t))
 
 /-- The mean energy as a function of the real-valued inverse temperature b. -/
@@ -415,7 +415,7 @@ noncomputable def meanEnergyBeta (𝓒 : CanonicalEnsemble ι) (b : ℝ) : ℝ :
 
 /-- The heat capacity (at constant volume) C_V = ∂U/∂T (as a derivWithin on T > 0). -/
 noncomputable def heatCapacity (𝓒 : CanonicalEnsemble ι) (T : Temperature) : ℝ :=
-  derivWithin (𝓒.meanEnergy_T) (Set.Ioi 0) (T.val : ℝ)
+  derivWithin (𝓒.meanEnergyT) (Set.Ioi 0) (T.val : ℝ)
 
 /-- Relates C_V = dU/dT to dU/dβ. C_V = dU/dβ * (-1/(kB T²)). -/
 lemma heatCapacity_eq_deriv_meanEnergyBeta
@@ -427,9 +427,9 @@ lemma heatCapacity_eq_deriv_meanEnergyBeta
     𝓒.heatCapacity T
       = (derivWithin (𝓒.meanEnergyBeta) (Set.Ioi 0) (T.β : ℝ))
         * (-1 / (kB * (T.val : ℝ)^2)) := by
-  have h_U_eq_comp : (𝓒.meanEnergy_T) = fun t : ℝ => (𝓒.meanEnergyBeta) (betaFromReal t) := by
+  have h_U_eq_comp : (𝓒.meanEnergyT) = fun t : ℝ => (𝓒.meanEnergyBeta) (betaFromReal t) := by
     funext t
-    simp [meanEnergy_T, meanEnergyBeta, betaFromReal]
+    simp [meanEnergyT, meanEnergyBeta, betaFromReal]
   have h_UD : UniqueDiffWithinAt ℝ (Set.Ioi (0 : ℝ)) (T.val : ℝ) :=
     isOpen_Ioi.uniqueDiffWithinAt hT_pos
   unfold heatCapacity

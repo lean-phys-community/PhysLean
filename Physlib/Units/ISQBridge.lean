@@ -42,14 +42,14 @@ namespace Dimension
   send PhysLib's charge generator to the derived ISQ charge `I · T` (the current
   exponent is the charge exponent, and the time exponent absorbs it). -/
 def toISQFun (d : Dimension LTMCTDimensionBase) : Dimension ISQDimensionBase :=
-  ⟨fun
+  ofFunction fun
     | .length => d.exponent .length
     | .mass => d.exponent .mass
     | .time => d.exponent .time + d.exponent .charge
     | .current => d.exponent .charge
     | .temperature => d.exponent .temperature
     | .amount => 0
-    | .luminousIntensity => 0⟩
+    | .luminousIntensity => 0
 
 /-- The dimension-preserving embedding of PhysLib dimensions into the ISQ dimensions. -/
 def toISQHom : Dimension LTMCTDimensionBase →* Dimension ISQDimensionBase where
@@ -57,7 +57,7 @@ def toISQHom : Dimension LTMCTDimensionBase →* Dimension ISQDimensionBase wher
   map_one' := by ext b; cases b <;> simp [toISQFun]
   map_mul' d1 d2 := by
     ext b
-    cases b <;> simp only [toISQFun, mul_exponent]
+    cases b <;> simp only [toISQFun, ofFunction_exponent, mul_exponent]
     all_goals ring
 
 /-- `toISQHom` applied to a dimension is `toISQFun`. -/
@@ -67,12 +67,12 @@ lemma toISQHom_apply (d : Dimension LTMCTDimensionBase) : toISQHom d = toISQFun 
   electric current as charge/time (the charge exponent is the current exponent, and the
   time exponent subtracts it), and drop amount of substance and luminous intensity. -/
 def fromISQFun (d : Dimension ISQDimensionBase) : Dimension LTMCTDimensionBase :=
-  ⟨fun
+  ofFunction fun
     | .length => d.exponent .length
     | .time => d.exponent .time - d.exponent .current
     | .mass => d.exponent .mass
     | .charge => d.exponent .current
-    | .temperature => d.exponent .temperature⟩
+    | .temperature => d.exponent .temperature
 
 /-- The truth-preserving reduction of ISQ dimensions onto PhysLib's. -/
 def fromISQHom : Dimension ISQDimensionBase →* Dimension LTMCTDimensionBase where
@@ -80,7 +80,7 @@ def fromISQHom : Dimension ISQDimensionBase →* Dimension LTMCTDimensionBase wh
   map_one' := by ext b; cases b <;> simp [fromISQFun]
   map_mul' d1 d2 := by
     ext b
-    cases b <;> simp only [fromISQFun, mul_exponent]
+    cases b <;> simp only [fromISQFun, ofFunction_exponent, mul_exponent]
     all_goals ring
 
 /-- `fromISQHom` applied to a dimension is `fromISQFun`. -/
@@ -92,7 +92,7 @@ lemma fromISQHom_comp_toISQHom :
     fromISQHom.comp toISQHom = MonoidHom.id (Dimension LTMCTDimensionBase) := by
   refine MonoidHom.ext fun d => Dimension.ext fun b => ?_
   cases b <;> simp only [MonoidHom.comp_apply, MonoidHom.id_apply, toISQHom_apply,
-    fromISQHom_apply, fromISQFun, toISQFun]
+    fromISQHom_apply, fromISQFun, toISQFun, ofFunction_exponent]
   all_goals ring
 
 /-- `toISQHom` is injective: PhysLib dimensions include faithfully into ISQ. -/
@@ -104,15 +104,15 @@ lemma toISQHom_injective : Function.Injective toISQHom := by
     simpa only [toISQHom_apply] using hb
   ext b
   cases b with
-  | length => simpa only [toISQFun] using key .length
+  | length => simpa only [toISQFun, ofFunction_exponent] using key .length
   | time =>
       have ht := key .time
       have hc := key .current
-      simp only [toISQFun] at ht hc
+      simp only [toISQFun, ofFunction_exponent] at ht hc
       linarith
-  | mass => simpa only [toISQFun] using key .mass
-  | charge => simpa only [toISQFun] using key .current
-  | temperature => simpa only [toISQFun] using key .temperature
+  | mass => simpa only [toISQFun, ofFunction_exponent] using key .mass
+  | charge => simpa only [toISQFun, ofFunction_exponent] using key .current
+  | temperature => simpa only [toISQFun, ofFunction_exponent] using key .temperature
 
 /-- `fromISQHom` is surjective: every PhysLib dimension is the reduction of some ISQ
   dimension (namely its own embedding). -/
@@ -141,7 +141,6 @@ lemma isqToLTMCT_comp_ltmctToISQ :
   maps to the *derived* ISQ charge `I · T`. -/
 lemma toISQHom_C𝓭 : toISQHom C𝓭 = ISQDimensionBase.charge := by
   ext b
-  cases b <;> simp [toISQHom_apply, toISQFun, C𝓭, ofLTMCTDimensionBase,
-    ISQDimensionBase.charge, single_exponent]
+  cases b <;> simp [toISQHom_apply, toISQFun, C𝓭, ISQDimensionBase.charge, single_exponent]
 
 end Dimension

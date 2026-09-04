@@ -418,62 +418,38 @@ N-th roots of unity exp(i(k₂-k₁)a), and the sum of all N-th roots of unity e
 lemma energyEigenstate_orthogonal :
     Pairwise fun k1 k2 => ⟪T.energyEigenstate k1, T.energyEigenstate k2⟫_ℂ = 0 := by
   intro k1 k2 hne
-  simp only [energyEigenstate, sum_inner]
-  simp_rw [inner_sum, inner_smul_left, inner_smul_right, localizedState_orthonormal_eq_ite]
-  simp only [mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
   set ω := Complex.exp (Complex.I * (k2 - k1) * T.a) with hω_def
-  have hsum_eq : ∑ n : Fin T.N, (starRingEnd ℂ) (Complex.exp (Complex.I * k1 * n * T.a)) *
-      Complex.exp (Complex.I * k2 * n * T.a) = ∑ i ∈ Finset.range T.N, ω ^ i := by
-    rw [Fin.sum_univ_eq_sum_range (fun n =>
-      (starRingEnd ℂ) (Complex.exp (Complex.I * k1 * n * T.a)) *
-      Complex.exp (Complex.I * k2 * n * T.a))]
-    refine Finset.sum_congr rfl fun i _ => ?_
-    rw [starRingEnd_apply, Complex.star_def, ← Complex.exp_conj]
+  -- Each term of the overlap is a power of the `N`-th root of unity `ω`.
+  have hterm (n : ℕ) : (starRingEnd ℂ) (Complex.exp (Complex.I * k1 * n * T.a)) *
+      Complex.exp (Complex.I * k2 * n * T.a) = ω ^ n := by
+    rw [← Complex.exp_conj, ← Complex.exp_add, hω_def, ← Complex.exp_nat_mul]
     simp only [map_mul, Complex.conj_I, Complex.conj_ofReal, Complex.conj_natCast]
-    rw [← Complex.exp_add, hω_def, ← Complex.exp_nat_mul]
     ring_nf
-  rw [hsum_eq]
   have hω_pow : ω ^ T.N = 1 := by
-    simp only [hω_def, ← Complex.exp_nat_mul]
-    have h2 := quantaWaveNumber_exp_N T 1 k2
-    have h1 := quantaWaveNumber_exp_N T 1 k1
-    simp only [Nat.cast_one] at h2 h1
-    calc
-        _ = Complex.exp (Complex.I * k2 * 1 * T.N * T.a - Complex.I * k1 * 1 * T.N * T.a) := by
-              ring_nf
-        _ = 1 := by rw [Complex.exp_sub, h2, h1, div_one]
-  have hω_ne_one : ω ≠ 1 := by
-    intro hω_eq_one
-    apply hne
+    rw [hω_def, ← Complex.exp_nat_mul, show (T.N : ℂ) * (Complex.I * (k2 - k1) * T.a) =
+      Complex.I * k2 * (1 : ℕ) * T.N * T.a - Complex.I * k1 * (1 : ℕ) * T.N * T.a by
+        push_cast; ring,
+      Complex.exp_sub, T.quantaWaveNumber_exp_N 1 k2, T.quantaWaveNumber_exp_N 1 k1, div_one]
+  -- Distinct quantized wavenumbers differ by a non-multiple of `2π / a`, so `ω ≠ 1`.
+  have hω_ne_one : ω ≠ 1 := fun hω_eq_one => hne <| by
     obtain ⟨_, ⟨n1, rfl⟩⟩ := k1
     obtain ⟨_, ⟨n2, rfl⟩⟩ := k2
-    simp only [Subtype.mk.injEq]
-    have hexp := Complex.exp_eq_one_iff.mp (hω_def ▸ hω_eq_one)
-    obtain ⟨m, hm⟩ := hexp
+    obtain ⟨m, hm⟩ := Complex.exp_eq_one_iff.mp (hω_def ▸ hω_eq_one)
     have ha : (T.a : ℂ) ≠ 0 := Complex.ne_zero_of_re_pos T.a_pos
-    have hN : (T.N : ℂ) ≠ 0 := by simp [Ne.symm (NeZero.ne' T.N)]
-    simp only [Complex.ofReal_mul, Complex.ofReal_div, Complex.ofReal_ofNat,
-      Complex.ofReal_natCast, Complex.ofReal_sub] at hm
+    have hN : (T.N : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (NeZero.ne T.N)
+    push_cast at hm
     field_simp at hm
-    have hm_int : (n2 : ℤ) - n1 = T.N * m := by
-      have hm_eq : (n2 : ℂ) - n1 = (T.N : ℂ) * m := by ring_nf at hm ⊢; exact hm
-      exact_mod_cast congrArg Complex.re hm_eq
-    have hn1_lt : (n1 : ℤ) < T.N := by exact_mod_cast n1.isLt
-    have hn2_lt : (n2 : ℤ) < T.N := by exact_mod_cast n2.isLt
-    have hN_pos : (0 : ℤ) < T.N := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne T.N)
-    have hm_bound : m = 0 := by
-      have h1 : -(T.N : ℤ) < (n2 : ℤ) - n1 := by omega
-      have h2 : (n2 : ℤ) - n1 < T.N := by omega
-      rw [hm_int] at h1 h2
-      nlinarith
-    simp only [hm_bound, mul_zero] at hm_int
-    have heq : n1.val = n2.val := by omega
-    simp only [heq]
-  -- Use the geometric series formula: (ω - 1) * ∑ω^i = ω^N - 1
-  -- Since ω^N = 1 and ω ≠ 1, the sum must be zero
-  have hgeom := mul_geom_sum ω T.N
-  rw [hω_pow, sub_self] at hgeom
-  exact mul_eq_zero.mp hgeom |>.resolve_left (sub_ne_zero.mpr hω_ne_one)
+    have hm_int : (T.N : ℤ) ∣ (n2 : ℤ) - n1 := ⟨m, by
+      have : (n2 : ℂ) - n1 = (T.N : ℂ) * m := by ring_nf at hm ⊢; exact hm
+      exact_mod_cast this⟩
+    have := Int.eq_zero_of_abs_lt_dvd hm_int
+      (abs_lt.mpr ⟨by have := n1.isLt; omega, by have := n2.isLt; omega⟩)
+    simp only [show n1.val = n2.val by omega]
+  -- The sum of all `N`-th roots of unity vanishes, since `ω ^ N = 1` and `ω ≠ 1`.
+  simp only [energyEigenstate, sum_inner]
+  simp_rw [inner_sum, inner_smul_left, inner_smul_right, localizedState_orthonormal_eq_ite]
+  simp only [mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte, hterm]
+  rw [Fin.sum_univ_eq_sum_range (ω ^ ·), geom_sum_eq hω_ne_one, hω_pow, sub_self, zero_div]
 
 /-!
 

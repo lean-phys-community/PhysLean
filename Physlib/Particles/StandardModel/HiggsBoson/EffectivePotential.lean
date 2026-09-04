@@ -44,13 +44,13 @@ namespace EffectivePotential
 /-- The proposition that the general potential is invariant under
   the global action of the gauge group. -/
 def IsInvariant (V : EffectivePotential) : Prop :=
-  ∀ (g : GaugeGroupI), ∀ (φ : HiggsVec), V (g • φ) = V φ
+  ∀ (g : GaugeGroupI), ∀ (φ : HiggsVec), V (HiggsVec.repGaugeGroupI g φ) = V φ
 
 namespace IsInvariant
 
 /-- An invariant potential is equal on gauge orbits. -/
 lemma eq_on_orbits {φ1 φ2 : HiggsVec} {V : EffectivePotential} (h : IsInvariant V)
-    (hφ : φ1 ∈ MulAction.orbit GaugeGroupI  φ2) :
+    (hφ : ∃ g : GaugeGroupI, HiggsVec.repGaugeGroupI g φ2 = φ1) :
     V φ1 = V φ2 := by
   obtain ⟨g, rfl⟩ := hφ
   exact h g φ2
@@ -58,7 +58,7 @@ lemma eq_on_orbits {φ1 φ2 : HiggsVec} {V : EffectivePotential} (h : IsInvarian
 /-- An invariant potential is equal on Higgs vectors with identical norms. -/
 lemma eq_of_norm_eq {φ1 φ2 : HiggsVec} {V : EffectivePotential} (h : IsInvariant V)
     (hφ : ‖φ1‖ = ‖φ2‖) :
-    V φ1 = V φ2 := h.eq_on_orbits <| (HiggsVec.mem_orbit_gaugeGroupI_iff φ2 φ1).mpr hφ
+    V φ1 = V φ2 := h.eq_on_orbits <| (HiggsVec.exists_repGaugeGroupI_eq_iff_norm_eq φ2 φ1).mpr hφ
 
 lemma factors_through_norm {V : EffectivePotential} (h : IsInvariant V) :
     ∃ (f : ℝ → ℝ), V = f ∘ norm := by
@@ -146,13 +146,15 @@ lemma termOfMassDim_isInvariant {V : EffectivePotential} {n : ℕ} (h : HasMaxMa
     (m : ℕ) (hV : IsInvariant V) : IsInvariant (termOfMassDim V h m) := by
   intro g φ
   have hV (t : ℝ) := hV g (t • φ)
-  have h1 (t : ℝ) : ∑  m ∈ Finset.range (n + 1), t ^ m * (termOfMassDim V h m (g • φ) -
+  have h1 (t : ℝ) : ∑  m ∈ Finset.range (n + 1),
+      t ^ m * (termOfMassDim V h m (HiggsVec.repGaugeGroupI g φ) -
       termOfMassDim V h m φ) = 0 := by
     simp [mul_sub, ← apply_smul_eq_sum_termOfMassDim]
-    rw [smul_comm, hV, sub_eq_zero]
+    rw [← LinearMap.map_smul_of_tower, hV, sub_eq_zero]
   by_cases hmn : m ≤ n
   · have hp : (∑ k ∈ Finset.range (n + 1),
-        Polynomial.C (termOfMassDim V h k (g • φ) - termOfMassDim V h k φ) * Polynomial.X ^ k)
+        Polynomial.C (termOfMassDim V h k (HiggsVec.repGaugeGroupI g φ) -
+          termOfMassDim V h k φ) * Polynomial.X ^ k)
           = 0 := by
       apply Polynomial.funext
       intro x

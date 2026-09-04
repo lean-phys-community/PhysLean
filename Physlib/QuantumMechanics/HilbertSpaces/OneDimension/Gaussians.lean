@@ -14,7 +14,12 @@ public import Physlib.Meta.TODO.Basic
 
 -/
 
-TODO "Generalize Gaussian states to d dimensions and SpaceDHilbertSpace."
+TODO "Generalize Gaussian states to d dimensions and SpaceDHilbertSpace
+  using InnerProductSpace.gaussian from Physlib/Mathematics/InnerProductSpace/Gaussian
+  and SpaceDHilbertSpace.schwartzIncl. Some of the results in this file have become automatic
+  given InnerProductSpace.gaussian is a Schwartz map, e.g. gaussian_integrable and gaussian_memHS
+  (via schwartzIncl), and some hold more generally for any Schwartz map or member
+  of SchwartzSubmodule, e.g. abs_mul_gaussian_integrable."
 
 @[expose] public section
 

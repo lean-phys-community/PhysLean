@@ -254,7 +254,6 @@ lemma koszulSign_eraseIdx_insertionSortMinPos [Std.Total le] [IsTrans 𝓕 le] (
     rhs
     rhs
     lhs
-    simp [insertionSortMinPos]
   erw [Equiv.apply_symm_apply]
   simp only [List.get_eq_getElem, List.length_cons, List.insertionSort,
     List.take_zero, ofList_empty, exchangeSign_bosonic, mul_one, mul_eq_mul_left_iff]

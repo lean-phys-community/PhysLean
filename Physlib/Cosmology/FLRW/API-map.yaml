@@ -1,0 +1,98 @@
+version: v0.1
+
+Title: FLRW cosmology
+
+Overview: |
+    A Friedmann-Lemaître-Robertson-Walker (FLRW) spacetime models a homogeneous
+    and isotropic universe. Its geometry is set by a scale factor a(t), a function
+    of cosmic time, together with the curvature of the spatial slices, which is
+    spherical, flat, or saddle. The expansion rate is the Hubble parameter
+    H = (∂ₜ a) / a, and the change of the expansion rate is measured by the
+    deceleration parameter q = -(∂ₜ ∂ₜ a) a / (∂ₜ a)^2. The dynamics is governed
+    by the Friedmann equations, which relate the scale factor to the energy
+    density and pressure of the cosmic fluid, the spatial curvature, and the
+    cosmological constant.
+
+    The formal content lives in FLRW/Basic.lean: the spatial geometry with its
+    metric profile function S and the flat limits of the spherical and saddle
+    cases, the first- and second-order Friedmann equations as propositions on a
+    scale factor, the Hubble parameter, and the deceleration parameter with the
+    relation ∂ₜ H = -H^2 (1 + q). The FLRW type itself is a placeholder; the file
+    records a TODO to replace it with a structure bundling a positive scale
+    factor and a spatial geometry. Six further modules, ConformalTime.lean,
+    DensityParameters.lean, Distances.lean, Dynamics.lean, MatterContent.lean and
+    Solutions.lean, contain only TODO items: conformal time and the conformal
+    Hubble factor, the critical density and density parameters, cosmological
+    distances and redshift, energy conditions and the Big-Bang singularity, the
+    matter content with its continuity equation and scaling laws, and the exact
+    de Sitter, radiation-dominated, Einstein-de Sitter, Milne and Einstein static
+    solutions. The requirements below record the two most basic of those open
+    items. Cosmology/Basic.lean is a placeholder module doc with no declarations.
+
+ParentAPIs:
+  - Time (Physlib/SpaceAndTime/Time)
+
+References:
+  - "D. Baumann, Cosmology, Cambridge University Press (2022), Chapter 2 (FLRW geometry, Hubble parameter, Friedmann equations, matter content)"
+  - "S. Dodelson and F. Schmidt, Modern Cosmology, 2nd ed., Chapter 2 (the smooth, expanding universe)"
+  - "S. Weinberg, Cosmology, Oxford University Press (2008), Chapter 1 (the Robertson-Walker metric, the deceleration parameter, the Friedmann equations)"
+
+Requirements:
+
+  - description: >
+      The spatial geometry of the constant-time slices is defined, as an inductive
+      type with spherical, flat and saddle constructors, together with the metric
+      profile function S giving the transverse radius k sin(r/k), r, or
+      k sinh(r/k) in the three cases.
+    done: true
+    location: "Physlib/Cosmology/FLRW/Basic.lean (SpatialGeometry, SpatialGeometry.S)"
+
+  - description: >
+      The flat geometry is the large-radius limit of the curved ones: the profile
+      S of the spherical and of the saddle geometry tends to the flat profile as
+      the curvature radius tends to infinity.
+    done: true
+    location: "Physlib/Cosmology/FLRW/Basic.lean (limit_S_sphere, limit_S_saddle, tendsto_sin_rx_over_x, tendsto_sinh_rx_over_x, mul_sin_as_div, mul_sinh_as_div)"
+
+  - description: >
+      The key data structure, an FLRW model given by a positive scale factor
+      a : Time → ℝ together with an element of SpatialGeometry, is defined.
+      (FLRW currently exists only as a placeholder type; a TODO in the file
+      records the intended concrete structure.)
+    done: false
+    location: "Physlib/Cosmology/FLRW/Basic.lean (FLRW)"
+
+  - description: >
+      The first-order Friedmann equation
+      (∂ₜ a / a)^2 = (8πG/3) ρ - k c^2 / a^2 + Λ c^2 / 3 and the second-order
+      Friedmann equation ∂ₜ ∂ₜ a / a = -(4πG/3) (ρ + 3 p / c^2) + Λ c^2 / 3 are
+      defined as propositions, the first on a scale factor and an energy density
+      with the curvature parameter explicit, the second additionally on a
+      pressure and without a curvature term; the cosmological constant, Newton's
+      constant and the speed of light are explicit in both.
+    done: true
+    location: "Physlib/Cosmology/FLRW/Basic.lean (FirstOrderFriedmann, SecondOrderFriedmann)"
+
+  - description: >
+      The Hubble parameter H = ∂ₜ a / a is defined as a function of the scale
+      factor and cosmic time, and is nonzero whenever a and ∂ₜ a are both nonzero
+      at the given time.
+    done: true
+    location: "Physlib/Cosmology/FLRW/Basic.lean (hubbleConstant, hubbleConstant_ne_zero)"
+
+  - description: >
+      The deceleration parameter q = -(∂ₜ ∂ₜ a) a / (∂ₜ a)^2 is defined, and the
+      API contains the quotient-rule formula for ∂ₜ H, the identities
+      q = -(1 + (∂ₜ H) / H^2) and ∂ₜ H = -H^2 (1 + q), and the pointwise and
+      existential equivalences between ∂ₜ H < 0 and q > -1.
+    done: true
+    location: "Physlib/Cosmology/FLRW/Basic.lean (decelerationParameter, deriv_hubbleConstant, decelerationParameter_eq_one_plus_hubbleConstant, deriv_hubbleConstant_eq_neg_sq_mul, deriv_hubbleConstant_neg_iff, exists_deriv_hubbleConstant_neg_iff)"
+
+  - description: >
+      The continuity equation ∂ₜ ρ + 3 H (ρ + P/c^2) = 0 of the cosmic fluid, the
+      barotropic equation of state P = w ρ c^2, and the density scaling law
+      ρ ∝ a^(-3(1+w)) with its dust, radiation and vacuum-energy special cases.
+      Recorded as TODO items in Physlib/Cosmology/FLRW/MatterContent.lean; no
+      declarations exist yet.
+    done: false
+    location: "N/A"

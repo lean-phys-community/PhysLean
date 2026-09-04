@@ -206,7 +206,7 @@ lemma time_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x�
       have hf : Integrable η (volume.prod volume) := by
         exact η.integrable
       apply MeasureTheory.Integrable.comp_measurable
-      · haveI : (Measure.map (fun t => (t, x₀)) (volume (α := Time))).HasTemperateGrowth := by
+      · have : (Measure.map (fun t => (t, x₀)) (volume (α := Time))).HasTemperateGrowth := by
           refine { exists_integrable := ?_ }
           obtain ⟨r, hr⟩ := Measure.HasTemperateGrowth.exists_integrable (μ := volume (α := Time))
           use r
@@ -455,7 +455,7 @@ lemma time_integral_contDiff {d : ℕ} (n : ℕ) (η : 𝓢(Time × Space d, ℝ
 @[fun_prop]
 lemma integrable_time_integral {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x : Space d) :
     Integrable (fun t => η (t, x)) volume := by
-  haveI : Measure.HasTemperateGrowth ((Measure.map (fun t => (t, x)) (volume (α := Time)))) := by
+  have : Measure.HasTemperateGrowth ((Measure.map (fun t => (t, x)) (volume (α := Time)))) := by
       refine { exists_integrable := ?_ }
       obtain ⟨r, hr⟩ := Measure.HasTemperateGrowth.exists_integrable (μ := volume (α := Time))
       use r
@@ -606,7 +606,7 @@ lemma iteratedFDeriv_integrable {n} {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) 
     Integrable (fun t => iteratedFDeriv ℝ n ⇑η (t, x)) volume := by
   rw [← MeasureTheory.integrable_norm_iff]
   apply iteratedFDeriv_norm_integrable η x
-  haveI : SecondCountableTopologyEither Time
+  have : SecondCountableTopologyEither Time
     (ContinuousMultilinearMap ℝ (fun i : Fin n => Time × Space d) ℝ) := {
       out := by
         left

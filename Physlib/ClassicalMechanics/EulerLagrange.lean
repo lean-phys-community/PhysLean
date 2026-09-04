@@ -9,11 +9,32 @@ public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
 public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 
-# Euler-Lagrange equations
+# A. Euler–Lagrange equations
 
-In this module we define the Euler-Lagrange operator `eulerLagrangeOp`,
-and prove the that the variational derivative of the action functional
-`∫ L(t, q(t), dₜ q(t)) dt` is equal to the Euler-Lagrange operator applied to the trajectory `q`.
+The Euler–Lagrange equations characterize stationary trajectories of an action functional. For a
+Lagrangian `L t q v`, they compare the gradient with respect to position to the time derivative of
+the gradient with respect to velocity.
+
+## A.1. Mathematical setting
+
+Trajectories take values in a complete real inner-product space `X`. The Lagrangian has type
+`Time → X → X → ℝ`, and the corresponding action is the time integral of
+`L t (q t) (∂ₜ q t)`.
+
+## A.2. Main definitions and results
+
+- `eulerLagrangeOp` defines the Euler–Lagrange operator
+  `∂L/∂q - ∂ₜ (∂L/∂v)` along a trajectory.
+- `eulerLagrangeOp_eq` exposes its pointwise formula.
+- `eulerLagrangeOp_zero` evaluates the operator for the zero Lagrangian.
+- `euler_lagrange_varGradient` proves that the variational gradient of the action equals the
+  Euler–Lagrange operator for smooth trajectories and Lagrangians.
+
+## A.3. Current scope
+
+The result is formulated for smooth data and Hilbert-space-valued trajectories. Applications to
+specific mechanical systems are developed in their corresponding modules, where vanishing of the
+operator becomes the system's equation of motion.
 
 -/
 

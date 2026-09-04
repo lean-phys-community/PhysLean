@@ -151,6 +151,7 @@ theorem trace_eq_one_iff (A : HermitianMat n 𝕜) : A.trace = 1 ↔ A.mat.trace
   rw [← trace_eq_trace_rc]
   exact ⟨mod_cast id, mod_cast id⟩
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem trace_reindex (A : HermitianMat n ℂ) (e : n ≃ m) :
     (A.reindex e).trace = A.trace := by

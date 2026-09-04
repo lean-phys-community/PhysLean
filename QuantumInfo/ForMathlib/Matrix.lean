@@ -43,6 +43,7 @@ theorem fromBlocks_gram_posSemidef {m n k : Type*} [Fintype m] [Fintype n] [Fint
   rw [fromBlocks_conjTranspose, fromBlocks_multiply]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 theorem zero_rank_eq_zero {A : Matrix n n 𝕜} [Fintype n] (hA : A.rank = 0) : A = 0 := by
   have h : ∀ v, A.mulVecLin v = 0 := by
     intro v
@@ -76,10 +77,10 @@ theorem smul_real (c : ℝ) : (c • A).IsHermitian := by
 
 def HermitianSubspace (n 𝕜 : Type*) [Fintype n] [RCLike 𝕜] : Subspace ℝ (Matrix n n 𝕜) where
   carrier := { A : Matrix n n 𝕜 | A.IsHermitian }
-  add_mem' _ _ := by simp_all only [Set.mem_setOf_eq, IsHermitian.add]
-  zero_mem' := by simp only [Set.mem_setOf_eq, isHermitian_zero]
+  add_mem' _ _ := by simp_all only [Set.mem_ofPred_eq, IsHermitian.add]
+  zero_mem' := by simp only [Set.mem_ofPred_eq, isHermitian_zero]
   smul_mem' c A := by
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     intro hA
     exact IsHermitian.smul_real hA c
 
@@ -863,7 +864,7 @@ theorem cfc_diagonal (g : d → ℝ) (f : ℝ → ℝ) :
       change Matrix.conjTranspose _ = _
       simp [Matrix.conjTranspose]
   --TODO cfc_cont_tac
-  rw [cfc, dif_pos ⟨h_self_adjoint, continuousOn_iff_continuous_restrict.mpr <| by fun_prop⟩]
+  rw [cfc, dif_pos ⟨h_self_adjoint, continuousOn_iff_continuous_domRestrict.mpr <| by fun_prop⟩]
   rw [cfcHom_eq_of_continuous_of_map_id]
   rotate_left
   · refine' { .. }

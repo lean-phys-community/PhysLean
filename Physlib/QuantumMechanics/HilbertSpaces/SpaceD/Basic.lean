@@ -5,10 +5,8 @@ Authors: Adam Bornemann, Gregory J. Loges
 -/
 module
 
-public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
-public import Mathlib.Analysis.Distribution.Sobolev
+public import Mathlib.Analysis.Distribution.TemperedDistribution
 public import Mathlib.Analysis.InnerProductSpace.Dual
-public import Mathlib.MeasureTheory.Function.L2Space
 public import Physlib.SpaceAndTime.Space.Module
 /-!
 
@@ -132,16 +130,32 @@ lemma MemHS.zero : MemHS (0 : Space d → ℂ) μ := MemLp.zero
 
 lemma MemHS.neg (hf : MemHS f μ) : MemHS (-f) μ := MemLp.neg hf
 
+lemma memHS_neg_iff : MemHS (-f) μ ↔ MemHS f μ := memLp_neg_iff
+
 lemma MemHS.add (hf : MemHS f μ) (hg : MemHS g μ) : MemHS (f + g) μ := MemLp.add hf hg
 
 lemma MemHS.sub (hf : MemHS f μ) (hg : MemHS g μ) : MemHS (f - g) μ := MemLp.sub hf hg
 
 lemma MemHS.const_smul (c : ℂ) (hf : MemHS f μ) : MemHS (c • f) μ := MemLp.const_smul hf c
 
-lemma MemHS.const_smul_iff {c : ℂ} (hc : c ≠ 0) : MemHS (c • f) μ ↔ MemHS f μ :=
-  ⟨fun h ↦ inv_smul_smul₀ hc f ▸ h.const_smul c⁻¹, const_smul c⟩
+lemma memHS_const_smul_iff {c : ℂ} (hc : c ≠ 0) : MemHS (c • f) μ ↔ MemHS f μ :=
+  ⟨fun h ↦ inv_smul_smul₀ hc f ▸ h.const_smul c⁻¹, MemHS.const_smul c⟩
 
 lemma MemHS.ae_eq (hfg : f =ᵐ[μ] g) (hf : MemHS f μ) : MemHS g μ := MemLp.ae_eq hfg hf
+
+lemma memHS_congr_ae (hfg : f =ᵐ[μ] g) : MemHS f μ ↔ MemHS g μ := memLp_congr_ae hfg
+
+lemma MemHS.congr_norm
+    (hf : MemHS f μ) (hg : AEStronglyMeasurable g μ) (hfg : ∀ᵐ x ∂μ, ‖f x‖ = ‖g x‖) : MemHS g μ :=
+  MemLp.congr_norm hf hg hfg
+
+lemma memHS_congr_norm (hf : AEStronglyMeasurable f μ) (hg : AEStronglyMeasurable g μ)
+    (hfg : ∀ᵐ x ∂μ, ‖f x‖ = ‖g x‖) : MemHS f μ ↔ MemHS g μ :=
+  memLp_congr_norm hf hg hfg
+
+lemma MemHS.mono (hf : MemHS f μ) (hg : AEStronglyMeasurable g μ) (hfg : ∀ᵐ x ∂μ, ‖g x‖ ≤ ‖f x‖) :
+    MemHS g μ :=
+  MemLp.mono hf hg hfg
 
 lemma MemHS.mono_measure (h : μ' ≤ μ) (hf : MemHS f μ) : MemHS f μ' := MemLp.mono_measure h hf
 
@@ -212,6 +226,8 @@ end
 section
 
 variable (c : ℂ) (ψ φ : SpaceDHilbertSpace d μ)
+
+lemma coeFn_zero : ⇑(0 : SpaceDHilbertSpace d μ) =ᵐ[μ] 0 := Lp.coeFn_zero _ _ _
 
 lemma coeFn_neg : ⇑(-ψ) =ᵐ[μ] -ψ := Lp.coeFn_neg _
 

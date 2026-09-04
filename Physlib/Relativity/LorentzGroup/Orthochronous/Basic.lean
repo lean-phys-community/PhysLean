@@ -195,6 +195,7 @@ lemma isOrthochronous_mul_iff {Λ Λ' : LorentzGroup d} :
     rw [← hnn]
     refine isOrthochronous_mul ?_ ?_ <;> rwa [neg_isOrthochronous_iff_not]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The homomorphism from `LorentzGroup` to `ℤ₂`. -/
 def orthchroRep : LorentzGroup d →* ℤ₂ where
   toFun := orthchroMap
@@ -241,7 +242,7 @@ lemma isOrthochronous_on_connected_component {Λ Λ' : LorentzGroup d}
     (h : Λ' ∈ connectedComponent Λ) : IsOrthochronous Λ ↔ IsOrthochronous Λ' := by
   obtain ⟨s, hs, hΛ'⟩ := h
   let f : ContinuousMap s ℤ₂ := ContinuousMap.restrict s orthchroMap
-  haveI : PreconnectedSpace s := isPreconnected_iff_preconnectedSpace.mp hs.1
+  have : PreconnectedSpace s := isPreconnected_iff_preconnectedSpace.mp hs.1
   have h_eq : orthchroMap Λ = orthchroMap Λ' := by
     apply IsPreconnected.subsingleton (isPreconnected_range f.continuous_toFun)
     · exact Set.mem_range_self (⟨Λ, hs.2⟩ : {x : LorentzGroup d | x ∈ s})

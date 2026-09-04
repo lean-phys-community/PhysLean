@@ -20,7 +20,7 @@ should not be used in the proofs of any other results other then those in this f
 @[expose] public section
 
 namespace UnitExamples
-open Dimension CarriesDimension UnitChoices UnitDependent HasDim
+open Dimension CarriesDimension LTMCTUnitChoices UnitDependent HasDim
 /-!
 
 ## Defining a length dependent on units
@@ -30,6 +30,7 @@ open Dimension CarriesDimension UnitChoices UnitDependent HasDim
 /-- The length corresponding to 400 meters. -/
 noncomputable def meters400 : Dimensionful (WithDim L𝓭 ℝ) := toDimensionful SI ⟨400⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Changing that length to miles.
   400 meters is very almost a quarter of a mile. -/
 example : meters400 {SI with length := LengthUnit.miles} = ⟨1/4 - 73/50292⟩ := by
@@ -110,7 +111,6 @@ def EnergyMassWithDimNot (m : WithDim M𝓭 ℝ) (E : WithDim (M𝓭 * L𝓭 * L
     (c : WithDim (L𝓭 * T𝓭⁻¹) ℝ) : Prop :=
   E.1 = m.1 * c.1
 
-set_option backward.isDefEq.respectTransparency false in
 lemma energyMassWithDimNot_not_isDimensionallyCorrect :
     ¬ IsDimensionallyCorrect EnergyMassWithDimNot := by
   simp only [isDimensionallyCorrect_fun_iff, not_forall, funext_iff, scaleUnit_apply_fun]
@@ -130,14 +130,14 @@ open DimSpeed
 /-- The equation `E = m c^2`, in this equation we `E` and `m` are implicitly in the
   units `u`, while the speed of light is explicitly written in those units. -/
 def EnergyMass (m : WithDim M𝓭 ℝ) (E : WithDim (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹) ℝ)
-    (u : UnitChoices) : Prop :=
+    (u : LTMCTUnitChoices) : Prop :=
     E.1 = m.1 * (speedOfLight u).1 ^ 2
 
 /-- The equation `E = m c^2`, in this version everything is written explicitly in
   terms of a choice of units. -/
 def EnergyMass' (m : Dimensionful (WithDim M𝓭 ℝ))
     (E : Dimensionful (WithDim (M𝓭 * L𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹) ℝ))
-    (u : UnitChoices) : Prop :=
+    (u : LTMCTUnitChoices) : Prop :=
     (E.1 u).1 = (m.1 u).1 * (speedOfLight u).1 ^ 2
 
 /-- The lemma that the proposition `EnergyMass` is dimensionally correct-/
@@ -169,9 +169,9 @@ lemma example1_energyMass : EnergyMass ⟨2⟩ ⟨2 * 299792458 ^ 2⟩ SI := by
 /- The lemma `energyMass_isDimensionallyCorrect` allows us to scale the units
   of `example1_energyMass`, that is - we proved it in one set of units, but we get the result
   in any set of units. -/
-lemma example2_energyMass (u : UnitChoices) :
+lemma example2_energyMass (u : LTMCTUnitChoices) :
     EnergyMass (scaleUnit SI u ⟨2⟩) (scaleUnit SI u ⟨2 * 299792458 ^ 2⟩) u := by
-  conv_rhs => rw [← UnitChoices.scaleUnit_apply_fst SI u]
+  conv_rhs => rw [← LTMCTUnitChoices.scaleUnit_apply_fst SI u]
   rw [← energyMass_isDimensionallyCorrect SI u]
   simp only [scaleUnit_apply_fst, scaleUnit_apply_fun, scaleUnit_symm_apply,
     scaleUnit_apply_fun_left]

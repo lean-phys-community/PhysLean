@@ -496,21 +496,6 @@ private lemma phaseVectorField_apply (a b : EuclideanSpace ℝ (Fin 1)) :
     S.phaseVectorField (a, b) = (b, (-(S.m⁻¹ * S.k)) • a + (-(S.m⁻¹ * S.γ)) • b) := by
   simp [phaseVectorField]
 
-private lemma toRealCLE_symm_one : Time.toRealCLE.symm (1 : ℝ) = (1 : Time) := by
-  rw [ContinuousLinearEquiv.symm_apply_eq]
-  change (1 : ℝ) = (1 : Time).val
-  rw [Time.one_val]
-
-/-- Bridge from the time derivative to `HasDerivAt` for a curve reparametrised through the
-canonical `ℝ ≃L[ℝ] Time` equivalence. -/
-private lemma hasDerivAt_comp_toRealCLE_symm (w : Time → EuclideanSpace ℝ (Fin 1)) (τ : ℝ)
-    (hw : DifferentiableAt ℝ w (Time.toRealCLE.symm τ)) :
-    HasDerivAt (fun τ : ℝ => w (Time.toRealCLE.symm τ))
-      (∂ₜ w (Time.toRealCLE.symm τ)) τ := by
-  simpa [Function.comp_def, Time.deriv_eq, toRealCLE_symm_one] using
-    hw.hasFDerivAt.comp_hasDerivAt_of_eq τ
-      ((Time.toRealCLE.symm : ℝ →L[ℝ] Time).hasDerivAt) rfl
-
 /-- The phase curve `τ ↦ (z t, ẋ t)` (with `t = toRealCLE.symm τ`) of a smooth solution `z`
 solves the first-order phase-space ODE with vector field `phaseVectorField`. -/
 private lemma phaseCurve_hasDerivAt (z : Time → EuclideanSpace ℝ (Fin 1))
@@ -519,8 +504,8 @@ private lemma phaseCurve_hasDerivAt (z : Time → EuclideanSpace ℝ (Fin 1))
       (S.phaseVectorField (z (Time.toRealCLE.symm τ), ∂ₜ z (Time.toRealCLE.symm τ))) τ := by
   rw [S.phaseVectorField_apply,
     ← S.acceleration_eq_of_equationOfMotion z hEOM (Time.toRealCLE.symm τ)]
-  exact (hasDerivAt_comp_toRealCLE_symm z τ (hz.differentiable (by simp) _)).prodMk
-    (hasDerivAt_comp_toRealCLE_symm (∂ₜ z) τ (deriv_differentiable_of_contDiff z hz _))
+  exact (Time.hasDerivAt_comp_toRealCLE_symm z τ (hz.differentiable (by simp) _)).prodMk
+    (Time.hasDerivAt_comp_toRealCLE_symm (∂ₜ z) τ (deriv_differentiable_of_contDiff z hz _))
 
 /-- Any two smooth solutions of the damped equation of motion with the same initial position and
 velocity are equal. -/

@@ -54,7 +54,7 @@ def repCharges {n : ℕ} : Representation ℚ (PermGroup n) (SMCharges n).Charge
     intro S
     rw [charges_eq_toSpecies_eq]
     intro i
-    simp only [chargeMap_apply, Pi.inv_apply, Module.End.mul_apply]
+    simp only [Module.End.mul_apply]
     erw [toSMSpecies_toSpecies_inv, toSMSpecies_toSpecies_inv, toSMSpecies_toSpecies_inv]
     rfl
   map_one' := by
@@ -78,22 +78,26 @@ lemma toSpecies_sum_invariant (m : ℕ) (f : PermGroup n) (S : (SMCharges n).Cha
   rw [repCharges_toSpecies]
   exact Equiv.sum_comp (f⁻¹ j) ((fun a => a ^ m) ∘ toSpecies j S)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The gravitational anomaly equations is invariant under family permutations. -/
 lemma accGrav_invariant (f : PermGroup n) (S : (SMCharges n).Charges) :
     accGrav (repCharges f S) = accGrav S := accGrav_ext
   (by simpa using toSpecies_sum_invariant 1 f S)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `SU(2)` anomaly equation is invariant under family permutations. -/
 lemma accSU2_invariant (f : PermGroup n) (S : (SMCharges n).Charges) :
     accSU2 (repCharges f S) = accSU2 S := accSU2_ext
   (by simpa using toSpecies_sum_invariant 1 f S)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `SU(3)` anomaly equation is invariant under family permutations. -/
 lemma accSU3_invariant (f : PermGroup n) (S : (SMCharges n).Charges) :
     accSU3 (repCharges f S) = accSU3 S :=
   accSU3_ext
     (by simpa using toSpecies_sum_invariant 1 f S)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `Y²` anomaly equation is invariant under family permutations. -/
 lemma accYY_invariant (f : PermGroup n) (S : (SMCharges n).Charges) :
     accYY (repCharges f S) = accYY S :=

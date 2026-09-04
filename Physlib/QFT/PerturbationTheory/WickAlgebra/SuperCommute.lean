@@ -47,6 +47,7 @@ lemma ι_superCommuteF_eq_of_equiv_right (a b1 b2 : 𝓕.FieldOpFreeAlgebra) (h 
   rw [← sub_eq_zero, ← map_sub, ← map_sub]
   exact ι_superCommuteF_right_zero_of_mem_ideal a _ ((equiv_iff_sub_mem_ideal _ _).mp h)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The super commutator on the `WickAlgebra` defined as a linear map `[a,_]ₛ`. -/
 noncomputable def superCommuteRight (a : 𝓕.FieldOpFreeAlgebra) :
   WickAlgebra 𝓕 →ₗ[ℂ] WickAlgebra 𝓕 where
@@ -79,6 +80,7 @@ lemma superCommuteRight_eq_of_equiv (a1 a2 : 𝓕.FieldOpFreeAlgebra) (h : a1 �
     ι_superCommuteF_eq_zero_of_ι_left_zero (a1 - a2) b
       ((ι_eq_zero_iff_mem_ideal _).mpr ((equiv_iff_sub_mem_ideal _ _).mp h))
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a field specification `𝓕`, `superCommute` is the linear map
 
   `WickAlgebra 𝓕 →ₗ[ℂ] WickAlgebra 𝓕 →ₗ[ℂ] WickAlgebra 𝓕`
@@ -145,12 +147,14 @@ lemma superCommute_diff_statistic {φ φ' : 𝓕.CrAnFieldOp} (h : (𝓕 |>ₛ �
     [ofCrAnOp φ, ofCrAnOp φ']ₛ = 0 :=
   ι_superCommuteF_of_diff_statistic h
 
+set_option backward.isDefEq.respectTransparency false in
 lemma superCommute_ofCrAnOp_ofFieldOp_diff_stat_zero (φ : 𝓕.CrAnFieldOp) (ψ : 𝓕.FieldOp)
     (h : (𝓕 |>ₛ φ) ≠ (𝓕 |>ₛ ψ)) : [ofCrAnOp φ, ofFieldOp ψ]ₛ = 0 := by
   rw [ofFieldOp_eq_sum, map_sum]
   refine Finset.sum_eq_zero fun x _ => superCommute_diff_statistic ?_
   simpa [crAnStatistics] using h
 
+set_option backward.isDefEq.respectTransparency false in
 lemma superCommute_anPart_ofFieldOpF_diff_grade_zero (φ ψ : 𝓕.FieldOp)
     (h : (𝓕 |>ₛ φ) ≠ (𝓕 |>ₛ ψ)) : [anPart φ, ofFieldOp ψ]ₛ = 0 := by
   cases φ
@@ -230,11 +234,13 @@ lemma superCommute_crPart_anPart (φ φ' : 𝓕.FieldOp) :
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • anPart φ' * crPart φ :=
   congrArg ι (superCommuteF_crPartF_anPartF φ φ')
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma superCommute_crPart_crPart (φ φ' : 𝓕.FieldOp) : [crPart φ, crPart φ']ₛ = 0 := by
   cases φ <;> cases φ' <;>
     simp [superCommute_create_create, crAnFieldOpToCreateAnnihilate]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma superCommute_anPart_anPart (φ φ' : 𝓕.FieldOp) : [anPart φ, anPart φ']ₛ = 0 := by
   cases φ <;> cases φ' <;>

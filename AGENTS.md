@@ -58,8 +58,8 @@ When a long proof cannot be split, make sure it contains comments.
 - Check `./scripts/lint-style.sh`, but **commit your changes first**; this linter reads committed state.
 - If edited a `PhyslibAlpha` file, check the following:
   - `lake exe runPhyslibAlphaLinters`
-  - `./scripts/PhyslibAlpha/alphaFileImports.py`
-  - `./scripts/PhyslibAlpha/noAlphaImports.py`
+  - `lake exe noAlphaImports`
+  - `lake exe alphaFileImports`
   - `./scripts/PhyslibAlpha/alphaPythonLinters.sh`
 
 ## PR scope

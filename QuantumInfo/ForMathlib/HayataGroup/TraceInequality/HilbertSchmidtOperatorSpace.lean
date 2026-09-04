@@ -143,6 +143,7 @@ omit [CompleteSpace ℋ] in
       ((hsLinearMapEquiv (ℋ := ℋ)) T) p.1 p.2
   have h : hsCoordsLinearEquiv (toHSCoordsLinearEquiv (ℋ := ℋ) T) = f := by
     simp [toHSCoordsLinearEquiv, matrixToCoords, matrixToFun, f]
+    rfl
   have hEval := congrArg (fun g : HSCoordFun ℋ => g (i, j)) h
   simpa [f] using hEval
 
@@ -234,12 +235,14 @@ omit [CompleteSpace ℋ] in
 @[simp] lemma rightMulHS_apply (B : L ℋ) (T : HSOp ℋ) :
     toOp (rightMulHS (ℋ := ℋ) B T) = toOp T * B := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 omit [CompleteSpace ℋ] in
 @[simp] lemma leftMulHS_mul (A B : L ℋ) :
     leftMulHS (ℋ := ℋ) (A * B) = leftMulHS (ℋ := ℋ) A * leftMulHS (ℋ := ℋ) B := by
   ext T
   simp [mul_assoc]
 
+set_option backward.isDefEq.respectTransparency false in
 omit [CompleteSpace ℋ] in
 @[simp] lemma rightMulHS_mul (A B : L ℋ) :
     rightMulHS (ℋ := ℋ) (A * B) = rightMulHS (ℋ := ℋ) B * rightMulHS (ℋ := ℋ) A := by
@@ -258,6 +261,7 @@ omit [CompleteSpace ℋ] in
   ext T
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 omit [CompleteSpace ℋ] in
 lemma leftMulHS_rightMulHS_commute (A B : L ℋ) :
     Commute (leftMulHS (ℋ := ℋ) A) (rightMulHS (ℋ := ℋ) B) := by
@@ -446,10 +450,10 @@ lemma leftMulHS_pdSet [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint] [
   have hleft_sa : IsSelfAdjoint (leftMulHS (ℋ := ℋ) A) := by
     change star (leftMulHS (ℋ := ℋ) A) = leftMulHS (ℋ := ℋ) A
     simp [hA_sa.star_eq, leftMulHS_star (ℋ := ℋ) A]
-  letI : Nontrivial (HSOp ℋ) := by
+  let : Nontrivial (HSOp ℋ) := by
     delta HSOp
     infer_instance
-  letI : Nontrivial (L (HSOp ℋ)) := inferInstance
+  let : Nontrivial (L (HSOp ℋ)) := inferInstance
   refine ⟨?_, ?_⟩
   · exact hleft_sa
   · rcases (CFC.exists_pos_algebraMap_le_iff (A := L ℋ) (a := A) (ha := hA_sa)).2 hA_spec
@@ -495,7 +499,7 @@ noncomputable def leftMulHSStarAlgHom : L ℋ →⋆ₐ[ℝ] L (HSOp ℋ) where
 noncomputable def rightMulHSStarAlgHom : (L ℋ)ᵐᵒᵖ →⋆ₐ[ℝ] L (HSOp ℋ) where
   toFun := fun A => rightMulHS (ℋ := ℋ) (MulOpposite.unop A)
   map_one' := by simp [rightMulHS_one (ℋ := ℋ)]
-  map_mul' := by intro A B; ext T; simp [rightMulHS_apply, mul_assoc]
+  map_mul' := by intro A B; ext T; simp [rightMulHS_apply]
   map_zero' := by
     ext T
     change ofOp (toOp T * MulOpposite.unop (0 : (L ℋ)ᵐᵒᵖ)) = ofOp (0 : L ℋ)

@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Robert Sneiderman, Joseph Tooby-Smith
 -/
 module
 
@@ -179,6 +179,15 @@ lemma ofFinEquiv_apply_snd {n : ℕ} {c : Fin (n + 1 + 1) → C}
     (x : basisIdx (c i) × basisIdx (c j)) :
     (ofFinEquiv (S := S) hij b x).1 j = x.2 := by
   simp [ofFinEquiv]
+
+/-- Restoring the two entries dropped from a component index recovers that component index. -/
+@[simp]
+lemma ofFinEquiv_dropPair {n : ℕ} {c : Fin (n + 1 + 1) → C}
+    {i j : Fin (n + 1 + 1)} (hij : i ≠ j) (r : ComponentIdx (S := S) c) :
+    (ofFinEquiv (S := S) hij (r.dropPair i j) (r i, r j)).1 = r := by
+  exact congrArg Subtype.val <|
+    (ofFinEquiv (S := S) hij (r.dropPair i j)).apply_symm_apply
+      ⟨r, mem_self_of_dropPair r⟩
 
 end DropPairSection
 

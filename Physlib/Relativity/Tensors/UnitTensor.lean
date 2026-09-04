@@ -29,11 +29,20 @@ open Tensor
 noncomputable def unitTensor (c : C) : S.Tensor ![S.τ c, c] :=
   fromConstPair (S.unit c)
 
+/-- A component of the unit tensor is the corresponding component of the unit intertwiner in the
+tensor-product basis. -/
+lemma unitTensor_basis_repr (c : C) (φ : ComponentIdx (S := S) ![S.τ c, c]) :
+    (Tensor.basis _).repr (unitTensor (S := S) c) φ =
+      (Module.Basis.tensorProduct (b (S.τ c)) (b c)).repr ((S.unit c) (1 : k))
+        (φ 0, φ 1) := by
+  rw [unitTensor, fromConstPair, fromPairT_basis_repr]
+
 lemma unitTensor_congr {c c1 : C} (h : c = c1) :
     unitTensor c = permT id (by simp [h]) (unitTensor (S := S) c1) := by
   subst h
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The unit tensor is symmetric on dualing the color. -/
 lemma unitTensor_eq_permT_dual (c : C) :
     S.unitTensor c = permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> simp))
@@ -62,6 +71,7 @@ lemma unitTensor_eq_permT_dual (c : C) :
     · simp_all
   · simp_all
 
+set_option backward.isDefEq.respectTransparency false in
 lemma dual_unitTensor_eq_permT_unitTensor (c : C) :
     S.unitTensor (S.τ c) = permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> simp))
       (unitTensor c) := by

@@ -119,6 +119,7 @@ lemma congrLift_bijective {n m : ℕ} {c : WickContraction n} (h : n = m) :
 def congrLiftInv {n m : ℕ} (h : n = m) {c : WickContraction n} (a : (congr h c).1) : c.1 :=
   ⟨a.1.map (finCongr h.symm).toEmbedding, by aesop⟩
 
+set_option backward.isDefEq.respectTransparency false in
 lemma congrLiftInv_rfl {n : ℕ} {c : WickContraction n} :
     c.congrLiftInv rfl = id := by
   funext a

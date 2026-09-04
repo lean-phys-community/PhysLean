@@ -440,6 +440,7 @@ noncomputable def RelativeEntResource : MState (H i) → ℝ≥0 :=
 
 scoped notation "𝑅ᵣ" => RelativeEntResource
 
+set_option backward.isDefEq.respectTransparency false in
 theorem exists_isFree_relativeEntResource (ρ : MState (H i)) :
     ∃ σ ∈ IsFree, 𝐃(ρ‖σ) = 𝑅ᵣ ρ := by
   obtain ⟨σ, hσ₁, hσ₂⟩ := IsCompact_IsFree.exists_isMinOn_lowerSemicontinuousOn

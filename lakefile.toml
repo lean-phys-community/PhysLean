@@ -1,15 +1,22 @@
 name = "Physlib"
+
+# These settings allow `lake cache` to work
+# `enableArtifactCache` allows the workflow to update the cache
+# `restoreAllArtifacts` allows the cached artifacts to be used in `lake build`
+enableArtifactCache = true
+restoreAllArtifacts = true
+
 defaultTargets = ["Physlib", "QuantumInfo"]
 
 [[require]]
 name = "«doc-gen4»"
 git = "https://github.com/leanprover/doc-gen4"
-rev = "v4.32.0"
+rev = "v4.33.0"
 
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
-rev = "v4.32.0"
+rev = "v4.33.0"
 
 [[lean_lib]]
 name = "Physlib"
@@ -22,6 +29,10 @@ moreLeanArgs = ["-Dwarn.sorry=false", "-Dweak.says.verify=true"]
 [[lean_lib]]
 name = "QuantumInfo"
 moreLeanArgs = ["-Dwarn.sorry=false", "-Dweak.says.verify=true"]
+
+[[lean_exe]]
+name = "get_cache"
+srcDir = "scripts"
 
 [[lean_exe]]
 name = "check_file_imports"
@@ -65,6 +76,21 @@ srcDir = "scripts/PhyslibAlpha"
 supportInterpreter = true
 
 [[lean_exe]]
+name = "noAlphaImports"
+srcDir = "scripts/PhyslibAlpha"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "alphaFileImports"
+srcDir = "scripts/PhyslibAlpha"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "testImportScripts"
+srcDir = "Meta/test"
+supportInterpreter = true
+
+[[lean_exe]]
 name = "free_simps"
 srcDir = "scripts/MetaPrograms"
 
@@ -90,6 +116,11 @@ srcDir = "scripts/MetaPrograms"
 name = "stats"
 srcDir = "scripts"
 supportInterpreter = true
+
+[[lean_exe]]
+name = "api_map_index"
+root = "APIMapIndex"
+srcDir = "scripts"
 
 [[lean_exe]]
 name = "local_stats"

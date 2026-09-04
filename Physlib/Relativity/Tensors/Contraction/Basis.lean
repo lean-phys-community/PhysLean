@@ -29,7 +29,6 @@ namespace Tensor
 
 open ComponentIdx
 
-set_option backward.isDefEq.respectTransparency false in
 lemma Pure.dropPair_basisVector {n : ℕ} {c : Fin (n + 1 + 1) → C}
     {i j : Fin (n + 1 + 1)} (hij : i ≠ j) (b : ComponentIdx c) :
     Pure.dropPair i j hij (basisVector c b) =

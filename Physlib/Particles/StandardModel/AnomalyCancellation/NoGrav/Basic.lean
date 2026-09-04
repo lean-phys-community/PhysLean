@@ -40,12 +40,14 @@ namespace SMNoGrav
 
 variable {n : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The charges in `(SMNoGrav n).LinSols` satisfy the `SU(2)` anomaly-equation. -/
 lemma SU2Sol (S : (SMNoGrav n).LinSols) : accSU2 S.val = 0 := by
   have hS := S.linearSol
   simp only [SMNoGrav_linearACCs] at hS
   exact hS ⟨0, by simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The charges in `(SMNoGrav n).LinSols` satisfy the `SU(3)` anomaly-equation. -/
 lemma SU3Sol (S : (SMNoGrav n).LinSols) : accSU3 S.val = 0 := by
   have hS := S.linearSol

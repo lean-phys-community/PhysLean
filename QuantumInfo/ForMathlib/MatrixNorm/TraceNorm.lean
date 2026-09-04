@@ -195,10 +195,10 @@ theorem exists_svd_sqrt_eigenvalues (A : Matrix n n ℂ) :
     if hi : hH.eigenvalues i ≠ 0 then
       ((s i)⁻¹ • WithLp.toLp 2 (A.mulVec (hH.eigenvectorBasis i).ofLp))
     else 0
-  have hu : Orthonormal ℂ ({i | hH.eigenvalues i ≠ 0}.restrict u) := by
+  have hu : Orthonormal ℂ ({i | hH.eigenvalues i ≠ 0}.domRestrict u) := by
     rw [orthonormal_iff_ite]
     intro i j
-    dsimp [u, s]
+    dsimp [u, s, Set.domRestrict]
     have hi' : hH.eigenvalues i.1 ≠ 0 := i.2
     have hj' : hH.eigenvalues j.1 ≠ 0 := j.2
     simp only [hi', hj', not_false_eq_true, if_true]
@@ -282,7 +282,7 @@ omit [DecidableEq n] in
 /-- Every singular value is bounded by the operator norm. -/
 theorem singularValues_le_opNorm [DecidableEq n] (A : Matrix n n ℂ) (i : n) :
     singularValues A i ≤ ‖A‖ := by
-  letI : Nonempty n := ⟨i⟩
+  let : Nonempty n := ⟨i⟩
   let hH : (Aᴴ * A).IsHermitian := by
     simpa using (Matrix.isHermitian_mul_conjTranspose_self A.conjTranspose)
   have hmem : hH.eigenvalues i ∈ spectrum ℝ (Aᴴ * A) := by
@@ -307,9 +307,9 @@ theorem traceNorm_mul_le_opNorm_traceNorm [DecidableEq n] (A B : Matrix n n ℂ)
     (A * B).traceNorm ≤ ‖A‖ * B.traceNorm := by
   classical
   by_cases h : IsEmpty n
-  · letI := h
+  · let := h
     simp [Subsingleton.elim A 0, Subsingleton.elim B 0]
-  · letI : Nonempty n := not_isEmpty_iff.mp h
+  · let : Nonempty n := not_isEmpty_iff.mp h
     have hcard : 0 < Fintype.card n := Fintype.card_pos_iff.mpr ‹Nonempty n›
     have htop : singularValuesSorted A ⟨0, hcard⟩ ≤ ‖A‖ := by
       rw [singularValuesSorted_zero_eq_sup A hcard]
@@ -337,7 +337,7 @@ omit [DecidableEq n] in
 theorem traceNorm_conjTranspose (A : Matrix n n ℂ) :
     Aᴴ.traceNorm = A.traceNorm := by
   classical
-  letI : DecidableEq n := Classical.decEq n
+  let : DecidableEq n := Classical.decEq n
   have hH : (Aᴴ * A).IsHermitian := Matrix.isHermitian_conjTranspose_mul_self A
   obtain ⟨V, W, hA⟩ := Matrix.exists_svd_sqrt_eigenvalues A
   set D : Matrix n n ℂ :=
@@ -462,7 +462,7 @@ theorem traceNorm_add_le (A B : Matrix n n ℂ) : (A + B).traceNorm ≤ A.traceN
   rw [Matrix.mul_add, Matrix.trace_add, Complex.add_re] at h₁
   obtain h₂ := (traceNorm_eq_max_re_tr_U A).right
   obtain h₃ := (traceNorm_eq_max_re_tr_U B).right
-  simp only [upperBounds, Set.mem_setOf_eq] at h₂ h₃
+  simp only [upperBounds, Set.mem_ofPred_eq] at h₂ h₃
   calc _
     _ = RCLike.re ((Uab.1 * A).trace) + RCLike.re ((Uab.1 * B).trace) := h₁.symm
     _ ≤ traceNorm A + RCLike.re ((Uab.1 * B).trace) := by

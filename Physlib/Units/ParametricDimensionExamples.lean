@@ -17,28 +17,23 @@ illustrates two consequences.
 
 A recurring question is how to compare a quantity of dimension `length` with a
 product of a quantity of dimension `length / time` and a quantity of dimension
-`time`. The two dimensions are *equal*, but this equality is a **group
-cancellation law** on the rational exponents — it holds *propositionally*, never
-*definitionally*:
+`time`. In the fixed-tuple representation of `LTMCTDimensionBase`, reducible exponent
+arithmetic makes this concrete cancellation a definitional equality:
 
-* `(L𝓭 / T𝓭) * T𝓭 = L𝓭` cannot be closed by `rfl`: cancellation is not a
-  reduction rule.
-* nor by `decide`: the exponents are rational, so the kernel has nothing to
-  evaluate.
+* `(L𝓭 / T𝓭) * T𝓭 = L𝓭` is closed by `rfl`.
+* `WithDim ((L𝓭 / T𝓭) * T𝓭) ℝ` and `WithDim L𝓭 ℝ` are therefore definitionally
+  equal types.
 
-Consequently `WithDim ((L𝓭 / T𝓭) * T𝓭) ℝ` and `WithDim L𝓭 ℝ` are genuinely
-different types, and a bare `x = v * t` is a type error. The bridge is
-`WithDim.cast`, whose default argument discharges the propositional dimension
-equality automatically, so the comparison is a one-liner. This is not a
-limitation of the representation: no representation of `Dimension` makes the
-equality definitional, so a cast on a proven equality is the correct idiom.
+Consequently a bare `x = v * t` is well-typed for these concrete dimensions. For a
+representation where the same cancellation holds only propositionally, `WithDim.cast`
+bridges the two dimension-indexed types.
 
 ## A non-standard basis
 
-Because `Dimension` is parametric, the same dimensional algebra and the same
-`cast`-based comparison are available over *any* basis — not just the physical
-`LTMCTDimensionBase`. The unit-scaling layer (`UnitChoices`, `dimScale`) is not needed
-for either the algebra or the comparison, so neither is referenced here.
+Because `Dimension` is parametric, the same dimensional algebra and `cast`-based
+comparison are available over any represented basis, not just the physical
+`LTMCTDimensionBase`. The unit-scaling layer (`LTMCTUnitChoices`, `dimScale`) is not
+needed for either the algebra or the comparison, so neither is referenced here.
 
 This module is illustrative and should not be imported by other modules.
 
@@ -50,20 +45,29 @@ open Dimension
 
 namespace ParametricDimensionExamples
 
-/-- The dimension equality `(length / time) · time = length` holds
-propositionally, by cancellation of the rational exponents. -/
-example : (L𝓭 / T𝓭) * T𝓭 = L𝓭 := by ext; simp
+/-- The concrete dimension equality `(length / time) · time = length` holds by
+definitional equality. -/
+example : (L𝓭 / T𝓭) * T𝓭 = L𝓭 := rfl
 
-/-- The dimensions are equal, but the two `WithDim` *types* are not
-definitionally equal, so `WithDim.cast` bridges them. Its default argument proves
-`(L𝓭 / T𝓭) * T𝓭 = L𝓭` with no manual proof. -/
-noncomputable example (v : WithDim (L𝓭 / T𝓭) ℝ) (t : WithDim T𝓭 ℝ) : WithDim L𝓭 ℝ :=
-  (v * t).cast
+/-- The two concrete `WithDim` types are definitionally equal, so multiplication has
+the required result type without a cast. -/
+example (v : WithDim (L𝓭 / T𝓭) ℝ) (t : WithDim T𝓭 ℝ) : WithDim L𝓭 ℝ :=
+  v * t
 
-/-- The end-to-end comparison: a length equals a velocity times a time, once the
-product is cast to the length dimension. -/
+/-- The end-to-end comparison: a length equals a velocity times a time directly. -/
 example (x : WithDim L𝓭 ℝ) (v : WithDim (L𝓭 / T𝓭) ℝ) (t : WithDim T𝓭 ℝ) : Prop :=
-  x = (v * t).cast
+  x = v * t
+
+/-- Two half-powers of length multiply definitionally to length. The unannotated exponent also
+regresses the default away from natural-number division. -/
+example : (L𝓭 ^ (1 / 2)) * (L𝓭 ^ (1 / 2)) = L𝓭 := rfl
+
+/-- Reducible dimension powers also cancel for non-half fractional exponents. -/
+example : (L𝓭 ^ (2 / 3 : Exponent)) * (L𝓭 ^ (1 / 3 : Exponent)) = L𝓭 := rfl
+
+/-- Quantities carrying half-powers of length multiply directly to a length. -/
+example (a b : WithDim (L𝓭 ^ (1 / 2)) ℝ) : WithDim L𝓭 ℝ :=
+  a * b
 
 /-!
 ## The same comparison over a non-standard basis
@@ -79,11 +83,13 @@ inductive Info
   /-- The symbol base dimension. -/
   | symbol
 
+instance : DimensionBasis Info := DimensionBasis.pi _
+
 /-- The `bit` base dimension. -/
-def bitDim : Dimension Info := ⟨fun | .bit => 1 | .symbol => 0⟩
+def bitDim : Dimension Info := Dimension.ofFunction fun | .bit => 1 | .symbol => 0
 
 /-- The `symbol` base dimension. -/
-def symbolDim : Dimension Info := ⟨fun | .bit => 0 | .symbol => 1⟩
+def symbolDim : Dimension Info := Dimension.ofFunction fun | .bit => 0 | .symbol => 1
 
 /-- Cancellation works identically over the non-standard basis. -/
 example : (bitDim / symbolDim) * symbolDim = bitDim := by ext; simp

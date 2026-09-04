@@ -39,6 +39,7 @@ def standParamAsMatrix (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) : Matrix (Fin
 
 open CKMMatrix
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The standard parameterization forms a unitary matrix. -/
 lemma standParamAsMatrix_unitary (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) :
     ((standParamAsMatrix θ₁₂ θ₁₃ θ₂₃ δ₁₃)ᴴ * standParamAsMatrix θ₁₂ θ₁₃ θ₂₃ δ₁₃) = 1 := by
@@ -88,6 +89,7 @@ lemma eq_rows (U : CKMMatrix) {θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ} (hu : 
   apply ext_Rows hu hc
   rw [hU, cross_product_t, hu, hc]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Two standard parameterisations of CKM matrices are the same matrix if they have
   the same angles and the exponential of their faces is equal. -/
 lemma eq_exp_of_phases (θ₁₂ θ₁₃ θ₂₃ δ₁₃ δ₁₃' : ℝ) (h : cexp (δ₁₃ * I) = cexp (δ₁₃' * I)) :
@@ -97,6 +99,7 @@ lemma eq_exp_of_phases (θ₁₂ θ₁₃ θ₂₃ δ₁₃ δ₁₃' : ℝ) (h 
   apply CKMMatrix_ext
   simp only [exp_neg, he]
 
+set_option backward.isDefEq.respectTransparency false in
 open Invariant in
 lemma VusVubVcdSq_eq (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) (h1 : 0 ≤ Real.sin θ₁₂)
     (h2 : 0 ≤ Real.cos θ₁₃) (h3 : 0 ≤ Real.sin θ₂₃) (h4 : 0 ≤ Real.cos θ₁₂) :
@@ -123,6 +126,7 @@ lemma VusVubVcdSq_eq (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) (h1 : 0 ≤ Rea
   · simp only [ne_eq, Decidable.not_not] at hx
     simp [hx]
 
+set_option backward.isDefEq.respectTransparency false in
 open Invariant in
 lemma mulExpδ₁₃_eq (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) (h1 : 0 ≤ Real.sin θ₁₂)
     (h2 : 0 ≤ Real.cos θ₁₃) (h3 : 0 ≤ Real.sin θ₂₃) (h4 : 0 ≤ Real.cos θ₁₂) :

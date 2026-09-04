@@ -775,6 +775,7 @@ private lemma scalar_rpow_cross_term_of_continuous_zero {b : ℝ → ℝ}
   rw [ Asymptotics.isLittleO_iff ];
   intro ε hε; rcases h_eps ε hε with ⟨ δ, hδ, H ⟩ ; filter_upwards [ Metric.ball_mem_nhds _ hδ ] with x hx using by simpa [ hc ] using H ( 1 + x ) ( by simpa using hx ) ;
 
+set_option backward.isDefEq.respectTransparency false in
 /-- If ker A ≤ ker ρM, then conjugating ρM by the support projection of A gives back ρM.
     This is because ρM is supported entirely on the support (= range) of A. -/
 private lemma conj_supportProj_eq_of_ker_le (A ρM : HermitianMat d ℂ) (hker : A.ker ≤ ρM.ker) :
@@ -1101,6 +1102,7 @@ private lemma hasDerivAt_trace_rpow_sub_trace_variable_base
   ring_nf
   ext; norm_num; ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The cross term in the derivative decomposition vanishes: the function
     α ↦ Tr[B(α)^α] - Tr[B(α)] - Tr[ρ^α] + 1 has derivative 0 at α = 1.
     This is because at α=1, B^1 = B, so ∂/∂B Tr[B^α] = Tr[·] (the trace is linear),
@@ -1171,7 +1173,7 @@ theorem inner_log_sub_log_nonneg (h : σ.M.ker ≤ ρ.M.ker) :
     apply nhdsWithin_mono
     intro x hx
     exact ⟨Set.mem_Ioi.mpr (lt_trans zero_lt_one hx), ne_of_gt hx⟩
-  haveI : (nhdsWithin (1 : ℝ) (Set.Ioi 1)).NeBot := inferInstance
+  have : (nhdsWithin (1 : ℝ) (Set.Ioi 1)).NeBot := inferInstance
   apply ge_of_tendsto (h_limit.mono_left h_mono)
   filter_upwards [self_mem_nhdsWithin] with α hα
   exact sandwichedRelRentropy_nonneg_α_gt_1 h hα
@@ -1499,6 +1501,7 @@ def qRelativeEnt (ρ σ : MState d) : ENNReal :=
 
 notation "𝐃(" ρ "‖" σ ")" => qRelativeEnt ρ σ
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The Sandwiched Renyi Relative entropy is additive for α=1 (standard relative entropy).
 -/
@@ -1575,6 +1578,7 @@ theorem qRelativeEnt_additive (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState 
   --or `simp [SandwichedRelRentropy]`.
   exact sandwichedRelRentropy_additive_alpha_one ρ₁ σ₁ ρ₂ σ₂
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem sandwichedRelRentropy_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
     D̃_ α(ρ.relabel e‖σ.relabel e) = D̃_ α(ρ‖σ) := by
@@ -1582,6 +1586,7 @@ theorem sandwichedRelRentropy_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
   split_ifs <;> simp_all [HermitianMat.conj_submatrix] <;>
     exact (HermitianMat.ker_reindex_le_iff σ.M ρ.M e.symm).mp ‹_›
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem sandwichedRelRentropy_self (hα : 0 < α) (ρ : MState d) :
   --Technically this holds for all α except for `-1` and `0`. But those are stupid.
@@ -1609,6 +1614,7 @@ theorem sandwichedRelRentropy_self (hα : 0 < α) (ρ : MState d) :
       · field_simp; ring_nf; positivity
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[aesop (rule_sets := [finiteness]) unsafe apply]
 theorem sandwichedRelEntropy_ne_top {ρ σ : MState d} [σ.M.NonSingular] : D̃_ α(ρ‖σ) ≠ ⊤ := by
   by_cases 0 < α
@@ -1737,6 +1743,7 @@ private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1 (ρ σ : MState d) :
       dsimp only
       simp [hx.1]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Continuity at 1: the sandwich relative Rényi entropy is continuous at α = 1. -/
 private theorem sandwichedRelRentropy.continuousAt_1 (ρ σ : MState d) :
     ContinuousWithinAt (fun α => D̃_ α(ρ‖σ)) (Set.Ioi 0) 1 := by
@@ -1781,9 +1788,10 @@ theorem sandwichedRelRentropy.continuousOn (ρ σ : MState d) :
 /-- Quantum relative entropy as `Tr[ρ (log ρ - log σ)]` when supports are contained. -/
 theorem qRelativeEnt_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
     𝐃(ρ‖σ).toEReal = ⟪ρ.M, ρ.M.log - σ.M.log⟫ := by
-  simp [qRelativeEnt, SandwichedRelRentropy, h, EReal.coe_nnreal_eq_coe_real]
+  simp [qRelativeEnt, SandwichedRelRentropy, h]
   norm_cast
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The quantum relative entropy is finite exactly when the support condition
 `σ.M.ker ≤ ρ.M.ker` holds. -/
 theorem qRelativeEnt_ne_top_iff {ρ σ : MState d} : 𝐃(ρ‖σ) ≠ ⊤ ↔ σ.M.ker ≤ ρ.M.ker := by
@@ -2086,6 +2094,7 @@ Relative entropy is lower semicontinuous (in each argument, actually, but we onl
 latter here). Will need the fact that all the cfc / eigenvalue stuff is continuous, plus
 carefully handling what happens with the kernel subspace, which will make this a pain.
 -/
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 theorem qRelativeEnt.lowerSemicontinuous (ρ : MState d) : LowerSemicontinuous fun σ => 𝐃(ρ‖σ) := by
   simp_rw [qRelativeEnt, SandwichedRelRentropy, if_true, lowerSemicontinuous_iff]

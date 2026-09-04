@@ -29,7 +29,7 @@ namespace QuantumMechanics
 
 namespace OneDimension
 noncomputable section
-open HilbertSpace
+open _root_.QuantumMechanics.OneDimension.HilbertSpace
 
 /-!
 
@@ -80,7 +80,7 @@ def positionOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_inje
 
 /-!
 
-## Generalized eigenvectors of the momentum operator
+## Generalized eigenvectors of the position operator
 
 -/
 

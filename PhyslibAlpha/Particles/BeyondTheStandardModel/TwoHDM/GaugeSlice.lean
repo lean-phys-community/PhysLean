@@ -88,10 +88,10 @@ lemma ofU1Subgroup_smul_sliceHiggs (c : unitary ℂ) (z w0 w1 : ℂ) :
     GaugeGroupI.ofU1Subgroup c • sliceHiggs z w0 w1
       = sliceHiggs z w0 ((c : ℂ) ^ 6 * w1) := by
   apply ext_of_fst_snd
-  · rw [gaugeGroupI_smul_fst, HiggsVec.ofU1Subgroup_smul_eq_smul]
+  · rw [gaugeGroupI_smul_fst, HiggsVec.ofU1Subgroup_repGaugeGroupI_apply]
     ext i
     fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
-  · rw [gaugeGroupI_smul_snd, HiggsVec.ofU1Subgroup_smul_eq_smul]
+  · rw [gaugeGroupI_smul_snd, HiggsVec.ofU1Subgroup_repGaugeGroupI_apply]
     ext i
     fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
 

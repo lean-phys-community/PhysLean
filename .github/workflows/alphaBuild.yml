@@ -13,9 +13,14 @@ jobs:
   alpha_build:
     name: Lean based style linters
     runs-on: ubuntu-latest
+    env:
+      LAKE_CACHE_DIR: .lake/cache
     steps:
 
+      # Full history so lake can look back for a commit with a cache, see build.yml
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install elan
         run: |
@@ -29,9 +34,17 @@ jobs:
           lean --version
           lake --version
 
-      - name: build cache
+      - name: Mathlib build cache
         run: |
           lake exe cache get
+
+      # PhyslibAlpha has its own cache in the bucket so we pull that one
+      - name: PhyslibAlpha's build cache
+        env:
+          LAKE_CONFIG: ${{ github.workspace }}/lake-cache.toml
+        run: |
+          lake cache get --scope="physlib-master/$(tr '/:' '--' < lean-toolchain | tr -d '[:space:]')/alpha" \
+            || echo "no existing cache to restore -- building from scratch"
 
       - name: build PhyslibAlpha
         id: build
@@ -49,6 +62,13 @@ jobs:
         with:
           linters: gcc
           run: env LEAN_ABORT_ON_PANIC=1 lake exe runPhyslibAlphaLinters
+
+      - name: Check no PhyslibAlpha in Physlib and QuantumInfo
+        run: env LEAN_ABORT_ON_PANIC=1 lake exe noAlphaImports
+
+      - name: Check PhyslibAlpha imports
+        run: env LEAN_ABORT_ON_PANIC=1 lake exe alphaFileImports
+
 
   style_lint:
     name: Python based linters
@@ -72,16 +92,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.8
-
-      - name: Check PhyslibAlpha imports
-        run: |
-          chmod u+x scripts/PhyslibAlpha/alphaFileImports.py
-          ./scripts/PhyslibAlpha/alphaFileImports.py
-
-      - name: Check no PhyslibAlpha in Physlib and QuantumInfo
-        run: |
-          chmod u+x scripts/PhyslibAlpha/noAlphaImports.py
-          ./scripts/PhyslibAlpha/noAlphaImports.py
 
       - name: Python linters for PhyslibAlpha
         run: |

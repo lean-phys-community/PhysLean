@@ -47,6 +47,7 @@ lemma γ_det_not_zero (β : ℝ) (hβ : |β| < 1) : (1 - β^2) ≠ 0 := by
   simp at h1
   aesop
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Lorentz boost with in the space direction `i` with speed `β` with
   `|β| < 1`. -/
 def boost (i : Fin d) (β : ℝ) (hβ : |β| < 1) : LorentzGroup d :=
@@ -143,6 +144,7 @@ where
         · simp [hb']
       · simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma boost_transpose_eq_self (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
     transpose (boost i β hβ) = boost i β hβ := by

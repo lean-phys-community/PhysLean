@@ -206,6 +206,7 @@ lemma iteratedDeriv_tanh_const_mul (n : ℕ) (κ : ℝ) : ∀ x : ℝ,
     fun_prop
 
 /-- tanh(κx) has temperate growth -/
+@[fun_prop]
 lemma tanh_const_mul_hasTemperateGrowth (κ : ℝ) :
     Function.HasTemperateGrowth (fun x => Real.tanh (κ * x)) := by
   constructor

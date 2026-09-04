@@ -20,6 +20,7 @@ open SMCharges
 open SMACCs
 open BigOperators
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Given a map of for a generic species, the corresponding map for charges. -/
 @[simps!]
 def chargesMapOfSpeciesMap {n m : ℕ} (f : (SMSpecies n).Charges →ₗ[ℚ] (SMSpecies m).Charges) :
@@ -51,6 +52,7 @@ def speciesFamilyProj {m n : ℕ} (h : n ≤ m) :
 def familyProjection {m n : ℕ} (h : n ≤ m) : (SMCharges m).Charges →ₗ[ℚ] (SMCharges n).Charges :=
   chargesMapOfSpeciesMap (speciesFamilyProj h)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For species, the embedding of the `m`-family charges onto the `n`-family charges, with all
 other charges zero. -/
 @[simps!]

@@ -297,6 +297,7 @@ def replacement [Nonempty dIn] [DecidableEq dOut] (ρ : MState dOut) : CPTPMap d
       TP := by intro; simp [Matrix.trace_kronecker]
       }
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The output of `replacement ρ` is always that `ρ`. -/
 @[simp]
 theorem replacement_apply [Nonempty dIn] [DecidableEq dOut] (ρ : MState dOut) (ρ₀ : MState dIn) :
@@ -381,6 +382,7 @@ def piProd (Λi : (i:ι) → CPTPMap (dI i) (dO i)) : CPTPMap ((i:ι) → dI i) 
   cp := MatrixMap.IsCompletelyPositive.piProd (fun i ↦ (Λi i).cp)
   TP := MatrixMap.IsTracePreserving.piProd (fun i ↦ (Λi i).TP)
 
+set_option backward.isDefEq.respectTransparency false in
 theorem fin_1_piProd
   {dI : Fin 1 → Type v} [Fintype (dI 0)] [DecidableEq (dI 0)]
   {dO : Fin 1 → Type w} [Fintype (dO 0)] [DecidableEq (dO 0)]
@@ -436,7 +438,7 @@ def ofUnitary (U : 𝐔[dIn]) : CPTPMap dIn dIn where
 
 /-- The unitary channel U conjugated by U. -/
 theorem ofUnitary_eq_conj (U : 𝐔[dIn]) (ρ : MState dIn) :
-    (ofUnitary U) ρ = ρ.U_conj U :=
+    (ofUnitary U) ρ = ρ.uConj U :=
   rfl
 
 /-- A channel is unitary iff it is `ofUnitary U`. -/
@@ -444,9 +446,10 @@ def IsUnitary (Λ : CPTPMap dIn dIn) : Prop :=
   ∃ U, Λ = ofUnitary U
 
 /-- A channel is unitary iff it can be written as conjugation by a unitary. -/
-theorem IsUnitary_iff_U_conj (Λ : CPTPMap dIn dIn) : IsUnitary Λ ↔ ∃ U, ∀ ρ, Λ ρ = ρ.U_conj U := by
+theorem IsUnitary_iff_uConj (Λ : CPTPMap dIn dIn) : IsUnitary Λ ↔ ∃ U, ∀ ρ, Λ ρ = ρ.uConj U := by
   simp_rw [IsUnitary, ← ofUnitary_eq_conj, CPTPMap.funext_iff]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem IsUnitary_equiv (σ : dIn ≃ dIn) : IsUnitary (ofEquiv σ) := by
   have h_unitary : ∃ U : Matrix dIn dIn ℂ, U * U.conjTranspose = 1 ∧ U.conjTranspose * U = 1 ∧ ∀ x : dIn, (∀ y : dIn, (U y x = 1) ↔ (y = σ x)) ∧ ∀ y : dIn, (U y x = 0) ↔ (y ≠ σ x) := by
     simp only [Matrix.conjTranspose, RCLike.star_def];
@@ -556,7 +559,7 @@ private lemma exists_unitary_extending_isometry
     contrapose! this
     · refine ⟨fun i => if hi : i ∈ Set.range emb then u (Classical.choose hi) else 0, Set.range emb, ?_, ?_ ⟩
       · simp +contextual only [Orthonormal, h_orthonormal.1, implies_true, true_and,
-          Set.mem_range, Set.restrict_apply, Subtype.forall, ↓reduceDIte]
+          Set.mem_range, Set.domRestrict_apply, Subtype.forall, ↓reduceDIte]
         intro i j hij
         split_ifs with h₁ h₂
         · apply h_orthonormal.2
@@ -576,6 +579,7 @@ private lemma exists_unitary_extending_isometry
     exact this
   · simp [hb, u]
 
+set_option backward.isDefEq.respectTransparency false in
 omit [DecidableEq dOut] [Inhabited dOut] in
 /--
 Given Kraus operators K indexed by (dOut × dIn), define the isometry matrix
@@ -712,6 +716,7 @@ private lemma purify_of_kraus_entry (K : (dOut × dIn) → Matrix dOut dIn ℂ) 
   refine Finset.sum_congr rfl fun _ _ ↦ ?_
   rw [Finset.sum_comm]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem exists_purify (Λ : CPTPMap dIn dOut) :
     ∃ (Λ' : CPTPMap (dIn × dOut × dOut) (dIn × dOut × dOut)),
       Λ'.IsUnitary ∧

@@ -204,7 +204,7 @@ private theorem integrable_uncurry_complexLaplaceIntegrand_horizontal
         ComplexLaplaceIntegrand E (t + a.im * Complex.I) x)
       ((MeasureTheory.volume.restrict (Set.uIoc a.re b.re)).prod MeasureTheory.volume) := by
   let μI := MeasureTheory.volume.restrict (Set.uIoc a.re b.re)
-  haveI : MeasureTheory.IsFiniteMeasure μI := ⟨by
+  have : MeasureTheory.IsFiniteMeasure μI := ⟨by
     rw [MeasureTheory.Measure.restrict_apply_univ]
     simp [Set.uIoc]⟩
   have hsm : MeasureTheory.StronglyMeasurable (Function.uncurry fun t : ℝ => fun x : α =>
@@ -245,7 +245,7 @@ private theorem integrable_uncurry_complexLaplaceIntegrand_vertical
         ComplexLaplaceIntegrand E (b.re + t * Complex.I) x)
       ((MeasureTheory.volume.restrict (Set.uIoc a.im b.im)).prod MeasureTheory.volume) := by
   let μI := MeasureTheory.volume.restrict (Set.uIoc a.im b.im)
-  haveI : MeasureTheory.IsFiniteMeasure μI := ⟨by
+  have : MeasureTheory.IsFiniteMeasure μI := ⟨by
     rw [MeasureTheory.Measure.restrict_apply_univ]
     simp [Set.uIoc]⟩
   have hsm : MeasureTheory.StronglyMeasurable (Function.uncurry fun t : ℝ => fun x : α =>

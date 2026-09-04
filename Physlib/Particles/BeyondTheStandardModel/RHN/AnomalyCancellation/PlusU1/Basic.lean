@@ -41,26 +41,31 @@ namespace PlusU1
 
 variable {n : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gravSol (S : (PlusU1 n).LinSols) : accGrav S.val = 0 := by
   have hS := S.linearSol
   simp only [PlusU1_linearACCs] at hS
   exact hS ⟨0, by simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
 lemma SU2Sol (S : (PlusU1 n).LinSols) : accSU2 S.val = 0 := by
   have hS := S.linearSol
   simp only [PlusU1_linearACCs] at hS
   exact hS ⟨1, by simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
 lemma SU3Sol (S : (PlusU1 n).LinSols) : accSU3 S.val = 0 := by
   have hS := S.linearSol
   simp only [PlusU1_linearACCs] at hS
   exact hS ⟨2, by simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
 lemma YYsol (S : (PlusU1 n).LinSols) : accYY S.val = 0 := by
   have hS := S.linearSol
   simp only [PlusU1_linearACCs] at hS
   exact hS ⟨3, by simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
 lemma quadSol (S : (PlusU1 n).QuadSols) : accQuad S.val = 0 := by
   have hS := S.quadSol
   simp only [PlusU1_quadraticACCs] at hS

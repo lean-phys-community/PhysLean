@@ -17,7 +17,7 @@ depend on a choice of a units. For example a function
 carry a dimensions, but is dependent on a choice of units.
 
 We define three versions
-- `UnitDependent M` having a function `scaleUnit : UnitChoices → UnitChoices → M → M`
+- `UnitDependent M` having a function `scaleUnit : LTMCTUnitChoices → LTMCTUnitChoices → M → M`
   subject to two conditions `scaleUnit_trans` and `scaleUnit_id`
 - `LinearUnitDependent M` extends `UnitDependent M` with additional linearity conditions
   on `scaleUnit`.
@@ -43,7 +43,7 @@ class UnitDependent (M : Type) where
     to say that in `scaleUnit u1 u2 m` that `m` should be interpreted as being in the units `u1`,
     although this is often the case.
   -/
-  scaleUnit : UnitChoices → UnitChoices → M → M
+  scaleUnit : LTMCTUnitChoices → LTMCTUnitChoices → M → M
   scaleUnit_trans : ∀ u1 u2 u3 m, scaleUnit u2 u3 (scaleUnit u1 u2 m) = scaleUnit u1 u3 m
   scaleUnit_trans' : ∀ u1 u2 u3 m, scaleUnit u1 u2 (scaleUnit u2 u3 m) = scaleUnit u1 u3 m
   scaleUnit_id : ∀ u m, scaleUnit u u m = m
@@ -83,13 +83,13 @@ class ContinuousLinearUnitDependent (M : Type) [AddCommMonoid M] [Module ℝ M]
 
 @[simp]
 lemma UnitDependent.scaleUnit_symm_apply {M : Type} [UnitDependent M]
-    (u1 u2 : UnitChoices) (m : M) :
+    (u1 u2 : LTMCTUnitChoices) (m : M) :
     scaleUnit u2 u1 (scaleUnit u1 u2 m) = m := by
   rw [scaleUnit_trans, scaleUnit_id]
 
 @[simp]
 lemma UnitDependent.scaleUnit_injective {M : Type} [UnitDependent M]
-    (u1 u2 : UnitChoices) (m1 m2 : M) :
+    (u1 u2 : LTMCTUnitChoices) (m1 m2 : M) :
     scaleUnit u1 u2 m1 = scaleUnit u1 u2 m2 ↔ m1 = m2 :=
   ⟨fun h => by simpa using congrArg (scaleUnit u2 u1) h, congrArg (scaleUnit u1 u2)⟩
 
@@ -102,7 +102,7 @@ lemma UnitDependent.scaleUnit_injective {M : Type} [UnitDependent M]
 open UnitDependent
 /-- For an `M` with an instance of `UnitDependent M`, `scaleUnit u1 u2` as an equivalence. -/
 def UnitDependent.scaleUnitEquiv {M : Type} [UnitDependent M]
-    (u1 u2 : UnitChoices) : M ≃ M where
+    (u1 u2 : LTMCTUnitChoices) : M ≃ M where
   toFun m := scaleUnit u1 u2 m
   invFun m := scaleUnit u2 u1 m
   right_inv m := by simp
@@ -112,7 +112,7 @@ def UnitDependent.scaleUnitEquiv {M : Type} [UnitDependent M]
   linear map. -/
 def LinearUnitDependent.scaleUnitLinear
     {M : Type} [AddCommMonoid M] [Module ℝ M] [LinearUnitDependent M]
-    (u1 u2 : UnitChoices) :
+    (u1 u2 : LTMCTUnitChoices) :
     M →ₗ[ℝ] M where
   toFun m := scaleUnit u1 u2 m
   map_add' m1 m2 := by simp [LinearUnitDependent.scaleUnit_add]
@@ -121,9 +121,9 @@ def LinearUnitDependent.scaleUnitLinear
 /-- For an `M` with an instance of `LinearUnitDependent M`, `scaleUnit u1 u2` as a
   linear equivalence. -/
 def LinearUnitDependent.scaleUnitLinearEquiv {M : Type} [AddCommMonoid M]
-    [Module ℝ M] [LinearUnitDependent M] (u1 u2 : UnitChoices) :
+    [Module ℝ M] [LinearUnitDependent M] (u1 u2 : LTMCTUnitChoices) :
     M ≃ₗ[ℝ] M :=
-    LinearEquiv.ofLinear (scaleUnitLinear u1 u2) (scaleUnitLinear u2 u1)
+    LinearEquiv.ofLinearMap (scaleUnitLinear u1 u2) (scaleUnitLinear u2 u1)
     (by ext u; simp [scaleUnitLinear])
     (by ext u; simp [scaleUnitLinear])
 
@@ -131,7 +131,7 @@ def LinearUnitDependent.scaleUnitLinearEquiv {M : Type} [AddCommMonoid M]
   continuous linear map. -/
 def ContinuousLinearUnitDependent.scaleUnitContLinear {M : Type} [AddCommMonoid M] [Module ℝ M]
     [TopologicalSpace M] [ContinuousLinearUnitDependent M]
-    (u1 u2 : UnitChoices) : M →L[ℝ] M where
+    (u1 u2 : LTMCTUnitChoices) : M →L[ℝ] M where
   toLinearMap := LinearUnitDependent.scaleUnitLinear u1 u2
   cont := ContinuousLinearUnitDependent.scaleUnit_cont u1 u2
 
@@ -139,7 +139,7 @@ def ContinuousLinearUnitDependent.scaleUnitContLinear {M : Type} [AddCommMonoid 
   continuous linear equivalence. -/
 def ContinuousLinearUnitDependent.scaleUnitContLinearEquiv {M : Type} [AddCommMonoid M] [Module ℝ M]
     [TopologicalSpace M] [ContinuousLinearUnitDependent M]
-    (u1 u2 : UnitChoices) : M ≃L[ℝ] M :=
+    (u1 u2 : LTMCTUnitChoices) : M ≃L[ℝ] M :=
     ContinuousLinearEquiv.mk (LinearUnitDependent.scaleUnitLinearEquiv u1 u2)
     (ContinuousLinearUnitDependent.scaleUnit_cont u1 u2)
     (ContinuousLinearUnitDependent.scaleUnit_cont u2 u1)
@@ -148,7 +148,7 @@ def ContinuousLinearUnitDependent.scaleUnitContLinearEquiv {M : Type} [AddCommMo
 lemma ContinuousLinearUnitDependent.scaleUnitContLinearEquiv_apply
     {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     [ContinuousLinearUnitDependent M]
-    (u1 u2 : UnitChoices) (m : M) :
+    (u1 u2 : LTMCTUnitChoices) (m : M) :
     (ContinuousLinearUnitDependent.scaleUnitContLinearEquiv u1 u2) m =
       scaleUnit u1 u2 m := rfl
 
@@ -156,7 +156,7 @@ lemma ContinuousLinearUnitDependent.scaleUnitContLinearEquiv_apply
 lemma ContinuousLinearUnitDependent.scaleUnitContLinearEquiv_symm_apply
     {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     [ContinuousLinearUnitDependent M]
-    (u1 u2 : UnitChoices) (m : M) :
+    (u1 u2 : LTMCTUnitChoices) (m : M) :
     (ContinuousLinearUnitDependent.scaleUnitContLinearEquiv u1 u2).symm m =
       scaleUnit u2 u1 m := rfl
 /-!
@@ -171,7 +171,7 @@ We construct instance of the `UnitDependent`, `LinearUnitDependent` and
 
 open UnitDependent
 
-noncomputable instance : UnitDependent UnitChoices where
+noncomputable instance : UnitDependent LTMCTUnitChoices where
   scaleUnit u1 u2 u := ⟨
       LengthUnit.scale (u2.length/u1.length) u.length (by simp),
       TimeUnit.scale (u2.time/u1.time) u.time (by simp),
@@ -190,40 +190,43 @@ noncomputable instance : UnitDependent UnitChoices where
   scaleUnit_id u1 u := by simp
 
 @[simp]
-lemma UnitChoices.scaleUnit_apply_fst (u1 u2 : UnitChoices) :
+lemma LTMCTUnitChoices.scaleUnit_apply_fst (u1 u2 : LTMCTUnitChoices) :
     (scaleUnit u1 u2 u1) = u2 := by
   ext <;> simp [scaleUnit, LengthUnit.scale, TimeUnit.scale, MassUnit.scale, ChargeUnit.scale,
     TemperatureUnit.scale, LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val,
     ChargeUnit.div_eq_val, TemperatureUnit.div_eq_val, toReal]
 
 @[simp]
-lemma UnitChoices.dimScale_scaleUnit {u1 u2 u : UnitChoices} (d : Dimension LTMCTDimensionBase) :
+lemma LTMCTUnitChoices.dimScale_scaleUnit {u1 u2 u : LTMCTUnitChoices}
+    (d : Dimension LTMCTDimensionBase) :
     u.dimScale (scaleUnit u1 u2 u) d = u1.dimScale u2 d := by
   simp [dimScale, scaleUnit]
   simp [LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val, ChargeUnit.div_eq_val,
     TemperatureUnit.div_eq_val, toReal]
 
-lemma Dimensionful.of_scaleUnit {M : Type} [CarriesDimension M] {u1 u2 u : UnitChoices}
+lemma Dimensionful.of_scaleUnit {M : Type} [CarriesDimension M] {u1 u2 u : LTMCTUnitChoices}
     (c : Dimensionful M) :
     c.1 (scaleUnit u1 u2 u) =
     u1.dimScale u2 (dim M) • c.1 (u) := by
-  rw [c.2 u (scaleUnit u1 u2 u), UnitChoices.dimScale_scaleUnit]
+  rw [c.2 u (scaleUnit u1 u2 u), LTMCTUnitChoices.dimScale_scaleUnit]
 
 noncomputable instance {M1 : Type} [CarriesDimension M1] : MulUnitDependent M1 where
   scaleUnit u1 u2 m := (toDimensionful u1 m).1 u2
   scaleUnit_trans u1 u2 u3 m := by
-    simp [toDimensionful]
-    rw [smul_smul, mul_comm, UnitChoices.dimScale_transitive]
+    simp only [toDimensionful_apply_apply]
+    rw [smul_smul, mul_comm, LTMCTUnitChoices.dimScale_transitive]
   scaleUnit_trans' u1 u2 u3 m := by
-    simp [toDimensionful, smul_smul, UnitChoices.dimScale_transitive]
+    simp only [toDimensionful_apply_apply]
+    rw [smul_smul, LTMCTUnitChoices.dimScale_transitive]
   scaleUnit_id u m := by
-    simp [toDimensionful, UnitChoices.dimScale_self]
+    simp only [toDimensionful_apply_apply]
+    rw [LTMCTUnitChoices.dimScale_self, one_smul]
   scaleUnit_mul u1 u2 r m := by
-    simp [toDimensionful]
+    simp only [toDimensionful_apply_apply]
     exact smul_comm (u1.dimScale u2 (dim M1)) r m
 
 lemma HasDim.scaleUnit_apply {M : Type} [CarriesDimension M]
-    (u1 u2 : UnitChoices) (m : M) :
+    (u1 u2 : LTMCTUnitChoices) (m : M) :
     scaleUnit u1 u2 m = (u1.dimScale u2 (dim M)) • m :=
   toDimensionful_apply_apply u1 u2 m
 
@@ -258,7 +261,7 @@ noncomputable instance {M1 M2 : Type} [UnitDependent M2] :
 
 @[simp]
 lemma UnitDependent.scaleUnit_apply_fun_right {M1 M2 : Type} [UnitDependent M2]
-    (u1 u2 : UnitChoices) (f : M1 → M2) (m1 : M1) :
+    (u1 u2 : LTMCTUnitChoices) (f : M1 → M2) (m1 : M1) :
     scaleUnit u1 u2 f m1 = scaleUnit u1 u2 (f m1) := rfl
 
 open LinearUnitDependent in
@@ -324,7 +327,7 @@ noncomputable instance {M1 M2 : Type} [UnitDependent M1] :
 
 @[simp]
 lemma UnitDependent.scaleUnit_apply_fun_left {M1 M2 : Type} [UnitDependent M1]
-    (u1 u2 : UnitChoices) (f : M1 → M2) (m1 : M1) :
+    (u1 u2 : LTMCTUnitChoices) (f : M1 → M2) (m1 : M1) :
     scaleUnit u1 u2 f m1 = f (scaleUnit u2 u1 m1) := rfl
 
 noncomputable instance instUnitDependentTwoSided
@@ -343,7 +346,7 @@ noncomputable instance instUnitDependentTwoSided
 
 @[simp]
 lemma UnitDependent.scaleUnit_apply_fun {M1 M2 : Type} [UnitDependent M1]
-    [UnitDependent M2] (u1 u2 : UnitChoices) (f : M1 → M2) (m1 : M1) :
+    [UnitDependent M2] (u1 u2 : LTMCTUnitChoices) (f : M1 → M2) (m1 : M1) :
     scaleUnit u1 u2 f m1 = scaleUnit u1 u2 (f (scaleUnit u2 u1 m1)) := rfl
 
 noncomputable instance instUnitDependentTwoSidedMul
@@ -395,7 +398,7 @@ lemma ContinuousLinearUnitDependent.scaleUnit_apply_fun {M1 M2 : Type}
     [AddCommGroup M2] [Module ℝ M2] [TopologicalSpace M2] [ContinuousConstSMul ℝ M2]
     [IsTopologicalAddGroup M2]
     [ContinuousLinearUnitDependent M2]
-    (u1 u2 : UnitChoices) (f : M1 →L[ℝ] M2) (m1 : M1) :
+    (u1 u2 : LTMCTUnitChoices) (f : M1 →L[ℝ] M2) (m1 : M1) :
     scaleUnit u1 u2 f m1 =
       scaleUnit u1 u2 (f (scaleUnit u2 u1 m1)) := rfl
 
@@ -416,31 +419,31 @@ lemma ContinuousLinearUnitDependent.scaleUnit_apply_fun {M1 M2 : Type}
   or the dimension of `M` is zero.
 -/
 def IsDimensionallyCorrect {M : Type} [UnitDependent M] (m : M) : Prop :=
-  ∀ u1 u2 : UnitChoices, scaleUnit u1 u2 m = m
+  ∀ u1 u2 : LTMCTUnitChoices, scaleUnit u1 u2 m = m
 
 lemma isDimensionallyCorrect_iff {M : Type} [UnitDependent M] (m : M) :
-    IsDimensionallyCorrect m ↔ ∀ u1 u2 : UnitChoices,
+    IsDimensionallyCorrect m ↔ ∀ u1 u2 : LTMCTUnitChoices,
       scaleUnit u1 u2 m = m := by rfl
 
 @[simp]
 lemma isDimensionallyCorrect_fun_iff {M1 M2 : Type} [UnitDependent M1] [UnitDependent M2]
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
-    ∀ u1 u2 : UnitChoices, ∀ m, scaleUnit u1 u2 (f (scaleUnit u2 u1 m)) = f m := by
+    ∀ u1 u2 : LTMCTUnitChoices, ∀ m, scaleUnit u1 u2 (f (scaleUnit u2 u1 m)) = f m := by
   simp [IsDimensionallyCorrect, funext_iff]
 
 @[simp]
 lemma isDimensionallyCorrect_fun_left {M1 M2 : Type} [UnitDependent M1]
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
-    ∀ u1 u2 : UnitChoices, ∀ m, (f (scaleUnit u2 u1 m)) = f m := by
+    ∀ u1 u2 : LTMCTUnitChoices, ∀ m, (f (scaleUnit u2 u1 m)) = f m := by
   simp [IsDimensionallyCorrect, funext_iff]
 
 @[simp]
 lemma isDimensionallyCorrect_fun_right {M1 M2 : Type} [UnitDependent M2]
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
-    ∀ u1 u2 : UnitChoices, ∀ m, scaleUnit u1 u2 (f m) = f m := by
+    ∀ u1 u2 : LTMCTUnitChoices, ∀ m, scaleUnit u1 u2 (f m) = f m := by
   simp [IsDimensionallyCorrect, funext_iff]
 /-!
 
@@ -458,10 +461,11 @@ class DMul (M1 M2 M3 : Type) [CarriesDimension M1] [CarriesDimension M2] [Carrie
 @[simp]
 lemma DMul.hMul_scaleUnit {M1 M2 M3 : Type} [CarriesDimension M1] [CarriesDimension M2]
     [CarriesDimension M3]
-    [DMul M1 M2 M3] (m1 : M1) (m2 : M2) (u1 u2 : UnitChoices) :
+    [DMul M1 M2 M3] (m1 : M1) (m2 : M2) (u1 u2 : LTMCTUnitChoices) :
     (scaleUnit u1 u2 m1) * (scaleUnit u1 u2 m2) =
     scaleUnit u1 u2 (m1 * m2) := by
-  simpa [scaleUnit, toDimensionful] using
+  simpa only [toDimensionful_apply_apply, LTMCTUnitChoices.dimScale_self, one_smul,
+    HasDim.scaleUnit_apply] using
     DMul.mul_dim (M3 := M3) (toDimensionful u1 m1) (toDimensionful u1 m2) u1 u2
 
 /-!
@@ -474,7 +478,7 @@ lemma DMul.hMul_scaleUnit {M1 M2 M3 : Type} [CarriesDimension M1] [CarriesDimens
   carrying a dimension, the subtype of `M` which scales according to the dimension `d`. -/
 def DimSet (M : Type) [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension LTMCTDimensionBase) :
     Set M :=
-  {m : M | ∀ u1 u2, scaleUnit u1 u2 m = (UnitChoices.dimScale u1 u2 d) • m}
+  {m : M | ∀ u1 u2, scaleUnit u1 u2 m = (LTMCTUnitChoices.dimScale u1 u2 d) • m}
 
 instance (M : Type) [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension LTMCTDimensionBase) :
     MulAction ℝ≥0 (DimSet M d) where
@@ -496,9 +500,9 @@ instance (M : Type) [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension LT
 
 @[simp]
 lemma scaleUnit_dimSet_val {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M]
-    (d : Dimension LTMCTDimensionBase) (m : DimSet M d) (u1 u2 : UnitChoices) :
+    (d : Dimension LTMCTDimensionBase) (m : DimSet M d) (u1 u2 : LTMCTUnitChoices) :
     (scaleUnit u1 u2 m).1 = scaleUnit u1 u2 m.1 := (m.2 u1 u2).symm
 
 lemma DimSet.mem_iff {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M]
     (d : Dimension LTMCTDimensionBase) (m : M) :
-    m ∈ DimSet M d ↔ ∀ u1 u2, scaleUnit u1 u2 m = (UnitChoices.dimScale u1 u2 d) • m := by rfl
+    m ∈ DimSet M d ↔ ∀ u1 u2, scaleUnit u1 u2 m = (LTMCTUnitChoices.dimScale u1 u2 d) • m := by rfl

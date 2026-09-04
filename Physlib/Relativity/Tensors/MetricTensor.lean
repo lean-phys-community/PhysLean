@@ -29,6 +29,13 @@ open Tensor
 noncomputable def metricTensor (c : C) : S.Tensor ![c, c] :=
   fromConstPair (S.metric c)
 
+/-- A component of the metric tensor is the corresponding component of the metric intertwiner
+in the tensor-product basis. -/
+lemma metricTensor_basis_repr (c : C) (φ : ComponentIdx (S := S) ![c, c]) :
+    (Tensor.basis _).repr (metricTensor (S := S) c) φ =
+      (Module.Basis.tensorProduct (b c) (b c)).repr ((S.metric c) (1 : k)) (φ 0, φ 1) := by
+  rw [metricTensor, fromConstPair, fromPairT_basis_repr]
+
 lemma metricTensor_congr {c c1 : C} (h : c = c1) :
     S.metricTensor c = permT id (by simp [h]) (metricTensor c1) := by
   subst h
@@ -48,6 +55,7 @@ lemma permT_fromPairTContr_metric_metric {c : C} :
   rw [← S.contr_metric]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fromPairTContr_metric_metric_eq_permT_unit {c : C} :
     fromPairTContr ((S.metric c) (1 : k))
     ((S.metric (S.τ c)) (1 : k)) =
@@ -59,6 +67,7 @@ lemma fromPairTContr_metric_metric_eq_permT_unit {c : C} :
   apply permT_congr_eq_id
   decide
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The contraction of the metric tensor with its dual gives the unit tensor.
   This is the de-categorification of `S.contr_metric`. -/
 @[simp]
@@ -72,6 +81,7 @@ lemma contrT_metricTensor_metricTensor {c : C} :
   rw [permT_permT]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contrT_metricTensor_metricTensor_eq_dual_unit {c : C} :
     contrT 2 1 2 (by simp; rfl) (prodT (metricTensor c) (metricTensor (S.τ c))) =
       permT ![0, 1] (And.intro (by decide) (fun i => by

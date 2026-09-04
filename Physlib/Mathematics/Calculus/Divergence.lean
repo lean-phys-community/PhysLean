@@ -94,9 +94,9 @@ lemma divergence_prodMk [FiniteDimensional 𝕜 E] [FiniteDimensional 𝕜 F]
     +
     divergence 𝕜 (fun y' => g (xy.1,y')) xy.2 := by
   obtain ⟨s, ⟨bX⟩⟩ := Basis.exists_basis 𝕜 E
-  haveI : Fintype s := FiniteDimensional.fintypeBasisIndex bX
+  have : Fintype s := FiniteDimensional.fintypeBasisIndex bX
   obtain ⟨sY, ⟨bY⟩⟩ := Basis.exists_basis 𝕜 F
-  haveI : Fintype sY := FiniteDimensional.fintypeBasisIndex bY
+  have : Fintype sY := FiniteDimensional.fintypeBasisIndex bY
   let bXY := bX.prod bY
   rw[divergence_eq_sum_fderiv' bX]
   rw[divergence_eq_sum_fderiv' bY]
@@ -138,5 +138,5 @@ lemma divergence_smul [InnerProductSpace' 𝕜 E] {f : E → 𝕜} {g : E → E}
     [FiniteDimensional 𝕜 E] :
     divergence 𝕜 (fun x => f x • g x) x
     = f x * divergence 𝕜 g x + ⟪adjFDeriv 𝕜 f x 1, g x⟫_𝕜 := by
-  haveI : CompleteSpace E := FiniteDimensional.complete 𝕜 E
+  have : CompleteSpace E := FiniteDimensional.complete 𝕜 E
   simp [divergence, fderiv_fun_smul hf hg, hf.hasAdjFDerivAt.hasAdjoint_fderiv.adjoint_inner_left]

@@ -54,7 +54,7 @@ variable {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] [HasDim M]
     {G : Type}
     [NormedAddCommGroup G] [NormedSpace ℝ G] [HasDim G]
 
-lemma scaleUnit_measure (u1 u2 : UnitChoices) (μ : MeasureTheory.Measure M) :
+lemma scaleUnit_measure (u1 u2 : LTMCTUnitChoices) (μ : MeasureTheory.Measure M) :
     scaleUnit u1 u2 μ = μ.map (fun m => scaleUnit u1 u2 m) := by rfl
 
 /-- The statement that for a measure `μ` of dimension `d`, and a function
@@ -109,6 +109,6 @@ lemma integral_isDimensionallyCorrect (d : Dimension LTMCTDimensionBase) :
         * (u2.dimScale u1 d * u1.dimScale u2 d)) • ∫ (x : M), f x ∂ μ := by
       congr 1
       conv_lhs => simp only [map_mul]
-      rw [UnitChoices.dimScale_of_inv_eq_swap]
+      rw [LTMCTUnitChoices.dimScale_of_inv_eq_swap]
       ring
     _ = ∫ (x : M), f x ∂ μ := by simp

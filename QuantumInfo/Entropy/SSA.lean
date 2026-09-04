@@ -134,6 +134,7 @@ lemma V_rho_conj_mul_self_eq (ρAB : HermitianMat (dA × dB) ℂ) (hρ : ρAB.ma
   simp_all [ mul_assoc, Matrix.mul_assoc ];
   simp [ ← Matrix.mul_assoc, ← map_to_tensor_MES_prop ]
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The partial trace (left) of a positive definite matrix is positive definite.
 -/
@@ -899,6 +900,7 @@ private lemma PosDef_assoc'_traceRight
   apply PosDef_traceRight
   convert! hρ.reindex (Equiv.prodAssoc d₁ d₂ d₃).symm
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma wm_inner_lhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     (ρ : MState (d₁ × d₂ × d₃)) :
     ⟪(-ρ.assoc'.traceRight.M.traceRight.log) ⊗ₖ (1 : HermitianMat (d₂ × d₃) ℂ) +
@@ -915,6 +917,7 @@ private lemma wm_inner_lhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
   · rw [ Sᵥₙ_eq_neg_trace_log ];
     simp [ inner_one_kron_eq_inner_traceLeft ]
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma wm_inner_rhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     (ρ : MState (d₁ × d₂ × d₃)) :
     ⟪((-ρ.assoc'.traceRight.M.log) ⊗ₖ (1 : HermitianMat d₃ ℂ) +
@@ -937,11 +940,11 @@ private lemma Sᵥₙ_wm_pd [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
   -- Set up marginals and their PD properties
   have h₁₂ := PosDef_assoc'_traceRight ρ hρ
   have h₂₃ := PosDef_traceLeft ρ.M hρ
-  haveI : ρ.assoc'.traceRight.M.NonSingular := nonSingular_of_posDef h₁₂
-  haveI : ρ.traceLeft.M.NonSingular := nonSingular_of_posDef h₂₃
-  haveI : ρ.assoc'.traceRight.M.traceRight.NonSingular :=
+  have : ρ.assoc'.traceRight.M.NonSingular := nonSingular_of_posDef h₁₂
+  have : ρ.traceLeft.M.NonSingular := nonSingular_of_posDef h₂₃
+  have : ρ.assoc'.traceRight.M.traceRight.NonSingular :=
     nonSingular_of_posDef (PosDef_traceRight _ h₁₂)
-  haveI : ρ.traceLeft.M.traceLeft.NonSingular :=
+  have : ρ.traceLeft.M.traceLeft.NonSingular :=
     nonSingular_of_posDef (PosDef_traceLeft _ h₂₃)
   -- Step 1: Operator inequality
   have h_op := operator_ineq_SSA ρ.assoc'.traceRight.M ρ.traceLeft.M h₁₂ h₂₃
@@ -1012,6 +1015,7 @@ private lemma MState.traceLeft_continuous :
     · fun_prop;
   exact continuous_induced_rng.mpr ( by continuity )
 
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 private lemma MState.traceRight_continuous :
     Continuous (MState.traceRight : MState (d₁ × d₂) → MState d₁) := by
@@ -1077,6 +1081,7 @@ private def perm_A_BCR' (dA dB dC : Type*) :
 private def ρBCR (ρ : MState (dA × dB × dC)) : MState (dB × dC × (dA × dB × dC)) :=
   ((MState.pure ρ.purify).relabel (perm_A_BCR' dA dB dC).symm).traceLeft
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma S_BC_of_BCR_eq (ρ : MState (dA × dB × dC)) :
     Sᵥₙ (ρBCR ρ).assoc'.traceRight = Sᵥₙ ρ.traceLeft := by
   -- By definition of ρBCR, we know that its BC-marginal is equal to the BC-marginal of ρ.
@@ -1144,6 +1149,7 @@ private lemma S_CR_of_BCR_eq (ρ : MState (dA × dB × dC)) :
   rw [Sᵥₙ_pure_complement ρ.purify (perm_AB_CR' dA dB dC).symm]
   exact purify_AB_traceRight_eq ρ
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma S_B_of_BCR_eq (ρ : MState (dA × dB × dC)) :
     Sᵥₙ (ρBCR ρ).traceRight = Sᵥₙ ρ.traceLeft.traceRight := by
   unfold ρBCR;

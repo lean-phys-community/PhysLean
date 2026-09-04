@@ -16,11 +16,11 @@ public section
 
 namespace Physlib.List
 
-open Fin
+open _root_.Physlib.Fin
 open Physlib
 variable {n : Nat}
 
-lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
+lemma takeWhile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     (l : List I) → (i : ℕ) → (hi : ∀ (i j : Fin l.length), i < j → P (l.get j) → P (l.get i)) →
     List.takeWhile P (List.eraseIdx l i) = (List.takeWhile P l).eraseIdx i
   | [], _, h => by
@@ -44,7 +44,7 @@ lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     by_cases hPa : P a
     · dsimp only [List.takeWhile]
       simp only [hPa, decide_true, List.eraseIdx_cons_succ, List.cons.injEq, true_and]
-      exact takeWile_eraseIdx P (b :: l) n fun i j hij hP => by
+      exact takeWhile_eraseIdx P (b :: l) n fun i j hij hP => by
         simpa using h i.succ j.succ (by simpa using hij) (by simpa using hP)
     · simp [hPa]
 
@@ -143,7 +143,6 @@ lemma orderedInsertPos_sigma {I : Type} {f : I → Type}
     simp_all only
     split <;> simp_all
 
-set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsert_get_lt {I : Type} (le1 : I → I → Prop) [DecidableRel le1]
     (r : List I) (r0 : I) (i : ℕ)
     (hi : i < orderedInsertPos le1 r r0) :
@@ -257,7 +256,7 @@ lemma orderedInsert_eraseIdx_lt_orderedInsertPos {I : Type} (le1 : I → I → P
   rw [List.eraseIdx_append_of_lt_length]
   · simp only [List.orderedInsert_eq_take_drop]
     congr 1
-    · rw [takeWile_eraseIdx]
+    · rw [takeWhile_eraseIdx]
       exact hr
     · rw [dropWile_eraseIdx]
       simp only [orderedInsertPos, decide_not] at hi
@@ -276,7 +275,7 @@ lemma orderedInsert_eraseIdx_orderedInsertPos_le {I : Type} (le1 : I → I → P
   rw [List.eraseIdx_append_of_length_le]
   · simp only [List.orderedInsert_eq_take_drop]
     congr 1
-    · rw [takeWile_eraseIdx, List.eraseIdx_of_length_le]
+    · rw [takeWhile_eraseIdx, List.eraseIdx_of_length_le]
       simp only [orderedInsertPos, decide_not] at hi
       simp only [decide_not]
       omega
@@ -321,7 +320,8 @@ lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel 
   simp only [List.length_cons, orderedInsertEquiv, Nat.succ_eq_add_one, Equiv.trans_apply]
   match r with
   | [] =>
-    simp
+    simp only [List.length_cons, List.length_nil] at hn
+    omega
   | r1 :: r =>
     simp only [List.length_cons]
     rw [finExtractOne_apply_neq]
@@ -338,7 +338,7 @@ lemma orderedInsertEquiv_fin_succ {I : Type} (le1 : I → I → Prop) [Decidable
   simp only [orderedInsertEquiv, Equiv.trans_apply]
   match r with
   | [] =>
-    simp
+    exact n.elim0
   | r1 :: r =>
     simp only [List.length_cons, Fin.eta]
     rw [finExtractOne_apply_neq]
@@ -567,15 +567,13 @@ lemma insertionSortEquiv_order {α : Type} {r : α → α → Prop} [DecidableRe
     simp only [List.length_cons, Fin.zero_eta, Fin.getElem_fin, Fin.val_zero,
       List.getElem_cons_zero, List.getElem_cons_succ]
     nth_rewrite 2 [insertionSortEquiv] at hij'
-    simp only [List.length_cons, Nat.succ_eq_add_one, Fin.zero_eta,
-      Equiv.trans_apply, equivCons_zero] at hij'
+    simp only [List.length_cons, Nat.succ_eq_add_one, Fin.zero_eta] at hij'
     convert lt_orderedInsertPos_rel_fin r a (List.insertionSort r as) _ hij'
     change _ = ((List.insertionSort r (a :: as))).get ((insertionSortEquiv r (a :: as)) ⟨j + 1, hj⟩)
     rw [← insertionSortEquiv_get]
     simp
   | a :: as, ⟨i + 1, hi⟩, ⟨j + 1, hj⟩, hij, hij' => by
-    simp only [List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one, Equiv.trans_apply,
-      equivCons_succ] at hij'
+    simp only [List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one] at hij'
     simpa using insertionSortEquiv_order as ⟨i, Nat.succ_lt_succ_iff.mp hi⟩
       ⟨j, Nat.succ_lt_succ_iff.mp hj⟩ (by simpa using hij)
       (orderedInsertEquiv_monotone_fin_succ _ _ _ _ _ hij')

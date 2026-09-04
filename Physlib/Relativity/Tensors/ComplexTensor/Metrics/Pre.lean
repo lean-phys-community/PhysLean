@@ -27,7 +27,6 @@ namespace Lorentz
 def contrMetricVal : (ContrℂModule ⊗[ℂ] ContrℂModule) :=
   contrContrToMatrix.symm ((@minkowskiMatrix 3).map ofRealHom)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The expansion of `contrMetricVal` into basis vectors. -/
 lemma contrMetricVal_expand_tmul : contrMetricVal =
     complexContrBasis (Sum.inl 0) ⊗ₜ[ℂ] complexContrBasis (Sum.inl 0)
@@ -77,7 +76,6 @@ lemma contrMetric_apply_one : contrMetric (1 : ℂ) = contrMetricVal := by
 def coMetricVal : (CoℂModule ⊗[ℂ] CoℂModule) :=
   coCoToMatrix.symm ((@minkowskiMatrix 3).map ofRealHom)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The expansion of `coMetricVal` into basis vectors. -/
 lemma coMetricVal_expand_tmul : coMetricVal =
     complexCoBasis (Sum.inl 0) ⊗ₜ[ℂ] complexCoBasis (Sum.inl 0)

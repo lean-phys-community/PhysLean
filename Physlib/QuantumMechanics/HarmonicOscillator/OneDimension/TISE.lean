@@ -21,7 +21,9 @@ namespace HarmonicOscillator
 
 variable (Q : HarmonicOscillator)
 
-open Nat Physlib HilbertSpace Constants
+open Nat Polynomial
+open _root_.QuantumMechanics.OneDimension.HilbertSpace
+open Constants
 
 /-- The `n`th eigenvalues for a Harmonic oscillator is defined as `(n + 1/2) * ℏ * ω`. -/
 noncomputable def eigenValue (n : ℕ) : ℝ := (n + 1/2) * ℏ * Q.ω
@@ -67,11 +69,12 @@ lemma deriv_eigenfunction_zero' : deriv (Q.eigenfunction 0) =
 lemma deriv_physHermite_characteristic_length (n : ℕ) :
     deriv (fun x => Complex.ofReal (physHermite n (x/Q.ξ))) = fun x =>
     Complex.ofReal (1/Q.ξ) * 2 * n * physHermite (n-1) (x/Q.ξ) := by
+  change deriv (fun x ↦ Complex.ofReal ((physHermite n ∘ fun x ↦ x / Q.ξ) x)) = _
   funext x
-  have hd : DifferentiableAt ℝ (fun x => physHermite n (x / Q.ξ)) x := by fun_prop
-  rw [(hd.hasDerivAt.ofReal_comp).deriv, deriv_physHermite' x (fun x => x / Q.ξ) (by fun_prop)]
-  simp only [deriv_div_const, deriv_id'']
-  push_cast
+  have hd : DifferentiableAt ℝ (physHermite n ∘ fun x ↦ x / Q.ξ) x := by fun_prop
+  rw [(hd.hasDerivAt.ofReal_comp).deriv, deriv_comp _ (by fun_prop) (by fun_prop)]
+  simp only [deriv_physHermite, Pi.mul_apply, Pi.ofNat_apply, Pi.natCast_apply, deriv_div_const,
+    deriv_id'', Complex.ofReal_mul, Complex.ofReal_ofNat, Complex.ofReal_natCast]
   ring
 
 lemma deriv_eigenfunction_succ (n : ℕ) :
@@ -162,8 +165,7 @@ lemma deriv_deriv_eigenfunction (n : ℕ) (x : ℝ) :
       rw [deriv_physHermite_characteristic_length]
       have hr : (physHermite (n + 1) (x / Q.ξ) : ℝ) =
           2 * (x / Q.ξ) * physHermite n (x / Q.ξ) - 2 * n * physHermite (n - 1) (x / Q.ξ) := by
-        rw [physHermite_succ_fun']
-        simp [nsmul_eq_mul]
+        rw [physHermite_succ_apply']
       rw [hr]
       push_cast
       ring

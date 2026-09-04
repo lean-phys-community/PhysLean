@@ -20,7 +20,7 @@ Lorentz vectors which have norm equal to one and which are future-directed.
 open TensorProduct
 
 namespace Lorentz
-open Vector
+open _root_.Lorentz.Vector
 
 /-- A Lorentz Velocity is a Lorentz vector which has norm equal to one
   and which is future-directed. -/

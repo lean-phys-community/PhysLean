@@ -15,7 +15,7 @@ import all Physlib.Mathematics.List
 
 namespace Physlib.List
 
-open Fin
+open _root_.Physlib.Fin
 open Physlib
 variable {n : Nat}
 
@@ -51,10 +51,11 @@ lemma insertionSortEquiv_gt_zero_of_ne_insertionSortMinPos {α : Type} (r : α �
     ⟨0, by simp [List.orderedInsert_length]⟩ < insertionSortEquiv r (a :: l) k := by
   by_contra hn
   simp only [List.length_cons, not_lt] at hn
-  refine hk ((Equiv.apply_eq_iff_eq_symm_apply (insertionSortEquiv r (a :: l))).mp ?_)
+  refine hk ((Equiv.eq_symm_apply (insertionSortEquiv r (a :: l))).mpr ?_)
   simp_all only [List.length_cons, ne_eq, Fin.le_def, nonpos_iff_eq_zero]
   exact Fin.ext hn
 
+set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α → α → Prop)
     [DecidableRel r] (a : α) (l : List α)
     (i : Fin (insertionSortDropMinPos r a l).length)

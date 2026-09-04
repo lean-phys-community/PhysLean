@@ -55,20 +55,20 @@ noncomputable def hessianBilinearCompanion {V : Type*} [NormedAddCommGroup V]
         simp_rw [Matrix.vecCons, succ_eq_add_one, reduceAdd, ← curryLeft_apply,
           map_add]
         simp only [curryLeft_apply, succ_eq_add_one, reduceAdd,
-          ContinuousMultilinearMap.add_apply]
+          add_apply]
         abel) (by
         simp_rw [Matrix.vecCons, ← curryLeft_apply]
         simp only [map_smul, curryLeft_apply, succ_eq_add_one, reduceAdd,
-          ContinuousMultilinearMap.smul_apply, smul_eq_mul]
+          smul_eq_mul]
         ring_nf
         simp) (fun _ _ _ ↦ by
         simp_rw [Matrix.vecCons, succ_eq_add_one, reduceAdd, ← curryLeft_apply,
           map_add]
-        simp only [ContinuousMultilinearMap.add_apply, curryLeft_apply, succ_eq_add_one, reduceAdd,
+        simp only [add_apply, curryLeft_apply, succ_eq_add_one, reduceAdd,
           Matrix.Fin.cons_vecEmpty, Matrix.Fin.cons_vecCons]
         abel) (by
         simp_rw [Matrix.vecCons, ← curryLeft_apply]
-        simp only [map_smul, ContinuousMultilinearMap.smul_apply, curryLeft_apply, succ_eq_add_one,
+        simp only [map_smul, smul_apply, curryLeft_apply, succ_eq_add_one,
           reduceAdd, smul_eq_mul]
         simp_rw [← mul_add]
         simp)
@@ -295,7 +295,7 @@ lemma coercive_of_posdefHalf {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ
         F.toContinuousMultilinearMapHalfPolarBilin) := by
   obtain hsub | hnt := subsingleton_or_nontrivial V
   · exact ⟨1, one_pos, fun u => by rw [Subsingleton.elim u 0]; simp⟩
-  haveI := hnt
+  have := hnt
   have h₀ : ∃ x : ↑(Metric.sphere 0 1), ∀ (y : ↑(Metric.sphere 0 1)),
     (fun y ↦ F.toContinuousMultilinearMapHalfPolarBilin ![y, y]) x.1 ≤
       (fun y ↦ F.toContinuousMultilinearMapHalfPolarBilin ![y, y])
@@ -424,7 +424,7 @@ lemma coercive_of_posdef {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
         (iteratedFDeriv ℝ 2 f x₀)) := by
   obtain hsub | hnt := subsingleton_or_nontrivial V
   · exact ⟨1, one_pos, fun u => by rw [Subsingleton.elim u 0]; simp⟩
-  haveI := hnt
+  have := hnt
   have h₀ : ∃ x : ↑(Metric.sphere 0 1), ∀ (y : ↑(Metric.sphere 0 1)),
     (fun y ↦ (iteratedFDeriv ℝ 2 f x₀) ![y, y]) x.1 ≤ (fun y ↦ (iteratedFDeriv ℝ 2 f x₀) ![y, y])
       y.1 := by

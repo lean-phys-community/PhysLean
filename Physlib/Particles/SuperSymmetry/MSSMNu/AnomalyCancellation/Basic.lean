@@ -125,6 +125,7 @@ namespace MSSMACCs
 
 open MSSMCharges
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The gravitational anomaly equation. -/
 def accGrav : MSSMCharges.Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (6 * Q S i + 3 * U S i + 3 * D S i
@@ -138,6 +139,7 @@ def accGrav : MSSMCharges.Charges →ₗ[ℚ] ℚ where
     simp only [HSMul.hSMul, SMul.smul, sum_MSSMSpecies_numberCharges_eq_expand]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accGrav`. -/
 lemma accGrav_ext {S T : MSSMCharges.Charges}
     (hj : ∀ (j : Fin 6), ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i)
@@ -146,6 +148,7 @@ lemma accGrav_ext {S T : MSSMCharges.Charges}
   simp only [accGrav, LinearMap.coe_mk, AddHom.coe_mk, Finset.sum_add_distrib, ← Finset.mul_sum,
     hj, hd, hu]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The anomaly cancellation condition for SU(2) anomaly. -/
 def accSU2 : MSSMCharges.Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (3 * Q S i + L S i) + Hd S + Hu S
@@ -158,6 +161,7 @@ def accSU2 : MSSMCharges.Charges →ₗ[ℚ] ℚ where
     simp only [HSMul.hSMul, SMul.smul, sum_MSSMSpecies_numberCharges_eq_expand]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accSU2`. -/
 lemma accSU2_ext {S T : MSSMCharges.Charges}
     (hj : ∀ (j : Fin 6), ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i)
@@ -166,6 +170,7 @@ lemma accSU2_ext {S T : MSSMCharges.Charges}
   simp only [accSU2, LinearMap.coe_mk, AddHom.coe_mk, Finset.sum_add_distrib, ← Finset.mul_sum,
     hj, hd, hu]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The anomaly cancellation condition for SU(3) anomaly. -/
 def accSU3 : MSSMCharges.Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (2 * (Q S i) + (U S i) + (D S i))
@@ -178,6 +183,7 @@ def accSU3 : MSSMCharges.Charges →ₗ[ℚ] ℚ where
     simp only [HSMul.hSMul, SMul.smul, sum_MSSMSpecies_numberCharges_eq_expand]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accSU3`. -/
 lemma accSU3_ext {S T : MSSMCharges.Charges}
     (hj : ∀ (j : Fin 6), ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i) :
@@ -185,6 +191,7 @@ lemma accSU3_ext {S T : MSSMCharges.Charges}
   simp only [accSU3, LinearMap.coe_mk, AddHom.coe_mk, Finset.sum_add_distrib, ← Finset.mul_sum,
     hj]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The ACC for `Y²`. -/
 def accYY : MSSMCharges.Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, ((Q S) i + 8 * (U S) i + 2 * (D S) i + 3 * (L S) i
@@ -198,6 +205,7 @@ def accYY : MSSMCharges.Charges →ₗ[ℚ] ℚ where
     simp only [HSMul.hSMul, SMul.smul, sum_MSSMSpecies_numberCharges_eq_expand]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accGrav`. -/
 lemma accYY_ext {S T : MSSMCharges.Charges}
     (hj : ∀ (j : Fin 6), ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i)
@@ -206,6 +214,7 @@ lemma accYY_ext {S T : MSSMCharges.Charges}
   simp only [accYY, LinearMap.coe_mk, AddHom.coe_mk, Finset.sum_add_distrib, ← Finset.mul_sum,
     hj, hd, hu]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The symmetric bilinear function used to define the quadratic ACC. -/
 @[simps!]
 def quadBiLin : BiLinearSymm MSSMCharges.Charges := BiLinearSymm.mk₂
@@ -284,6 +293,7 @@ lemma cubeTriLinToFun_map_smul₁ (a : ℚ) (S T R : MSSMCharges.Charges) :
   simp only [HSMul.hSMul, SMul.smul, sum_MSSMSpecies_numberCharges_eq_expand]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cubeTriLinToFun_map_add₁ (S T R L : MSSMCharges.Charges) :
     cubeTriLinToFun (S + T, R, L) = cubeTriLinToFun (S, R, L) + cubeTriLinToFun (T, R, L) := by
   simp only [cubeTriLinToFun, map_add, ACCSystemCharges.chargesAddCommMonoid_add,
@@ -420,8 +430,8 @@ def dot : BiLinearSymm MSSMCharges.Charges := BiLinearSymm.mk₂
     ring)
   (by
     intro S1 S2 T
-    simp only [toSMSpecies_apply, Fin.isValue,
-      ACCSystemCharges.chargesAddCommMonoid_add, map_add, Hd_apply, Fin.reduceFinMk, Hu_apply]
+    simp only [map_add, ACCSystemCharges.chargesAddCommMonoid_add]
+    simp only [toSMSpecies_apply, Fin.isValue, Hd_apply, Fin.reduceFinMk, Hu_apply]
     simp only [reduceMul, Fin.isValue, sum_MSSMSpecies_numberCharges_eq_expand, Fin.zero_eta,
       Fin.mk_one]
     simp only [Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one]

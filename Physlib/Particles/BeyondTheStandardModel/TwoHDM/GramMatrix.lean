@@ -89,17 +89,17 @@ lemma gramMatrix_tr_nonneg (H : TwoHiggsDoublet) :
 
 lemma gaugeGroupI_exists_fst_eq {H : TwoHiggsDoublet} (h1 : H.Φ1 ≠ 0) :
     ∃ g : StandardModel.GaugeGroupI,
-      g • H.Φ1 = (!₂[‖H.Φ1‖, 0] : HiggsVec) ∧
-      (g • H.Φ2) 0 = ⟪H.Φ1, H.Φ2⟫_ℂ / ‖H.Φ1‖ ∧
-      ‖(g • H.Φ2) 1‖ = Real.sqrt (H.gramMatrix.det.re) / ‖H.Φ1‖ := by
+      HiggsVec.repGaugeGroupI g H.Φ1 = (!₂[‖H.Φ1‖, 0] : HiggsVec) ∧
+      (HiggsVec.repGaugeGroupI g H.Φ2) 0 = ⟪H.Φ1, H.Φ2⟫_ℂ / ‖H.Φ1‖ ∧
+      ‖(HiggsVec.repGaugeGroupI g H.Φ2) 1‖ = Real.sqrt (H.gramMatrix.det.re) / ‖H.Φ1‖ := by
   rw [gramMatrix_det_eq_real]
-  obtain ⟨g, h⟩ := (HiggsVec.mem_orbit_gaugeGroupI_iff (H.Φ1) (!₂[‖H.Φ1‖, 0] : HiggsVec)).mpr
-    (by simp [@PiLp.norm_eq_of_L2])
+  obtain ⟨g, h⟩ := (HiggsVec.exists_repGaugeGroupI_eq_iff_norm_eq (H.Φ1)
+    (!₂[‖H.Φ1‖, 0] : HiggsVec)).mpr (by simp [@PiLp.norm_eq_of_L2])
   use g
-  simp at h
   simp [h]
-  have h_fst : (g • H.Φ2).ofLp 0 = ⟪H.Φ1, H.Φ2⟫_ℂ / ‖H.Φ1‖ := by
-    have h2 : ⟪H.Φ1, H.Φ2⟫_ℂ = ⟪g • H.Φ1, g • H.Φ2⟫_ℂ := by
+  have h_fst : (HiggsVec.repGaugeGroupI g H.Φ2).ofLp 0 = ⟪H.Φ1, H.Φ2⟫_ℂ / ‖H.Φ1‖ := by
+    have h2 : ⟪H.Φ1, H.Φ2⟫_ℂ = ⟪HiggsVec.repGaugeGroupI g H.Φ1,
+        HiggsVec.repGaugeGroupI g H.Φ2⟫_ℂ := by
       simp
     rw [h] at h2
     conv_rhs at h2 =>
@@ -109,14 +109,16 @@ lemma gaugeGroupI_exists_fst_eq {H : TwoHiggsDoublet} (h1 : H.Φ1 ≠ 0) :
       simp_all
     field_simp
   apply And.intro h_fst
-  have hx : ‖g • H.Φ2‖ ^ 2 = ‖H.Φ2‖ ^ 2 := by
+  have hx : ‖HiggsVec.repGaugeGroupI g H.Φ2‖ ^ 2 = ‖H.Φ2‖ ^ 2 := by
     simp
   rw [PiLp.norm_sq_eq_of_L2] at hx
   simp at hx
-  have hx0 : ‖(g • H.Φ2).ofLp 1‖ ^ 2 = ‖H.Φ2‖ ^ 2 - ‖(g • H.Φ2).ofLp 0‖ ^ 2 := by
+  have hx0 : ‖(HiggsVec.repGaugeGroupI g H.Φ2).ofLp 1‖ ^ 2 =
+      ‖H.Φ2‖ ^ 2 - ‖(HiggsVec.repGaugeGroupI g H.Φ2).ofLp 0‖ ^ 2 := by
     rw [← hx]
     simp
-  have h0 : ‖(g • H.Φ2) 1‖ ^ 2 = (‖H.Φ1‖ ^ 2 * ‖H.Φ2‖ ^ 2 - ‖⟪H.Φ1, H.Φ2⟫_ℂ‖ ^ 2) / ‖H.Φ1‖ ^ 2 := by
+  have h0 : ‖(HiggsVec.repGaugeGroupI g H.Φ2) 1‖ ^ 2 =
+      (‖H.Φ1‖ ^ 2 * ‖H.Φ2‖ ^ 2 - ‖⟪H.Φ1, H.Φ2⟫_ℂ‖ ^ 2) / ‖H.Φ1‖ ^ 2 := by
     field_simp
     rw [hx0, h_fst]
     simp only [Fin.isValue, Complex.norm_div, Complex.norm_real, norm_norm]
@@ -133,18 +135,19 @@ lemma gaugeGroupI_exists_fst_eq {H : TwoHiggsDoublet} (h1 : H.Φ1 ≠ 0) :
   ring_nf
   · exact norm_ne_zero_iff.mpr h1
   · simpa using h1
-  · exact norm_nonneg ((g • H.Φ2).ofLp 1)
+  · exact norm_nonneg ((HiggsVec.repGaugeGroupI g H.Φ2).ofLp 1)
 
 lemma gaugeGroupI_exists_fst_eq_snd_eq {H : TwoHiggsDoublet} (h1 : H.Φ1 ≠ 0) :
     ∃ g : StandardModel.GaugeGroupI,
-      g • H.Φ1 = (!₂[‖H.Φ1‖, 0] : HiggsVec) ∧
-      g • H.Φ2 = (!₂[⟪H.Φ1, H.Φ2⟫_ℂ / ‖H.Φ1‖, √(H.gramMatrix.det.re) / ‖H.Φ1‖] : HiggsVec) := by
+      HiggsVec.repGaugeGroupI g H.Φ1 = (!₂[‖H.Φ1‖, 0] : HiggsVec) ∧
+      HiggsVec.repGaugeGroupI g H.Φ2 =
+        (!₂[⟪H.Φ1, H.Φ2⟫_ℂ / ‖H.Φ1‖, √(H.gramMatrix.det.re) / ‖H.Φ1‖] : HiggsVec) := by
   obtain ⟨g, h_fst, h_snd_0, h_snd_1⟩ := gaugeGroupI_exists_fst_eq h1
-  obtain ⟨k, h1, h2, h3⟩ := HiggsVec.gaugeGroupI_smul_phase_snd (g • H.Φ2)
+  obtain ⟨k, h1, h2, h3⟩ := HiggsVec.repGaugeGroupI_phase_snd (HiggsVec.repGaugeGroupI g H.Φ2)
   use k * g
   apply And.intro
-  · rw [mul_smul, h_fst, h3]
-  · rw [mul_smul]
+  · rw [HiggsVec.repGaugeGroupI_mul_apply, h_fst, h3]
+  · rw [HiggsVec.repGaugeGroupI_mul_apply]
     ext i
     fin_cases i
     · simp
@@ -162,10 +165,10 @@ lemma mem_orbit_gaugeGroupI_iff_gramMatrix (H1 H2 : TwoHiggsDoublet) :
     simp [← hg]
   by_cases Φ1_zero : H1.Φ1 = 0
   · intro h
-    obtain ⟨g1, hg1⟩ := (HiggsVec.mem_orbit_gaugeGroupI_iff (H1.Φ2) (!₂[‖H1.Φ2‖, 0] : HiggsVec)).mpr
-      (by simp [@PiLp.norm_eq_of_L2])
-    obtain ⟨g2, hg2⟩ := (HiggsVec.mem_orbit_gaugeGroupI_iff (H2.Φ2) (!₂[‖H2.Φ2‖, 0] : HiggsVec)).mpr
-      (by simp [@PiLp.norm_eq_of_L2])
+    obtain ⟨g1, hg1⟩ := (HiggsVec.exists_repGaugeGroupI_eq_iff_norm_eq (H1.Φ2)
+      (!₂[‖H1.Φ2‖, 0] : HiggsVec)).mpr (by simp [@PiLp.norm_eq_of_L2])
+    obtain ⟨g2, hg2⟩ := (HiggsVec.exists_repGaugeGroupI_eq_iff_norm_eq (H2.Φ2)
+      (!₂[‖H2.Φ2‖, 0] : HiggsVec)).mpr (by simp [@PiLp.norm_eq_of_L2])
     use g1⁻¹ * g2
     simp only
     ext:1
@@ -175,9 +178,8 @@ lemma mem_orbit_gaugeGroupI_iff_gramMatrix (H1 H2 : TwoHiggsDoublet) :
         rw [← eq_fst_norm_of_eq_gramMatrix h]
       simp [Φ1_zero] at hnorm
       simp [hnorm]
-    · simp [mul_smul]
-      refine inv_smul_eq_iff.mpr ?_
-      simp at hg1 hg2
+    · simp
+      refine (HiggsVec.repGaugeGroupI_inv_apply_eq_iff _ _ _).mpr ?_
       simp [hg1, hg2]
       exact eq_snd_norm_of_eq_gramMatrix h.symm
   · intro h
@@ -192,12 +194,12 @@ lemma mem_orbit_gaugeGroupI_iff_gramMatrix (H1 H2 : TwoHiggsDoublet) :
     use g1⁻¹ * g2
     simp only
     ext:1
-    · simp [mul_smul]
-      refine inv_smul_eq_iff.mpr ?_
+    · simp
+      refine (HiggsVec.repGaugeGroupI_inv_apply_eq_iff _ _ _).mpr ?_
       simp [H1_Φ1, H2_Φ1]
       apply eq_fst_norm_of_eq_gramMatrix h.symm
-    · simp [mul_smul]
-      refine inv_smul_eq_iff.mpr ?_
+    · simp
+      refine (HiggsVec.repGaugeGroupI_inv_apply_eq_iff _ _ _).mpr ?_
       simp [H1_Φ2, H2_Φ2]
       apply And.intro
       · congr 1

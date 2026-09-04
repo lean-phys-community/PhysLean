@@ -1,0 +1,57 @@
+# Gives review claims a time to live, so that nothing stays blocked forever.
+#
+# A reviewer claims a PR by commenting `claim` (see `review_claim.yml`).  This
+# workflow runs hourly and, for every PR carrying the `review-claimed` label:
+#
+#   * @-mentions the claimant 48h and then 24h before the deadline, skipping a
+#     reminder that is not shorter than the window they asked for;
+#   * once the deadline passes, completes the claim quietly if they did review
+#     in time, and otherwise releases it -- dropping the label and taking the
+#     claimant off the PR as reviewer and assignee -- announcing the release on
+#     Zulip so that somebody else picks the PR up.
+#
+# The deadline is read back out of the claim's status comment, so extending a
+# claim (`claim` again) moves the deadline and resets its reminders with it.
+#
+# The work itself is in `scripts/review_claim.py`.
+
+name: Expire review claims
+
+on:
+  schedule:
+    # hourly, so a deadline or a reminder is never overshot by more than an hour
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+# Limit permissions for GITHUB_TOKEN for the entire workflow
+permissions:
+  contents: read
+  issues: write         # Only allow reading/labelling issues
+  pull-requests: write  # Only allow PR comments/labels/assignees
+  # All other permissions are implicitly 'none'
+
+jobs:
+  expire:
+    name: Expire review claims
+    runs-on: ubuntu-latest
+    # Don't run on forks, where we wouldn't have permission to act on the PR anyway.
+    if: github.repository == 'leanprover-community/physlib'
+    steps:
+      - name: Check out the claim script
+        uses: actions/checkout@v7.0.0
+        with:
+          sparse-checkout: scripts/review_claim.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Remind and expire
+        run: python3 scripts/review_claim.py expire
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Same bot credentials as the Physlib Zulip bots.  Missing secrets
+          # downgrade to a warning rather than failing the job: releasing the
+          # claim on GitHub matters more than announcing it.
+          ZULIP_SITE: ${{ secrets.ZULIP_SITE }}
+          ZULIP_BOT_EMAIL: ${{ secrets.ZULIP_BOT_EMAIL }}
+          ZULIP_BOT_API_KEY: ${{ secrets.ZULIP_BOT_API_KEY }}
+          ZULIP_STREAM: ${{ secrets.ZULIP_STREAM }}
+          ZULIP_TOPIC: PR reviews

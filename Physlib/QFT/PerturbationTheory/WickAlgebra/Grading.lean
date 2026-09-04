@@ -41,7 +41,7 @@ lemma mem_bosonic_of_mem_free_bosonic (a : 𝓕.FieldOpFreeAlgebra)
   change p a h
   apply Submodule.span_induction
   · intro x hx
-    simp only [Set.mem_setOf_eq] at hx
+    simp only [Set.mem_ofPred_eq] at hx
     obtain ⟨φs, rfl, h⟩ := hx
     simp [p]
     apply ofCrAnList_mem_statSubmodule_of_eq
@@ -62,7 +62,7 @@ lemma mem_fermionic_of_mem_free_fermionic (a : 𝓕.FieldOpFreeAlgebra)
   change p a h
   apply Submodule.span_induction
   · intro x hx
-    simp only [Set.mem_setOf_eq] at hx
+    simp only [Set.mem_ofPred_eq] at hx
     obtain ⟨φs, rfl, h⟩ := hx
     simp [p]
     apply ofCrAnList_mem_statSubmodule_of_eq
@@ -399,7 +399,7 @@ instance WickAlgebraGrade : GradedAlgebra (A := 𝓕.WickAlgebra) statSubmodule 
   one_mem := by
     simp only [statSubmodule]
     refine Submodule.mem_span.mpr fun p a => a ?_
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     use []
     simp only [ofCrAnList, ofCrAnListF_nil, map_one, ofList_empty, true_and]
     rfl
@@ -409,7 +409,7 @@ instance WickAlgebraGrade : GradedAlgebra (A := 𝓕.WickAlgebra) statSubmodule 
     change p a2 h2
     apply Submodule.span_induction
     · intro x hx
-      simp only [Set.mem_setOf_eq] at hx
+      simp only [Set.mem_ofPred_eq] at hx
       obtain ⟨φs, rfl, h⟩ := hx
       simp only [p]
       let p (a1 : 𝓕.WickAlgebra) (hx : a1 ∈ statSubmodule f1) : Prop :=
@@ -421,7 +421,7 @@ instance WickAlgebraGrade : GradedAlgebra (A := 𝓕.WickAlgebra) statSubmodule 
         simp only [p]
         rw [← ofCrAnList_append]
         refine Submodule.mem_span.mpr fun p a => a ?_
-        simp only [Set.mem_setOf_eq]
+        simp only [Set.mem_ofPred_eq]
         use φs' ++ φs
         simp only [ofList_append, h', h, true_and]
         cases f1 <;> cases f2 <;> rfl

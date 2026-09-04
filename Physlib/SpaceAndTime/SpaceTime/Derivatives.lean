@@ -122,6 +122,7 @@ lemma deriv_eq_manifoldDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ 
     deriv μ f y = manifoldDeriv 𝓘(ℝ, M) μ f y := by
   rw [deriv_eq_mfderiv, manifoldDeriv_eq]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
     [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
@@ -340,7 +341,7 @@ lemma deriv_sum_inl {d : ℕ} {M : Type} [NormedAddCommGroup M]
 
 open Distribution SchwartzMap
 
-/-- Given a distribution (function) `f : Space d →d[ℝ] M` the derivative
+/-- Given a distribution (function) `f : SpaceTime d →d[ℝ] M` the derivative
   of `f` in direction `μ`. -/
 noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ : Fin 1 ⊕ Fin d) : ((SpaceTime d) →d[ℝ] M) →ₗ[ℝ] (SpaceTime d) →d[ℝ] M where

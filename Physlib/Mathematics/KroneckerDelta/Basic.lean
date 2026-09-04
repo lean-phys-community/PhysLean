@@ -195,11 +195,22 @@ This is one row transposition of the underlying determinant. -/
 lemma generalizedKroneckerDelta_swap {α ι : Type} [DecidableEq α] [DecidableEq ι] [Fintype ι]
     (μ ν : ι → α) {i j : ι} (hij : i ≠ j) :
     generalizedKroneckerDelta (μ ∘ Equiv.swap i j) ν = - generalizedKroneckerDelta μ ν := by
-  rw [show generalizedKroneckerDelta (μ ∘ Equiv.swap i j) ν
-        = (Matrix.submatrix (fun a b => ((kroneckerDelta (μ a) (ν b) : ℕ) : ℤ))
-            (Equiv.swap i j) id).det from rfl,
-    Matrix.det_permute, Equiv.Perm.sign_swap hij]
-  simp [generalizedKroneckerDelta]
+  show (Matrix.submatrix (Matrix.of fun a b => ((kroneckerDelta (μ a) (ν b) : ℕ) : ℤ))
+      (Equiv.swap i j) id).det
+    = -(Matrix.of fun a b => ((kroneckerDelta (μ a) (ν b) : ℕ) : ℤ)).det
+  rw [Matrix.det_permute, Equiv.Perm.sign_swap hij]
+  simp
+
+/-- Simultaneously reindexing the upper and lower slots of a generalized Kronecker delta by the
+same permutation leaves it unchanged. -/
+@[simp]
+lemma generalizedKroneckerDelta_comp_perm {α ι : Type} [DecidableEq α] [DecidableEq ι]
+    [Fintype ι] (μ ν : ι → α) (e : Equiv.Perm ι) :
+    generalizedKroneckerDelta (μ ∘ e) (ν ∘ e) = generalizedKroneckerDelta μ ν := by
+  show (Matrix.submatrix
+      (Matrix.of fun i j => ((kroneckerDelta (μ i) (ν j) : ℕ) : ℤ)) e e).det =
+    (Matrix.of fun i j => ((kroneckerDelta (μ i) (ν j) : ℕ) : ℤ)).det
+  exact Matrix.det_submatrix_equiv_self e _
 
 end Generalized
 

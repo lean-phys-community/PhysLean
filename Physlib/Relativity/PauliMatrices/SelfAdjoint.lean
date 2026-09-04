@@ -7,6 +7,7 @@ module
 
 public import Physlib.Relativity.PauliMatrices.Basic
 public import Physlib.Relativity.MinkowskiMatrix
+public import Mathlib.Analysis.CStarAlgebra.Matrix
 /-!
 
 ## Interaction of Pauli matrices with self-adjoint matrices
@@ -14,8 +15,11 @@ public import Physlib.Relativity.MinkowskiMatrix
 -/
 
 @[expose] public section
+
+noncomputable section
+
 namespace PauliMatrix
-open Matrix Module
+open Matrix Module KroneckerDelta
 
 /-- The trace of a pauli-matrix multiplied by a self-adjoint `2×2` matrix is real. -/
 lemma trace_pauliMatrix_mul_selfAdjoint_re (μ : Fin 1 ⊕ Fin 3)
@@ -75,11 +79,10 @@ lemma selfAdjoint_ext {A B : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)}
     trace_pauliMatrix_mul_selfAdjoint_re _ B] at h0' h1' h2' h3'
   exact selfAdjoint_ext_complex h0' h1' h2' h3'
 
-noncomputable section
-
 /-- An auxiliary function which on `i : Fin 1 ⊕ Fin 3` returns the corresponding
-  Pauli-matrix as a self-adjoint matrix. -/
-def pauliSelfAdjoint (i : Fin 1 ⊕ Fin 3) : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ) :=
+Pauli matrix as a self-adjoint matrix. -/
+def pauliSelfAdjoint (i : Fin 1 ⊕ Fin 3) :
+    selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ) :=
   ⟨pauliMatrix i, pauliMatrix_selfAdjoint i⟩
 
 /-- The Pauli matrices are linearly independent. -/
@@ -91,53 +94,168 @@ lemma pauliSelfAdjoint_linearly_independent : LinearIndependent ℝ pauliSelfAdj
   rw [Fin.sum_univ_three] at hg
   simp only [Fin.isValue, pauliSelfAdjoint] at hg
   intro i
-  have h1 := congrArg (fun A => (Matrix.trace (pauliMatrix i * A.1))) hg
-  simp only [Fin.isValue, AddSubgroup.coe_add, selfAdjoint.val_smul, mul_add, Algebra.mul_smul_comm,
-    trace_add, trace_smul, ZeroMemClass.coe_zero, mul_zero, trace_zero] at h1
-  fin_cases i <;> simpa [pauliMatrix] using h1
+  have h1 := congrArg (fun A => Matrix.trace (pauliMatrix i * A.1)) hg
+  simp only [Fin.isValue, AddSubgroup.coe_add, selfAdjoint.val_smul, mul_add,
+    Algebra.mul_smul_comm, trace_add, trace_smul, ZeroMemClass.coe_zero, mul_zero,
+    trace_zero] at h1
+  fin_cases i <;> simpa [pauliMatrix, kroneckerDelta] using h1
 
-/-- The Pauli matrices span all self-adjoint matrices. -/
-lemma pauliSelfAdjoint_span : ⊤ ≤ Submodule.span ℝ (Set.range pauliSelfAdjoint) := by
-  refine (Submodule.top_le_span_range_iff_forall_exists_fun ℝ).mpr ?_
-  intro A
-  let c : Fin 1 ⊕ Fin 3 → ℝ := fun i =>
-    match i with
-    | Sum.inl 0 => 1/2 * (Matrix.trace (σ0 * A.1)).re
-    | Sum.inr 0 => 1/2 * (Matrix.trace (σ1 * A.1)).re
-    | Sum.inr 1 => 1/2 * (Matrix.trace (σ2 * A.1)).re
-    | Sum.inr 2 => 1/2 * (Matrix.trace (σ3 * A.1)).re
-  use c
-  simp only [one_div, Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
-    Finset.sum_singleton, Fin.sum_univ_three, c]
+/-- Pauli matrices are orthogonal with respect to the trace pairing: `tr(σ_μ σ_ν) = 2 δ_μν`. -/
+@[simp]
+lemma trace_pauliMatrix_mul_pauliMatrix (μ ν : Fin 1 ⊕ Fin 3) :
+    Matrix.trace (pauliMatrix μ * pauliMatrix ν) = ((2 * kroneckerDelta μ ν : ℕ) : ℂ) := by
+  fin_cases μ <;> fin_cases ν <;> simp [kroneckerDelta, pauliMatrix] <;> norm_num
+
+/-- The four real Pauli coefficients of a self-adjoint `2 × 2` matrix. -/
+noncomputable def pauliCoeff
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    Fin 1 ⊕ Fin 3 → ℝ
+  | Sum.inl 0 => 1 / 2 * (Matrix.trace (σ0 * A.1)).re
+  | Sum.inr 0 => 1 / 2 * (Matrix.trace (σ1 * A.1)).re
+  | Sum.inr 1 => 1 / 2 * (Matrix.trace (σ2 * A.1)).re
+  | Sum.inr 2 => 1 / 2 * (Matrix.trace (σ3 * A.1)).re
+
+/-- Every self-adjoint `2 × 2` matrix is its Pauli decomposition. -/
+lemma sum_pauliCoeff
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    ∑ i, pauliCoeff A i • pauliSelfAdjoint i = A := by
+  simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
+    Finset.sum_singleton, Fin.sum_univ_three, pauliCoeff]
   apply selfAdjoint_ext
   · simp only [pauliSelfAdjoint, AddSubgroup.coe_add, selfAdjoint.val_smul, mul_add,
-    Algebra.mul_smul_comm, trace_add, trace_smul, σ0_σ0_trace, real_smul, ofReal_mul, ofReal_inv,
-    ofReal_ofNat, σ0_σ1_trace, smul_zero, σ0_σ2_trace, add_zero, σ0_σ3_trace, mul_re, inv_re,
-    re_ofNat, normSq_ofNat, div_self_mul_self', ofReal_re, inv_im, im_ofNat, neg_zero, zero_div,
-    ofReal_im, mul_zero, sub_zero, mul_im, zero_mul]
+      Algebra.mul_smul_comm, trace_add, trace_smul, σ0_σ0_trace, real_smul, ofReal_mul,
+      σ0_σ1_trace, smul_zero, σ0_σ2_trace, add_zero,
+      σ0_σ3_trace, mul_re, re_ofNat,
+      ofReal_re, im_ofNat, ofReal_im, mul_zero, sub_zero,
+      mul_im, zero_mul]
     ring
   · simp only [pauliSelfAdjoint, AddSubgroup.coe_add, selfAdjoint.val_smul, mul_add,
-    Algebra.mul_smul_comm, trace_add, trace_smul, σ1_σ0_trace, smul_zero, σ1_σ1_trace, real_smul,
-    ofReal_mul, ofReal_inv, ofReal_ofNat, σ1_σ2_trace, add_zero, σ1_σ3_trace, zero_add, mul_re,
-    inv_re, re_ofNat, normSq_ofNat, div_self_mul_self', ofReal_re, inv_im, im_ofNat, neg_zero,
-    zero_div, ofReal_im, mul_zero, sub_zero, mul_im, zero_mul]
+      Algebra.mul_smul_comm, trace_add, trace_smul, σ1_σ0_trace, smul_zero,
+      σ1_σ1_trace, real_smul, ofReal_mul, σ1_σ2_trace,
+      add_zero, σ1_σ3_trace, zero_add, mul_re, re_ofNat,
+      ofReal_re, im_ofNat, ofReal_im,
+      mul_zero, sub_zero, mul_im, zero_mul]
     ring
   · simp only [pauliSelfAdjoint, AddSubgroup.coe_add, selfAdjoint.val_smul, mul_add,
-    Algebra.mul_smul_comm, trace_add, trace_smul, σ2_σ0_trace, smul_zero, σ2_σ1_trace, σ2_σ2_trace,
-    real_smul, ofReal_mul, ofReal_inv, ofReal_ofNat, zero_add, σ2_σ3_trace, add_zero, mul_re,
-    inv_re, re_ofNat, normSq_ofNat, div_self_mul_self', ofReal_re, inv_im, im_ofNat, neg_zero,
-    zero_div, ofReal_im, mul_zero, sub_zero, mul_im, zero_mul]
+      Algebra.mul_smul_comm, trace_add, trace_smul, σ2_σ0_trace, smul_zero,
+      σ2_σ1_trace, σ2_σ2_trace, real_smul, ofReal_mul,
+      zero_add, σ2_σ3_trace, add_zero, mul_re, re_ofNat,
+      ofReal_re, im_ofNat, ofReal_im,
+      mul_zero, sub_zero, mul_im, zero_mul]
     ring
   · simp only [pauliSelfAdjoint, AddSubgroup.coe_add, selfAdjoint.val_smul, mul_add,
-    Algebra.mul_smul_comm, trace_add, trace_smul, σ3_σ0_trace, smul_zero, σ3_σ1_trace, σ3_σ2_trace,
-    add_zero, σ3_σ3_trace, real_smul, ofReal_mul, ofReal_inv, ofReal_ofNat, zero_add, mul_re,
-    inv_re, re_ofNat, normSq_ofNat, div_self_mul_self', ofReal_re, inv_im, im_ofNat, neg_zero,
-    zero_div, ofReal_im, mul_zero, sub_zero, mul_im, zero_mul]
+      Algebra.mul_smul_comm, trace_add, trace_smul, σ3_σ0_trace, smul_zero,
+      σ3_σ1_trace, σ3_σ2_trace, add_zero, σ3_σ3_trace, real_smul, ofReal_mul,
+      zero_add, mul_re, re_ofNat,
+      ofReal_re, im_ofNat, ofReal_im,
+      mul_zero, sub_zero, mul_im, zero_mul]
     ring
 
+/-- Every self-adjoint `2 × 2` matrix is a real linear combination of the Pauli matrices. -/
+lemma eq_sum_pauli
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    A = ∑ i, pauliCoeff A i • pauliSelfAdjoint i :=
+  (sum_pauliCoeff A).symm
+
+/-- The Pauli matrices span all self-adjoint matrices. -/
+lemma pauliSelfAdjoint_span :
+    ⊤ ≤ Submodule.span ℝ (Set.range pauliSelfAdjoint) := by
+  refine (Submodule.top_le_span_range_iff_forall_exists_fun ℝ).mpr ?_
+  intro A
+  exact ⟨pauliCoeff A, sum_pauliCoeff A⟩
+
 /-- The basis of `selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)` formed by Pauli matrices. -/
-def pauliBasis : Basis (Fin 1 ⊕ Fin 3) ℝ (selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :=
+def pauliBasis :
+    Basis (Fin 1 ⊕ Fin 3) ℝ (selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :=
   Basis.mk pauliSelfAdjoint_linearly_independent pauliSelfAdjoint_span
+
+/-! ### Pauli coordinates of self-adjoint `2 × 2` matrices -/
+
+/-- The coefficient of the identity in the Pauli decomposition. -/
+noncomputable def scalarCoeff
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) : ℝ :=
+  pauliCoeff A (Sum.inl 0)
+
+/-- The three spatial Pauli coefficients. -/
+noncomputable def vectorCoeff
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) : Fin 3 → ℝ :=
+  fun i => pauliCoeff A (Sum.inr i)
+
+/-- The traceless Pauli-vector part `a · σ`. -/
+noncomputable def vectorPart
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    Matrix (Fin 2) (Fin 2) ℂ :=
+  vectorMatrix (vectorCoeff A)
+
+/-- The Euclidean length of the spatial Pauli coefficients. -/
+noncomputable def pauliRadius
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) : ℝ :=
+  Real.sqrt (∑ i : Fin 3, vectorCoeff A i ^ 2)
+
+/-- The Pauli radius is the square root of the squared Euclidean length of the
+spatial Pauli coefficients. -/
+lemma pauliRadius_sq
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    pauliRadius A ^ 2 =
+      ∑ i : Fin 3, vectorCoeff A i ^ 2 := by
+  rw [pauliRadius, Real.sq_sqrt]
+  positivity
+
+@[simp]
+lemma pauliRadius_nonneg
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    0 ≤ pauliRadius A :=
+  Real.sqrt_nonneg _
+
+/-! ### Explicit coefficients -/
+
+/-- A self-adjoint matrix is its scalar part plus its Pauli-vector part. -/
+lemma matrix_eq_scalar_add_vector
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    A.val = (scalarCoeff A : ℂ) • 1 + vectorPart A := by
+  have h := congrArg
+    (fun B : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ) => B.val)
+    (sum_pauliCoeff A)
+  simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero,
+    Finset.sum_singleton, Fin.sum_univ_three, pauliSelfAdjoint,
+    AddSubgroup.coe_add, selfAdjoint.val_smul] at h
+  rw [← h]
+  simp [scalarCoeff, vectorPart, vectorMatrix, vectorCoeff,
+    Fin.sum_univ_three, pauliMatrix_inl_zero_eq_one]
+
+/-- The trace of a self-adjoint matrix is twice its scalar Pauli coefficient. -/
+lemma trace_eq_two_mul_scalarCoeff
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    Matrix.trace A.1 = 2 * scalarCoeff A := by
+  have htrace :
+      ((Matrix.trace A.1).re : ℂ) = Matrix.trace A.1 := by
+    simpa [pauliMatrix_inl_zero_eq_one] using
+      trace_pauliMatrix_mul_selfAdjoint_re (Sum.inl 0) A
+  rw [scalarCoeff, pauliCoeff]
+  simp only [pauliMatrix_inl_zero_eq_one, one_mul]
+  calc
+    Matrix.trace A.1 = ((Matrix.trace A.1).re : ℂ) := htrace.symm
+    _ = 2 * ((1 / 2 * (Matrix.trace A.1).re : ℝ) : ℂ) := by
+      push_cast
+      ring
+
+/-- The Pauli-vector part has zero trace. -/
+@[simp]
+lemma trace_vectorPart
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    Matrix.trace (vectorPart A) = 0 := by
+  have h := congrArg Matrix.trace (matrix_eq_scalar_add_vector A)
+  simp only [trace_add, trace_smul, smul_eq_mul, Matrix.trace_one, Fintype.card_fin,
+    Nat.cast_ofNat, trace_eq_two_mul_scalarCoeff A] at h
+  linear_combination -h
+
+/-- The square of the vector part of a self-adjoint matrix is its squared
+Pauli radius times the identity. -/
+lemma vectorPart_sq
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    vectorPart A * vectorPart A =
+      (pauliRadius A ^ 2 : ℝ) • 1 := by
+  rw [vectorPart, vectorMatrix_sq, ← pauliRadius_sq]
 
 /-- An auxiliary function which on `i : Fin 1 ⊕ Fin 3` returns the corresponding
   Pauli-matrix as a self-adjoint matrix with a minus sign for `Sum.inr _`. -/
@@ -147,6 +265,33 @@ def pauliSelfAdjoint' (i : Fin 1 ⊕ Fin 3) : selfAdjoint (Matrix (Fin 2) (Fin 2
   | Sum.inr 0 => ⟨-σ1, by rw [AddSubgroup.neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
   | Sum.inr 1 => ⟨-σ2, by rw [AddSubgroup.neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
   | Sum.inr 2 => ⟨-σ3, by rw [AddSubgroup.neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
+
+/-- Trace orthogonality of the covariant Pauli basis:
+  `tr (σ'_a σ'_b) = 2 δ_{a b}`. -/
+lemma trace_pauliSelfAdjoint'_mul (a b : Fin 1 ⊕ Fin 3) :
+    Matrix.trace ((pauliSelfAdjoint' a).1 * (pauliSelfAdjoint' b).1) =
+      if a = b then 2 else 0 := by
+  rcases a with a | a <;> rcases b with b | b <;>
+    fin_cases a <;> fin_cases b <;>
+    simp only [pauliSelfAdjoint', Matrix.neg_mul, Matrix.mul_neg,
+      Matrix.trace_neg, neg_neg, trace_pauliMatrix_mul_pauliMatrix,
+      KroneckerDelta.kroneckerDelta] <;>
+    simp
+
+/-- The trace pairing of a covariant Pauli matrix with an arbitrary matrix, expressed through the
+matrix entries. -/
+lemma trace_pauliSelfAdjoint'_mul_apply (l : Fin 1 ⊕ Fin 3)
+    (N : Matrix (Fin 2) (Fin 2) ℂ) :
+    Matrix.trace ((pauliSelfAdjoint' l).1 * N) =
+      match l with
+      | Sum.inl 0 => N 0 0 + N 1 1
+      | Sum.inr 0 => -(N 0 1 + N 1 0)
+      | Sum.inr 1 => -(Complex.I * (N 0 1 - N 1 0))
+      | Sum.inr 2 => -(N 0 0 - N 1 1) := by
+  rcases l with l | l <;> fin_cases l <;>
+    simp [pauliSelfAdjoint', pauliMatrix, Matrix.trace, Matrix.mul_apply,
+      Fin.sum_univ_two, Matrix.diag] <;>
+    ring
 
 /-- The Pauli matrices where `σi` are negated are linearly independent. -/
 lemma pauliSelfAdjoint'_linearly_independent : LinearIndependent ℝ pauliSelfAdjoint' := by
@@ -159,7 +304,7 @@ lemma pauliSelfAdjoint'_linearly_independent : LinearIndependent ℝ pauliSelfAd
   intro i
   have h1 := congrArg (fun A => (Matrix.trace (pauliMatrix i * A.1))) hg
   simp [-real_smul, mul_add] at h1
-  fin_cases i <;> simpa [pauliMatrix] using h1
+  fin_cases i <;> simpa [pauliMatrix, kroneckerDelta] using h1
 
 /-- The Pauli matrices where `σi` are negated span all Self-adjoint matrices. -/
 lemma pauliSelfAdjoint'_span : ⊤ ≤ Submodule.span ℝ (Set.range pauliSelfAdjoint') := by
@@ -325,5 +470,4 @@ lemma pauliBasis_minkowskiMetric_pauliBasis' (i : Fin 1 ⊕ Fin 3) :
     simp [pauliSelfAdjoint', pauliSelfAdjoint, pauliBasis, pauliBasis',
       minkowskiMatrix.inr_i_inr_i, Subtype.ext_iff, NegMemClass.coe_neg, neg_neg]
 
-end
 end PauliMatrix

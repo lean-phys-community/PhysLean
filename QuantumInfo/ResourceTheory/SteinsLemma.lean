@@ -37,6 +37,7 @@ theorem Lemma6_σn_IsFree {σ₁ : MState (H i)} {σₘ : (m : ℕ) → MState (
     · exact hσ₁_free.npow (n % m)
   · rw [← pow_mul, ← spacePow_add, Nat.div_add_mod n m]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Lemma 6 from the paper.
 We _did_ end up doing the version that "works also in the case of ε = 0", which is nice.
 -/
@@ -245,7 +246,7 @@ theorem LemmaS2liminf {ε3 : Prob} {ε4 : ℝ≥0} (hε4 : 0 < ε4)
     · replace hf := le_trans hf hRinf
       replace hf := tsub_eq_zero_iff_le.mpr hf
       simp_all
-    apply Filter.IsCobounded.of_frequently_le (u := ⊤)
+    apply Filter.IsCobounded.of_frequently_le (l := ⊤)
     simp [Filter.frequently_atTop]
     intro n; use n
   apply Filter.isBoundedUnder_of

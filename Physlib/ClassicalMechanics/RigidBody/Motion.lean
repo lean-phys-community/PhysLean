@@ -28,6 +28,7 @@ a rigid motion into a translation of the centre of mass plus a rotation about it
 @[expose] public section
 
 open Time Manifold Matrix RigidBody InnerProductSpace
+open Space (cmap cmap_apply)
 
 attribute [local instance] Matrix.linftyOpNormedAddCommGroup Matrix.linftyOpNormedSpace
   Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
@@ -52,22 +53,24 @@ lemma orientation_mul_transpose {d : ℕ} (M : RigidBodyMotion d) (t : Time) :
 /-- The velocity of the centre of mass of a rigid body in motion, defined as the time-derivative
 of its centre-of-mass trajectory. This is the velocity `V` in the Landau–Lifshitz decomposition
 `v = V + Ω × r` of the velocity of a point of the body. -/
-noncomputable def centerOfMassVelocity {d : ℕ} (M : RigidBodyMotion d) : Time → Space d :=
-  ∂ₜ M.comTrajectory
+noncomputable def centerOfMassVelocity {d : ℕ} (M : RigidBodyMotion d) :
+    Time → EuclideanSpace ℝ (Fin d) :=
+  ∂ₜᵥ M.comTrajectory
 
 lemma centerOfMassVelocity_eq {d : ℕ} (M : RigidBodyMotion d) :
-    M.centerOfMassVelocity = ∂ₜ M.comTrajectory := rfl
+    M.centerOfMassVelocity = ∂ₜᵥ M.comTrajectory := rfl
 
 /-- A rigid body whose centre of mass is stationary has zero centre-of-mass velocity. -/
 lemma centerOfMassVelocity_of_comTrajectory_const {d : ℕ} (M : RigidBodyMotion d) (c : Space d)
     (h : M.comTrajectory = fun _ => c) : M.centerOfMassVelocity = 0 := by
   rw [centerOfMassVelocity_eq, h]
   funext t
-  exact Time.deriv_const c
+  exact Time.derivVec_const c
 
 /-- The linear momentum of a rigid body in motion: the total mass times the velocity of the
 centre of mass. -/
-noncomputable def linearMomentum {d : ℕ} (M : RigidBodyMotion d) : Time → Space d :=
+noncomputable def linearMomentum {d : ℕ} (M : RigidBodyMotion d) :
+    Time → EuclideanSpace ℝ (Fin d) :=
   fun t => M.mass • M.centerOfMassVelocity t
 
 lemma linearMomentum_eq {d : ℕ} (M : RigidBodyMotion d) :
@@ -106,6 +109,7 @@ lemma orientation_mulVec_sub_centerOfMass {d : ℕ} (M : RigidBodyMotion d) (t :
   rw [eq_sub_iff_add_eq, displacement_apply]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The mass distribution of the rigid body in motion at time `t`: the pushforward of the
 body-fixed mass distribution along the rigid displacement, acting on a test function `f` by
 `f ↦ ρ (f ∘ displacement t)`. -/
@@ -133,6 +137,7 @@ private lemma contMDiffMap_sum_apply {d : ℕ} {ι : Type*} (s : Finset ι)
   | insert a s ha ih =>
     simp only [Finset.sum_insert ha, ContMDiffMap.coe_add, Pi.add_apply, ih]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The centre of mass of the moving mass distribution tracks the prescribed trajectory: for a
 body of nonzero mass, the centre of mass of `massDistribution M t` is exactly `comTrajectory t`.
 This is the decisive check that `comTrajectory` and `orientation` are wired correctly in
@@ -164,11 +169,12 @@ lemma massDistribution_centerOfMass {d : ℕ} (M : RigidBodyMotion d) (t : Time)
 
 /-- The velocity of the material point `y` of a rigid body in motion: the inertial-frame time
 derivative of the trajectory `s ↦ displacement s y` of that point. -/
-noncomputable def velocity {d : ℕ} (M : RigidBodyMotion d) (y : Space d) : Time → Space d :=
-  fun t => ∂ₜ (fun s => M.displacement s y) t
+noncomputable def velocity {d : ℕ} (M : RigidBodyMotion d) (y : Space d) :
+    Time → EuclideanSpace ℝ (Fin d) :=
+  fun t => ∂ₜᵥ (fun s => M.displacement s y) t
 
 lemma velocity_eq {d : ℕ} (M : RigidBodyMotion d) (y : Space d) (t : Time) :
-    M.velocity y t = ∂ₜ (fun s => M.displacement s y) t := rfl
+    M.velocity y t = ∂ₜᵥ (fun s => M.displacement s y) t := rfl
 
 /-- The `i`-th component of the velocity of a body point is the time derivative of the `i`-th
 coordinate of its inertial-frame trajectory. -/
@@ -176,7 +182,7 @@ lemma velocity_apply {d : ℕ} (M : RigidBodyMotion d) (y : Space d) (t : Time) 
     (hd : Differentiable ℝ (fun s => M.displacement s y)) :
     M.velocity y t i = ∂ₜ (fun s => M.displacement s y i) t := by
   rw [velocity_eq]
-  exact (Time.deriv_space hd t i).symm
+  exact derivVec_space hd t i
 
 /-- The material point at the centre of mass moves with the centre-of-mass velocity, for any
 motion: `v(centreOfMass) = V`. This is the velocity counterpart of `massDistribution_centerOfMass`.
@@ -199,15 +205,14 @@ lemma velocity_of_orientation_const {d : ℕ} (M : RigidBodyMotion d) (y : Space
   funext t
   rw [velocity_eq, centerOfMassVelocity_eq]
   have hdisp : (fun s => M.displacement s y)
-      = fun s => (⟨fun k => ∑ j, R.1 k j * (y j - M.centerOfMass j)⟩ : Space d)
-          + M.comTrajectory s := by
+      = fun s => (WithLp.toLp 2 fun k => ∑ j, R.1 k j * (y j - M.centerOfMass j))
+          +ᵥ M.comTrajectory s := by
     funext s
     ext k
     rw [displacement_apply, h]
     simp
   rw [hdisp]
-  simp only [Time.deriv_eq]
-  rw [fderiv_const_add]
+  simp only [Time.derivVec_eq, vadd_vsub_vadd_cancel_left]
 
 /-- The velocity of a body point decomposes as `v = Ṙ (y − c) + V`: the rate of change of the
 orientation acting on the body-frame position, plus the centre-of-mass velocity. -/
@@ -243,7 +248,7 @@ lemma velocity_eq_deriv_orientation {d : ℕ} (M : RigidBodyMotion d) (y : Space
       Time.deriv_mul_const (fun s => (M.orientation s).1 i j)
         (y j - M.centerOfMass j) ((hentry i j) t))]
   simp only [Time.deriv_matrix_apply (fun s => (M.orientation s).1) t (hR t)]
-  rw [hmv, Time.deriv_space hX t i, ← centerOfMassVelocity_eq]
+  rw [hmv, ← Time.derivVec_space hX t i, ← centerOfMassVelocity_eq]
 
 /-- The closed form `Ṙ(t) (y − c) + V(t)` of the velocity of the body point `y` at time `t`.
 Unlike `velocity` — whose junk values on non-differentiable motions need not vary continuously
@@ -251,8 +256,8 @@ with `y` — it is polynomial in `y` for any motion, so its squared speed can be
 smooth integrand of the total kinetic energy; for differentiable motions the two agree, see
 `velocityClosedForm_eq_velocity`. -/
 noncomputable def velocityClosedForm {d : ℕ} (M : RigidBodyMotion d) (t : Time) (y : Space d) :
-    Space d :=
-  ⟨∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j⟩
+    EuclideanSpace ℝ (Fin d) :=
+  WithLp.toLp 2 (∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j)
     + M.centerOfMassVelocity t
 
 /-- The `i`-th coordinate of the closed-form velocity. -/
@@ -261,7 +266,7 @@ lemma velocityClosedForm_apply {d : ℕ} (M : RigidBodyMotion d) (t : Time) (y :
     M.velocityClosedForm t y i
       = (∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j) i
         + M.centerOfMassVelocity t i := by
-  simp only [velocityClosedForm, Space.add_apply]
+  simp only [velocityClosedForm, PiLp.add_apply]
 
 /-- The closed-form velocity as a plain vector-valued function of the coordinates of `y`. -/
 lemma velocityClosedForm_val {d : ℕ} (M : RigidBodyMotion d) (t : Time) (y : Space d) :
@@ -283,7 +288,8 @@ lemma velocityClosedForm_eq_velocity {d : ℕ} (M : RigidBodyMotion d) (t : Time
 /-- The squared speed of a body point, in closed form, is a smooth function of the point. -/
 lemma contDiff_velocityClosedForm_inner {d : ℕ} (M : RigidBodyMotion d) (t : Time) :
     ContDiff ℝ ⊤ fun y : Space d => (⟪M.velocityClosedForm t y, M.velocityClosedForm t y⟫_ℝ) := by
-  simp only [Space.inner_eq_sum, velocityClosedForm_apply, Matrix.mulVec, dotProduct]
+  simp only [EuclideanSpace.inner_eq_star_dotProduct, star_trivial,
+    velocityClosedForm_apply, Matrix.mulVec, dotProduct]
   fun_prop
 
 end RigidBodyMotion

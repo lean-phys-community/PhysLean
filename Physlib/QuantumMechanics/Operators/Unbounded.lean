@@ -486,7 +486,7 @@ lemma IsClosed.isClosed_toFun_graph (hU : U.IsClosed) :
 lemma IsClosed.continuous_of_isClosed_domain [CompleteSpace H] [CompleteSpace H']
     (hU : U.IsClosed) (h : _root_.IsClosed (U.domain : Set H)) :
     Continuous U := by
-  haveI : CompleteSpace U.domain := instCompleteSpaceSubtypeMemSubmoduleOfIsClosedCoe U.domain
+  have : CompleteSpace U.domain := instCompleteSpaceSubtypeMemSubmoduleOfIsClosedCoe U.domain
   exact LinearMap.continuous_of_isClosed_graph U.toFun hU.isClosed_toFun_graph
 
 /-- Closability is preserved upon adding a continuous operator. -/

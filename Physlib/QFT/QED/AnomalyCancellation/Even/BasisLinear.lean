@@ -19,10 +19,12 @@ conditions.
 
 ## ii. Key results
 
-- `P'` : The inclusion of the first plane into linear solutions
-- `P_accCube` : The statement that chares from the first plane satisfy the cubic ACC
-- `P!'` : The inclusion of the second plane.
-- `P!_accCube` : The statement that charges from the second plane satisfy the cubic ACC
+- `Unshifted.planeLinSols` : The inclusion of the unshifted plane into linear solutions
+- `Unshifted.planeCharges_accCube` : The statement that charges from the unshifted plane
+  satisfy the cubic ACC
+- `Shifted.planeLinSols` : The inclusion of the shifted plane.
+- `Shifted.planeCharges_accCube` : The statement that charges from the shifted plane
+  satisfy the cubic ACC
 - `span_basis` : Every linear solution is the sum of a point from each plane.
 
 ## iii. Table of contents
@@ -31,29 +33,29 @@ conditions.
   - A.1. The even split: Spltting the charges up via `n.succ + n.succ`
   - A.2. The shifted even split: Spltting the charges up via `1 + (n + n + 1)`
   - A.3. Lemmas relating the two splittings
-- B. The first plane
-  - B.1. The basis vectors of the first plane as charges
+- B. The unshifted plane
+  - B.1. The basis vectors of the unshifted plane as charges
   - B.2. Components of the basis vectors
   - B.3. The basis vectors satisfy the linear ACCs
   - B.4. The basis vectors satisfy the cubic ACC
   - B.5. The basis vectors as linear solutions
-  - B.6. The inclusion of the first plane into charges
+  - B.6. The inclusion of the unshifted plane into charges
   - B.7. Components of the inclusion into charges
   - B.8. The inclusion into charges satisfies the linear and cubic ACCs
   - B.9. Kernel of the inclusion into charges
   - B.10. The inclusion of the plane into linear solutions
   - B.11. The basis vectors are linearly independent
-  - B.12. Every vector-like even solution is in the span of the basis of the first plane
-- C. The vectors of the basis spanning the second plane, via the shifted even split
+  - B.12. Every vector-like even solution is in the span of the basis of the unshifted plane
+- C. The shifted plane
   - C.2. Components of the vectors
   - C.3. The vectors satisfy the linear ACCs
   - C.4. The vectors satisfy the cubic ACC
   - C.6. The vectors as linear solutions
-  - C.7. The inclusion of the second plane into charges
+  - C.7. The inclusion of the shifted plane into charges
   - C.8. Components of the inclusion into charges
   - C.9. The inclusion into charges satisfies the cubic ACC
   - C.10. Kernel of the inclusion into charges
-  - C.11. The inclusion of the second plane into the span of the basis
+  - C.11. The inclusion of the shifted plane into the span of the basis
   - C.12. The inclusion of the plane into linear solutions
   - C.13. The basis vectors are linearly independent
   - C.14. Properties of the basis vectors relating to the span
@@ -200,17 +202,20 @@ lemma evenShiftSnd_eq_evenSnd_castSucc (j : Fin n) : evenShiftSnd j = evenSnd j.
 
 /-!
 
-## B. The first plane
+## B. The unshifted plane
 
 -/
+
+namespace Unshifted
 
 /-!
 
-### B.1. The basis vectors of the first plane as charges
+### B.1. The basis vectors of the unshifted plane as charges
 
 -/
 
-/-- The first part of the basis as charges. -/
+set_option backward.isDefEq.respectTransparency false in
+/-- The unshifted part of the basis as charges. -/
 def basisAsCharges (j : Fin n.succ) : (PureU1 (2 * n.succ)).Charges :=
   fun i =>
   if i = evenFst j then
@@ -227,6 +232,7 @@ def basisAsCharges (j : Fin n.succ) : (PureU1 (2 * n.succ)).Charges :=
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_evenFst_self (j : Fin n.succ) : basisAsCharges j (evenFst j) = 1 := by
   simp [basisAsCharges]
 
@@ -286,6 +292,7 @@ lemma basis_on_evenSnd_other {k j : Fin n.succ} (h : k ≠ j) : basisAsCharges k
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_linearACC (j : Fin n.succ) : (accGrav (2 * n.succ)) (basisAsCharges j) = 0 := by
   simp [accGrav, sum_even, basis_evenSnd_eq_neg_evenFst]
 /-!
@@ -293,6 +300,7 @@ lemma basis_linearACC (j : Fin n.succ) : (accGrav (2 * n.succ)) (basisAsCharges 
 ### B.4. The basis vectors satisfy the cubic ACC
 
 -/
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_accCube (j : Fin n.succ) :
     accCube (2 * n.succ) (basisAsCharges j) = 0 := by
   rw [accCube_explicit, sum_even]
@@ -306,7 +314,7 @@ lemma basis_accCube (j : Fin n.succ) :
 
 -/
 
-/-- The first part of the basis as `LinSols`. -/
+/-- The unshifted part of the basis as `LinSols`. -/
 @[simps!]
 def basis (j : Fin n.succ) : (PureU1 (2 * n.succ)).LinSols :=
   ⟨basisAsCharges j, by
@@ -316,12 +324,12 @@ def basis (j : Fin n.succ) : (PureU1 (2 * n.succ)).LinSols :=
 
 /-!
 
-### B.6. The inclusion of the first plane into charges
+### B.6. The inclusion of the unshifted plane into charges
 
 -/
 
-/-- A point in the span of the first part of the basis as a charge. -/
-def P (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).Charges := ∑ i, f i • basisAsCharges i
+/-- A point in the span of the unshifted part of the basis as a charge. -/
+def planeCharges (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).Charges := ∑ i, f i • basisAsCharges i
 
 /-!
 
@@ -329,23 +337,27 @@ def P (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).Charges := ∑ i, f i •
 
 -/
 
-lemma P_evenFst (f : Fin n.succ → ℚ) (j : Fin n.succ) : P f (evenFst j) = f j := by
-  rw [P, sum_of_charges]
+lemma planeCharges_evenFst (f : Fin n.succ → ℚ) (j : Fin n.succ) :
+    planeCharges f (evenFst j) = f j := by
+  rw [planeCharges, sum_of_charges]
   simp only [succ_eq_add_one, HSMul.hSMul, SMul.smul]
   rw [Fintype.sum_eq_single j]
   · simp [basis_on_evenFst_self]
   · exact fun k hkj => mul_eq_zero_of_right (f k) (basis_on_evenFst_other hkj)
 
-lemma P_evenSnd (f : Fin n.succ → ℚ) (j : Fin n.succ) : P f (evenSnd j) = - f j := by
-  rw [P, sum_of_charges]
+lemma planeCharges_evenSnd (f : Fin n.succ → ℚ) (j : Fin n.succ) :
+    planeCharges f (evenSnd j) = - f j := by
+  rw [planeCharges, sum_of_charges]
   simp only [succ_eq_add_one, HSMul.hSMul, SMul.smul]
   rw [Fintype.sum_eq_single j]
   · simp [basis_on_evenSnd_self]
   · exact fun k hkj => mul_eq_zero_of_right (f k) (basis_on_evenSnd_other hkj)
 
-lemma P_evenSnd_evenFst (f : Fin n.succ → ℚ) : P f ∘ evenSnd = - P f ∘ evenFst := by
+set_option backward.isDefEq.respectTransparency false in
+lemma planeCharges_evenSnd_evenFst (f : Fin n.succ → ℚ) :
+    planeCharges f ∘ evenSnd = - planeCharges f ∘ evenFst := by
   funext j
-  simp [P_evenFst, P_evenSnd]
+  simp [planeCharges_evenFst, planeCharges_evenSnd]
 
 /-!
 
@@ -353,13 +365,16 @@ lemma P_evenSnd_evenFst (f : Fin n.succ → ℚ) : P f ∘ evenSnd = - P f ∘ e
 
 -/
 
-lemma P_linearACC (f : Fin n.succ → ℚ) : (accGrav (2 * n.succ)) (P f) = 0 := by
-  simp [accGrav, sum_even, P_evenSnd, P_evenFst]
+set_option backward.isDefEq.respectTransparency false in
+lemma planeCharges_linearACC (f : Fin n.succ → ℚ) :
+    (accGrav (2 * n.succ)) (planeCharges f) = 0 := by
+  simp [accGrav, sum_even, planeCharges_evenSnd, planeCharges_evenFst]
 
-lemma P_accCube (f : Fin n.succ → ℚ) : accCube (2 * n.succ) (P f) = 0 := by
+set_option backward.isDefEq.respectTransparency false in
+lemma planeCharges_accCube (f : Fin n.succ → ℚ) : accCube (2 * n.succ) (planeCharges f) = 0 := by
   rw [accCube_explicit, sum_even]
   refine Finset.sum_eq_zero fun i _ => ?_
-  simp only [succ_eq_add_one, Function.comp_apply, P_evenFst, P_evenSnd]
+  simp only [succ_eq_add_one, Function.comp_apply, planeCharges_evenFst, planeCharges_evenSnd]
   ring
 
 /-!
@@ -368,8 +383,8 @@ lemma P_accCube (f : Fin n.succ → ℚ) : accCube (2 * n.succ) (P f) = 0 := by
 
 -/
 
-lemma P_zero (f : Fin n.succ → ℚ) (h : P f = 0) : ∀ i, f i = 0 := by
-  exact fun i => (P_evenFst f i).symm.trans (congr_fun h (evenFst i))
+lemma planeCharges_zero (f : Fin n.succ → ℚ) (h : planeCharges f = 0) : ∀ i, f i = 0 := by
+  exact fun i => (planeCharges_evenFst f i).symm.trans (congr_fun h (evenFst i))
 
 /-!
 
@@ -377,11 +392,12 @@ lemma P_zero (f : Fin n.succ → ℚ) (h : P f = 0) : ∀ i, f i = 0 := by
 
 -/
 
-/-- A point in the span of the first part of the basis. -/
-def P' (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).LinSols := ∑ i, f i • basis i
+/-- A point in the span of the unshifted part of the basis. -/
+def planeLinSols (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).LinSols := ∑ i, f i • basis i
 
-lemma P'_val (f : Fin n.succ → ℚ) : (P' f).val = P f := by
-  simp only [succ_eq_add_one, P', P]
+set_option backward.isDefEq.respectTransparency false in
+lemma planeLinSols_val (f : Fin n.succ → ℚ) : (planeLinSols f).val = planeCharges f := by
+  simp only [succ_eq_add_one, planeLinSols, planeCharges]
   funext i
   rw [sum_of_anomaly_free_linear, sum_of_charges]
   rfl
@@ -395,12 +411,12 @@ lemma P'_val (f : Fin n.succ → ℚ) : (P' f).val = P f := by
 theorem basis_linear_independent : LinearIndependent ℚ (@basis n) := by
   apply Fintype.linearIndependent_iff.mpr
   intro f h
-  change P' f = 0 at h
-  exact P_zero f ((P'_val f).symm.trans (congrArg _ h))
+  change planeLinSols f = 0 at h
+  exact planeCharges_zero f ((planeLinSols_val f).symm.trans (congrArg _ h))
 
 /-!
 
-### B.12. Every vector-like even solution is in the span of the basis of the first plane
+### B.12. Every vector-like even solution is in the span of the basis of the unshifted plane
 
 -/
 
@@ -414,13 +430,13 @@ lemma vectorLikeEven_in_span (S : (PureU1 (2 * n.succ)).LinSols)
   use f
   apply ACCSystemLinear.LinSols.ext
   rw [sortAFL_val]
-  erw [P'_val]
+  erw [planeLinSols_val]
   apply ext_even
   · intro i
-    rw [P_evenFst]
+    rw [planeCharges_evenFst]
     rfl
   · intro i
-    rw [P_evenSnd]
+    rw [planeCharges_evenSnd]
     have ht := hS i
     change sort S.val (evenFst i) = - sort S.val (evenSnd i) at ht
     have h : sort S.val (evenSnd i) = - sort S.val (evenFst i) := by
@@ -429,14 +445,21 @@ lemma vectorLikeEven_in_span (S : (PureU1 (2 * n.succ)).LinSols)
     rw [h]
     rfl
 
+
+
+end Unshifted
+
 /-!
 
-## C. The vectors of the basis spanning the second plane, via the shifted even split
+## C. The shifted plane
 
 -/
 
-/-- The second part of the basis as charges. -/
-def basis!AsCharges (j : Fin n) : (PureU1 (2 * n.succ)).Charges :=
+namespace Shifted
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The shifted part of the basis as charges. -/
+def basisAsCharges (j : Fin n) : (PureU1 (2 * n.succ)).Charges :=
   fun i =>
   if i = evenShiftFst j then
     1
@@ -451,27 +474,27 @@ def basis!AsCharges (j : Fin n) : (PureU1 (2 * n.succ)).Charges :=
 
 -/
 
-lemma basis!_on_evenShiftFst_self (j : Fin n) : basis!AsCharges j (evenShiftFst j) = 1 := by
-  simp [basis!AsCharges]
+set_option backward.isDefEq.respectTransparency false in
+lemma basis_on_evenShiftFst_self (j : Fin n) : basisAsCharges j (evenShiftFst j) = 1 := by
+  simp [basisAsCharges]
 
 set_option backward.isDefEq.respectTransparency false in
-lemma basis!_on_other {k : Fin n} {j : Fin (2 * n.succ)} (h1 : j ≠ evenShiftFst k)
-    (h2 : j ≠ evenShiftSnd k) : basis!AsCharges k j = 0 := by
-  simp only [basis!AsCharges, if_neg h1, if_neg h2]
+lemma basis_on_other {k : Fin n} {j : Fin (2 * n.succ)} (h1 : j ≠ evenShiftFst k)
+    (h2 : j ≠ evenShiftSnd k) : basisAsCharges k j = 0 := by
+  simp only [basisAsCharges, if_neg h1, if_neg h2]
 
-set_option backward.isDefEq.respectTransparency false in
-lemma basis!_on_evenShiftFst_other {k j : Fin n} (h : k ≠ j) :
-    basis!AsCharges k (evenShiftFst j) = 0 := by
+lemma basis_on_evenShiftFst_other {k j : Fin n} (h : k ≠ j) :
+    basisAsCharges k (evenShiftFst j) = 0 := by
   rw [ne_eq, Fin.ext_iff] at h
-  refine basis!_on_other ?_ ?_ <;>
+  refine basis_on_other ?_ ?_ <;>
     simp only [ne_eq, Fin.ext_iff, evenShiftFst, evenShiftSnd, Fin.val_cast, Fin.val_castAdd,
       Fin.val_natAdd] <;>
     omega
 
 set_option backward.isDefEq.respectTransparency false in
-lemma basis!_evenShftSnd_eq_neg_evenShiftFst (j i : Fin n) :
-    basis!AsCharges j (evenShiftSnd i) = - basis!AsCharges j (evenShiftFst i) := by
-  simp only [basis!AsCharges, succ_eq_add_one, evenShiftSnd, evenShiftFst]
+lemma basis_evenShiftSnd_eq_neg_evenShiftFst (j i : Fin n) :
+    basisAsCharges j (evenShiftSnd i) = - basisAsCharges j (evenShiftFst i) := by
+  simp only [basisAsCharges, succ_eq_add_one, evenShiftSnd, evenShiftFst]
   split <;> split
   any_goals split
   any_goals split
@@ -490,24 +513,22 @@ lemma basis!_evenShftSnd_eq_neg_evenShiftFst (j i : Fin n) :
   all_goals
     omega
 
-lemma basis!_on_evenShiftSnd_self (j : Fin n) : basis!AsCharges j (evenShiftSnd j) = - 1 := by
-  rw [basis!_evenShftSnd_eq_neg_evenShiftFst, basis!_on_evenShiftFst_self]
+lemma basis_on_evenShiftSnd_self (j : Fin n) : basisAsCharges j (evenShiftSnd j) = - 1 := by
+  rw [basis_evenShiftSnd_eq_neg_evenShiftFst, basis_on_evenShiftFst_self]
 
-lemma basis!_on_evenShiftSnd_other {k j : Fin n} (h : k ≠ j) :
-    basis!AsCharges k (evenShiftSnd j) = 0 := by
-  rw [basis!_evenShftSnd_eq_neg_evenShiftFst, basis!_on_evenShiftFst_other h]
+lemma basis_on_evenShiftSnd_other {k j : Fin n} (h : k ≠ j) :
+    basisAsCharges k (evenShiftSnd j) = 0 := by
+  rw [basis_evenShiftSnd_eq_neg_evenShiftFst, basis_on_evenShiftFst_other h]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
-lemma basis!_on_evenShiftZero (j : Fin n) : basis!AsCharges j evenShiftZero = 0 := by
-  refine basis!_on_other ?_ ?_ <;>
+lemma basis_on_evenShiftZero (j : Fin n) : basisAsCharges j evenShiftZero = 0 := by
+  refine basis_on_other ?_ ?_ <;>
     simp only [ne_eq, Fin.ext_iff, evenShiftZero, evenShiftFst, evenShiftSnd, Fin.val_cast,
       Fin.val_castAdd, Fin.val_natAdd, Fin.val_eq_zero] <;>
     omega
 
-set_option backward.isDefEq.respectTransparency false in
-lemma basis!_on_evenShiftLast (j : Fin n) : basis!AsCharges j evenShiftLast = 0 := by
-  refine basis!_on_other ?_ ?_ <;>
+lemma basis_on_evenShiftLast (j : Fin n) : basisAsCharges j evenShiftLast = 0 := by
+  refine basis_on_other ?_ ?_ <;>
     simp only [ne_eq, Fin.ext_iff, evenShiftLast, evenShiftFst, evenShiftSnd, Fin.val_cast,
       Fin.val_castAdd, Fin.val_natAdd, Fin.val_eq_zero, add_zero] <;>
     omega
@@ -518,9 +539,10 @@ lemma basis!_on_evenShiftLast (j : Fin n) : basis!AsCharges j evenShiftLast = 0 
 
 -/
 
-lemma basis!_linearACC (j : Fin n) : (accGrav (2 * n.succ)) (basis!AsCharges j) = 0 := by
-  simp [accGrav, sum_evenShift, basis!_on_evenShiftZero, basis!_on_evenShiftLast,
-    basis!_evenShftSnd_eq_neg_evenShiftFst]
+set_option backward.isDefEq.respectTransparency false in
+lemma basis_linearACC (j : Fin n) : (accGrav (2 * n.succ)) (basisAsCharges j) = 0 := by
+  simp [accGrav, sum_evenShift, basis_on_evenShiftZero, basis_on_evenShiftLast,
+    basis_evenShiftSnd_eq_neg_evenShiftFst]
 
 /-!
 
@@ -528,14 +550,15 @@ lemma basis!_linearACC (j : Fin n) : (accGrav (2 * n.succ)) (basis!AsCharges j) 
 
 -/
 
-lemma basis!_accCube (j : Fin n) :
-    accCube (2 * n.succ) (basis!AsCharges j) = 0 := by
+set_option backward.isDefEq.respectTransparency false in
+lemma basis_accCube (j : Fin n) :
+    accCube (2 * n.succ) (basisAsCharges j) = 0 := by
   rw [accCube_explicit, sum_evenShift]
-  rw [basis!_on_evenShiftLast, basis!_on_evenShiftZero]
+  rw [basis_on_evenShiftLast, basis_on_evenShiftZero]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, add_zero, Function.comp_apply,
     zero_add]
   refine Finset.sum_eq_zero fun i _ => ?_
-  simp only [basis!_evenShftSnd_eq_neg_evenShiftFst]
+  simp only [basis_evenShiftSnd_eq_neg_evenShiftFst]
   ring
 
 /-!
@@ -544,22 +567,22 @@ lemma basis!_accCube (j : Fin n) :
 
 -/
 
-/-- The second part of the basis as `LinSols`. -/
+/-- The shifted part of the basis as `LinSols`. -/
 @[simps!]
-def basis! (j : Fin n) : (PureU1 (2 * n.succ)).LinSols :=
-  ⟨basis!AsCharges j, by
+def basis (j : Fin n) : (PureU1 (2 * n.succ)).LinSols :=
+  ⟨basisAsCharges j, by
     intro i
     match i with
-    | ⟨0, _⟩ => exact basis!_linearACC j⟩
+    | ⟨0, _⟩ => exact basis_linearACC j⟩
 
 /-!
 
-### C.7. The inclusion of the second plane into charges
+### C.7. The inclusion of the shifted plane into charges
 
 -/
 
-/-- A point in the span of the second part of the basis as a charge. -/
-def P! (f : Fin n → ℚ) : (PureU1 (2 * n.succ)).Charges := ∑ i, f i • basis!AsCharges i
+/-- A point in the span of the shifted part of the basis as a charge. -/
+def planeCharges (f : Fin n → ℚ) : (PureU1 (2 * n.succ)).Charges := ∑ i, f i • basisAsCharges i
 
 /-!
 
@@ -567,25 +590,29 @@ def P! (f : Fin n → ℚ) : (PureU1 (2 * n.succ)).Charges := ∑ i, f i • bas
 
 -/
 
-lemma P!_evenShiftFst (f : Fin n → ℚ) (j : Fin n) : P! f (evenShiftFst j) = f j := by
-  rw [P!, sum_of_charges]
+lemma planeCharges_evenShiftFst (f : Fin n → ℚ) (j : Fin n) :
+    planeCharges f (evenShiftFst j) = f j := by
+  rw [planeCharges, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
   rw [Fintype.sum_eq_single j]
-  · simp [basis!_on_evenShiftFst_self]
-  · exact fun k hkj => mul_eq_zero_of_right (f k) (basis!_on_evenShiftFst_other hkj)
+  · simp [basis_on_evenShiftFst_self]
+  · exact fun k hkj => mul_eq_zero_of_right (f k) (basis_on_evenShiftFst_other hkj)
 
-lemma P!_evenShiftSnd (f : Fin n → ℚ) (j : Fin n) : P! f (evenShiftSnd j) = - f j := by
-  rw [P!, sum_of_charges]
+lemma planeCharges_evenShiftSnd (f : Fin n → ℚ) (j : Fin n) :
+    planeCharges f (evenShiftSnd j) = - f j := by
+  rw [planeCharges, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
   rw [Fintype.sum_eq_single j]
-  · simp [basis!_on_evenShiftSnd_self]
-  · exact fun k hkj => mul_eq_zero_of_right (f k) (basis!_on_evenShiftSnd_other hkj)
+  · simp [basis_on_evenShiftSnd_self]
+  · exact fun k hkj => mul_eq_zero_of_right (f k) (basis_on_evenShiftSnd_other hkj)
 
-lemma P!_evenShiftZero (f : Fin n → ℚ) : P! f (evenShiftZero) = 0 := by
-  simp [P!, sum_of_charges, HSMul.hSMul, SMul.smul, basis!_on_evenShiftZero]
+set_option backward.isDefEq.respectTransparency false in
+lemma planeCharges_evenShiftZero (f : Fin n → ℚ) : planeCharges f (evenShiftZero) = 0 := by
+  simp [planeCharges, sum_of_charges, HSMul.hSMul, SMul.smul, basis_on_evenShiftZero]
 
-lemma P!_evenShiftLast (f : Fin n → ℚ) : P! f evenShiftLast = 0 := by
-  simp [P!, sum_of_charges, HSMul.hSMul, SMul.smul, basis!_on_evenShiftLast]
+set_option backward.isDefEq.respectTransparency false in
+lemma planeCharges_evenShiftLast (f : Fin n → ℚ) : planeCharges f evenShiftLast = 0 := by
+  simp [planeCharges, sum_of_charges, HSMul.hSMul, SMul.smul, basis_on_evenShiftLast]
 
 /-!
 
@@ -593,12 +620,13 @@ lemma P!_evenShiftLast (f : Fin n → ℚ) : P! f evenShiftLast = 0 := by
 
 -/
 
-lemma P!_accCube (f : Fin n → ℚ) : accCube (2 * n.succ) (P! f) = 0 := by
-  rw [accCube_explicit, sum_evenShift, P!_evenShiftZero, P!_evenShiftLast]
+set_option backward.isDefEq.respectTransparency false in
+lemma planeCharges_accCube (f : Fin n → ℚ) : accCube (2 * n.succ) (planeCharges f) = 0 := by
+  rw [accCube_explicit, sum_evenShift, planeCharges_evenShiftZero, planeCharges_evenShiftLast]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, add_zero, Function.comp_apply,
     zero_add]
   refine Finset.sum_eq_zero fun i _ => ?_
-  simp only [P!_evenShiftFst, P!_evenShiftSnd]
+  simp only [planeCharges_evenShiftFst, planeCharges_evenShiftSnd]
   ring
 
 /-!
@@ -607,16 +635,17 @@ lemma P!_accCube (f : Fin n → ℚ) : accCube (2 * n.succ) (P! f) = 0 := by
 
 -/
 
-lemma P!_zero (f : Fin n → ℚ) (h : P! f = 0) : ∀ i, f i = 0 := by
-  exact fun i => (P!_evenShiftFst f i).symm.trans (congr_fun h (evenShiftFst i))
+lemma planeCharges_zero (f : Fin n → ℚ) (h : planeCharges f = 0) : ∀ i, f i = 0 := by
+  exact fun i => (planeCharges_evenShiftFst f i).symm.trans (congr_fun h (evenShiftFst i))
 
 /-!
 
-### C.11. The inclusion of the second plane into the span of the basis
+### C.11. The inclusion of the shifted plane into the span of the basis
 
 -/
 
-lemma P!_in_span (f : Fin n → ℚ) : P! f ∈ Submodule.span ℚ (Set.range basis!AsCharges) := by
+lemma planeCharges_in_span (f : Fin n → ℚ) :
+    planeCharges f ∈ Submodule.span ℚ (Set.range basisAsCharges) := by
   exact (Submodule.mem_span_range_iff_exists_fun ℚ).mpr ⟨f, rfl⟩
 
 /-!
@@ -625,11 +654,12 @@ lemma P!_in_span (f : Fin n → ℚ) : P! f ∈ Submodule.span ℚ (Set.range ba
 
 -/
 
-/-- A point in the span of the second part of the basis. -/
-def P!' (f : Fin n → ℚ) : (PureU1 (2 * n.succ)).LinSols := ∑ i, f i • basis! i
+/-- A point in the span of the shifted part of the basis. -/
+def planeLinSols (f : Fin n → ℚ) : (PureU1 (2 * n.succ)).LinSols := ∑ i, f i • basis i
 
-lemma P!'_val (f : Fin n → ℚ) : (P!' f).val = P! f := by
-  simp only [succ_eq_add_one, P!', P!]
+set_option backward.isDefEq.respectTransparency false in
+lemma planeLinSols_val (f : Fin n → ℚ) : (planeLinSols f).val = planeCharges f := by
+  simp only [succ_eq_add_one, planeLinSols, planeCharges]
   funext i
   rw [sum_of_anomaly_free_linear, sum_of_charges]
   rfl
@@ -640,11 +670,11 @@ lemma P!'_val (f : Fin n → ℚ) : (P!' f).val = P! f := by
 
 -/
 
-theorem basis!_linear_independent : LinearIndependent ℚ (@basis! n) := by
+theorem basis_linear_independent : LinearIndependent ℚ (@basis n) := by
   apply Fintype.linearIndependent_iff.mpr
   intro f h
-  change P!' f = 0 at h
-  exact P!_zero f ((P!'_val f).symm.trans (congrArg _ h))
+  change planeLinSols f = 0 at h
+  exact planeCharges_zero f ((planeLinSols_val f).symm.trans (congrArg _ h))
 
 /-!
 
@@ -652,9 +682,9 @@ theorem basis!_linear_independent : LinearIndependent ℚ (@basis! n) := by
 
 -/
 
-lemma smul_basis!AsCharges_in_span (S : (PureU1 (2 * n.succ)).LinSols) (j : Fin n) :
-    (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • basis!AsCharges j ∈
-    Submodule.span ℚ (Set.range basis!AsCharges) := by
+lemma smul_basisAsCharges_in_span (S : (PureU1 (2 * n.succ)).LinSols) (j : Fin n) :
+    (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • basisAsCharges j ∈
+    Submodule.span ℚ (Set.range basisAsCharges) := by
   exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
 
 /-!
@@ -663,56 +693,65 @@ lemma smul_basis!AsCharges_in_span (S : (PureU1 (2 * n.succ)).LinSols) (j : Fin 
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Swapping the elements evenShiftFst j and evenShiftSnd j is equivalent to
-  adding a vector basis!AsCharges j. -/
-lemma swap!_as_add {S S' : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
+  adding a vector basisAsCharges j. -/
+lemma swap_as_add {S S' : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
     (hS : ((FamilyPermutations (2 * n.succ)).linSolRep
     (Equiv.swap (evenShiftFst j) (evenShiftSnd j))) S = S') :
-    S'.val = S.val + (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • basis!AsCharges j := by
+    S'.val = S.val + (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • basisAsCharges j := by
   funext i
   rw [← hS, FamilyPermutations_anomalyFreeLinear_apply]
   by_cases hi : i = evenShiftFst j
   · subst hi
-    simp [HSMul.hSMul, basis!_on_evenShiftFst_self, Equiv.swap_apply_left]
+    simp [HSMul.hSMul, basis_on_evenShiftFst_self, Equiv.swap_apply_left]
   · by_cases hi2 : i = evenShiftSnd j
-    · simp [HSMul.hSMul, hi2, basis!_on_evenShiftSnd_self, Equiv.swap_apply_right]
+    · simp [HSMul.hSMul, hi2, basis_on_evenShiftSnd_self, Equiv.swap_apply_right]
     · simp only [succ_eq_add_one, Equiv.invFun_as_coe, HSMul.hSMul,
       ACCSystemCharges.chargesAddCommMonoid_add, ACCSystemCharges.chargesModule_smul]
-      rw [basis!_on_other hi hi2]
+      rw [basis_on_other hi hi2]
       aesop
+
+
+end Shifted
+
 /-!
 
 ## D. Mixed cubic ACCs involving points from both planes
 
 -/
 
-lemma P_P_P!_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
-    accCubeTriLinSymm (P g) (P g) (basis!AsCharges j)
+set_option backward.isDefEq.respectTransparency false in
+lemma unshifted_unshifted_shifted_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
+    accCubeTriLinSymm (Unshifted.planeCharges g) (Unshifted.planeCharges g)
+      (Shifted.basisAsCharges j)
     = g (j.succ) ^ 2 - g (j.castSucc) ^ 2 := by
   simp only [succ_eq_add_one, accCubeTriLinSymm,
     TriLinearSymm.mk₃_toFun_apply_apply]
-  erw [sum_evenShift, basis!_on_evenShiftZero, basis!_on_evenShiftLast]
+  erw [sum_evenShift, Shifted.basis_on_evenShiftZero, Shifted.basis_on_evenShiftLast]
   simp only [mul_zero, add_zero, Function.comp_apply, zero_add]
-  rw [Fintype.sum_eq_single j, basis!_on_evenShiftFst_self, basis!_on_evenShiftSnd_self]
+  rw [Fintype.sum_eq_single j, Shifted.basis_on_evenShiftFst_self,
+    Shifted.basis_on_evenShiftSnd_self]
   · simp only [evenShiftFst_eq_evenFst_succ, mul_one, evenShiftSnd_eq_evenSnd_castSucc, mul_neg]
-    rw [P_evenFst, P_evenSnd]
+    rw [Unshifted.planeCharges_evenFst, Unshifted.planeCharges_evenSnd]
     ring
   · intro k hkj
-    erw [basis!_on_evenShiftFst_other hkj.symm, basis!_on_evenShiftSnd_other hkj.symm]
+    erw [Shifted.basis_on_evenShiftFst_other hkj.symm, Shifted.basis_on_evenShiftSnd_other hkj.symm]
     simp only [mul_zero, add_zero]
 
-lemma P_P!_P!_accCube (g : Fin n → ℚ) (j : Fin n.succ) :
-    accCubeTriLinSymm (P! g) (P! g) (basisAsCharges j)
-    = (P! g (evenFst j))^2 - (P! g (evenSnd j))^2 := by
+set_option backward.isDefEq.respectTransparency false in
+lemma shifted_shifted_unshifted_accCube (g : Fin n → ℚ) (j : Fin n.succ) :
+    accCubeTriLinSymm (Shifted.planeCharges g) (Shifted.planeCharges g) (Unshifted.basisAsCharges j)
+    = (Shifted.planeCharges g (evenFst j))^2 - (Shifted.planeCharges g (evenSnd j))^2 := by
   simp only [succ_eq_add_one, accCubeTriLinSymm,
     TriLinearSymm.mk₃_toFun_apply_apply]
   erw [sum_even]
   simp only [Function.comp_apply]
-  rw [Fintype.sum_eq_single j, basis_on_evenFst_self, basis_on_evenSnd_self]
+  rw [Fintype.sum_eq_single j, Unshifted.basis_on_evenFst_self, Unshifted.basis_on_evenSnd_self]
   · simp only [mul_one, mul_neg]
     ring
   · intro k hkj
-    erw [basis_on_evenFst_other hkj.symm, basis_on_evenSnd_other hkj.symm]
+    erw [Unshifted.basis_on_evenFst_other hkj.symm, Unshifted.basis_on_evenSnd_other hkj.symm]
     simp only [mul_zero, add_zero]
 
 /-!
@@ -729,8 +768,8 @@ lemma P_P!_P!_accCube (g : Fin n → ℚ) (j : Fin n.succ) :
 /-- The whole basis as `LinSols`. -/
 def basisa : (Fin n.succ) ⊕ (Fin n) → (PureU1 (2 * n.succ)).LinSols := fun i =>
   match i with
-  | .inl i => basis i
-  | .inr i => basis! i
+  | .inl i => Unshifted.basis i
+  | .inr i => Shifted.basis i
 
 /-!
 
@@ -739,7 +778,8 @@ def basisa : (Fin n.succ) ⊕ (Fin n) → (PureU1 (2 * n.succ)).LinSols := fun i
 -/
 
 /-- A point in the span of the basis as a charge. -/
-def Pa (f : Fin n.succ → ℚ) (g : Fin n → ℚ) : (PureU1 (2 * n.succ)).Charges := P f + P! g
+def Pa (f : Fin n.succ → ℚ) (g : Fin n → ℚ) : (PureU1 (2 * n.succ)).Charges :=
+  Unshifted.planeCharges f + Shifted.planeCharges g
 
 /-!
 
@@ -747,29 +787,37 @@ def Pa (f : Fin n.succ → ℚ) (g : Fin n → ℚ) : (PureU1 (2 * n.succ)).Char
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pa_evenShiftFst (f : Fin n.succ → ℚ) (g : Fin n → ℚ) (j : Fin n) :
     Pa f g (evenShiftFst j) = f j.succ + g j := by
   rw [Pa]
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
-  rw [P!_evenShiftFst, evenShiftFst_eq_evenFst_succ, P_evenFst]
+  rw [Shifted.planeCharges_evenShiftFst, evenShiftFst_eq_evenFst_succ,
+    Unshifted.planeCharges_evenFst]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pa_evenShiftSnd (f : Fin n.succ → ℚ) (g : Fin n → ℚ) (j : Fin n) :
     Pa f g (evenShiftSnd j) = - f j.castSucc - g j := by
   rw [Pa]
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
-  rw [P!_evenShiftSnd, evenShiftSnd_eq_evenSnd_castSucc, P_evenSnd]
+  rw [Shifted.planeCharges_evenShiftSnd, evenShiftSnd_eq_evenSnd_castSucc,
+    Unshifted.planeCharges_evenSnd]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pa_evenShitZero (f : Fin n.succ → ℚ) (g : Fin n → ℚ) : Pa f g (evenShiftZero) = f 0 := by
   rw [Pa]
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
-  rw [P!_evenShiftZero, evenShiftZero_eq_evenFst_zero, P_evenFst, add_zero]
+  rw [Shifted.planeCharges_evenShiftZero, evenShiftZero_eq_evenFst_zero,
+    Unshifted.planeCharges_evenFst, add_zero]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pa_evenShiftLast (f : Fin n.succ → ℚ) (g : Fin n → ℚ) :
     Pa f g (evenShiftLast) = - f (Fin.last n) := by
   rw [Pa]
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
-  rw [P!_evenShiftLast, evenShiftLast_eq_evenSnd_last, P_evenSnd, add_zero]
+  rw [Shifted.planeCharges_evenShiftLast, evenShiftLast_eq_evenSnd_last,
+    Unshifted.planeCharges_evenSnd, add_zero]
 
 /-!
 
@@ -803,9 +851,9 @@ lemma Pa_zero (f : Fin n.succ → ℚ) (g : Fin n → ℚ) (h : Pa f g = 0) :
 lemma Pa_zero! (f : Fin n.succ → ℚ) (g : Fin n → ℚ) (h : Pa f g = 0) :
     ∀ i, g i = 0 := by
   have hf := Pa_zero f g h
-  rw [Pa, P] at h
+  rw [Pa, Unshifted.planeCharges] at h
   simp only [succ_eq_add_one, hf, zero_smul, sum_const_zero, zero_add] at h
-  exact P!_zero g h
+  exact Shifted.planeCharges_zero g h
 
 /-!
 
@@ -817,7 +865,7 @@ def Pa' (f : (Fin n.succ) ⊕ (Fin n) → ℚ) : (PureU1 (2 * n.succ)).LinSols :
     ∑ i, f i • basisa i
 
 lemma Pa'_P'_P!' (f : (Fin n.succ) ⊕ (Fin n) → ℚ) :
-    Pa' f = P' (f ∘ Sum.inl) + P!' (f ∘ Sum.inr) := by
+    Pa' f = Unshifted.planeLinSols (f ∘ Sum.inl) + Shifted.planeLinSols (f ∘ Sum.inr) := by
   exact Fintype.sum_sum_type _
 
 /-!
@@ -832,7 +880,8 @@ theorem basisa_linear_independent : LinearIndependent ℚ (@basisa n) := by
   change Pa' f = 0 at h
   have h1 : (Pa' f).val = 0 := congrArg _ h
   rw [Pa'_P'_P!'] at h1
-  simp only [ACCSystemLinear.linSolsAddCommMonoid_add_val, P'_val, P!'_val] at h1
+  simp only [ACCSystemLinear.linSolsAddCommMonoid_add_val, Unshifted.planeLinSols_val,
+    Shifted.planeLinSols_val] at h1
   have hf := Pa_zero (f ∘ Sum.inl) (f ∘ Sum.inr) h1
   have hg := Pa_zero! (f ∘ Sum.inl) (f ∘ Sum.inr) h1
   rintro (i | i)
@@ -864,7 +913,8 @@ lemma Pa'_elim_eq_iff (g g' : Fin n.succ → ℚ) (f f' : Fin n → ℚ) :
     rw [h.left, h.right]
   · apply ACCSystemLinear.LinSols.ext
     rw [Pa'_P'_P!', Pa'_P'_P!']
-    simp only [succ_eq_add_one, ACCSystemLinear.linSolsAddCommMonoid_add_val, P'_val, P!'_val]
+    simp only [succ_eq_add_one, ACCSystemLinear.linSolsAddCommMonoid_add_val,
+      Unshifted.planeLinSols_val, Shifted.planeLinSols_val]
     exact h
 
 lemma Pa_eq (g g' : Fin n.succ → ℚ) (f f' : Fin n → ℚ) :
@@ -902,16 +952,18 @@ noncomputable def basisaAsBasis :
 -/
 
 lemma span_basis (S : (PureU1 (2 * n.succ)).LinSols) :
-    ∃ (g : Fin n.succ → ℚ) (f : Fin n → ℚ), S.val = P g + P! f := by
+    ∃ (g : Fin n.succ → ℚ) (f : Fin n → ℚ),
+      S.val = Unshifted.planeCharges g + Shifted.planeCharges f := by
   have h := (Submodule.mem_span_range_iff_exists_fun ℚ).mp (Basis.mem_span basisaAsBasis S)
   obtain ⟨f, hf⟩ := h
   simp only [succ_eq_add_one, basisaAsBasis, coe_basisOfLinearIndependentOfCardEqFinrank,
     Fintype.sum_sum_type] at hf
-  change P' _ + P!' _ = S at hf
+  change Unshifted.planeLinSols _ + Shifted.planeLinSols _ = S at hf
   use f ∘ Sum.inl
   use f ∘ Sum.inr
   rw [← hf]
-  simp only [succ_eq_add_one, ACCSystemLinear.linSolsAddCommMonoid_add_val, P'_val, P!'_val]
+  simp only [succ_eq_add_one, ACCSystemLinear.linSolsAddCommMonoid_add_val,
+    Unshifted.planeLinSols_val, Shifted.planeLinSols_val]
   rfl
 
 /-!
@@ -922,23 +974,26 @@ lemma span_basis (S : (PureU1 (2 * n.succ)).LinSols) :
 lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
     (hS : ((FamilyPermutations (2 * n.succ)).linSolRep
     (Equiv.swap (evenShiftFst j) (evenShiftSnd j))) S = S') (g : Fin n.succ → ℚ) (f : Fin n → ℚ)
-    (h : S.val = P g + P! f) : ∃ (g' : Fin n.succ → ℚ) (f' : Fin n → ℚ),
-      S'.val = P g' + P! f' ∧ P! f' = P! f +
-      (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • basis!AsCharges j ∧ g' = g := by
-  let X := P! f + (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • basis!AsCharges j
-  have hX : X ∈ Submodule.span ℚ (Set.range (basis!AsCharges)) := by
+    (h : S.val = Unshifted.planeCharges g + Shifted.planeCharges f) :
+    ∃ (g' : Fin n.succ → ℚ) (f' : Fin n → ℚ),
+      S'.val = Unshifted.planeCharges g' + Shifted.planeCharges f' ∧
+      Shifted.planeCharges f' = Shifted.planeCharges f +
+      (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • Shifted.basisAsCharges j ∧ g' = g := by
+  let X := Shifted.planeCharges f +
+    (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • Shifted.basisAsCharges j
+  have hX : X ∈ Submodule.span ℚ (Set.range (Shifted.basisAsCharges)) := by
     apply Submodule.add_mem
-    exact (P!_in_span f)
-    exact (smul_basis!AsCharges_in_span S j)
+    exact (Shifted.planeCharges_in_span f)
+    exact (Shifted.smul_basisAsCharges_in_span S j)
   have hXsum := (Submodule.mem_span_range_iff_exists_fun ℚ).mp hX
   obtain ⟨f', hf'⟩ := hXsum
   use g
   use f'
-  change P! f' = _ at hf'
+  change Shifted.planeCharges f' = _ at hf'
   erw [hf']
   simp only [and_self, and_true, X]
   rw [← add_assoc, ← h]
-  apply swap!_as_add at hS
+  apply Shifted.swap_as_add at hS
   exact hS
 
 end VectorLikeEvenPlane

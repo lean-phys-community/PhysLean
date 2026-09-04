@@ -84,3 +84,20 @@ understand where in the process PRs are.
   post [here](https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/topic/PR.20reviews/with/577663418).
 - Once a PR is marked with a `ready-to-merge` the author does not need to do anything else,
   the maintainers will make sure it gets merged into the project.
+
+## Claiming a PR for review
+
+To keep track of PRs, reviewers can "claim" PRs and promise to review them within a certain timeframe. Failing to submit a review in that time will trigger a workflow which removes them and a Zulip bot notifies the community.
+
+1. **Claim it.** Comment `claim` on the PR. The bot requests a review from you, assigns
+   you, applies the `review-claimed` label and leaves a status comment recording the
+   deadline. For a custom window, comment `claim 5 days` (hours, days and weeks all work)
+   or `claim 2026-08-01`; `claim` uses the default of 2 days.
+2. **You are reminded.** The bot @-mentions you 48 hours and then 24 hours before the
+   deadline.
+3. **It expires.** Claims carry a time to live (2 days by default, 14 days max) and are
+   released automatically if they go stale, so nothing stays blocked forever. Comment
+   `claim` again to extend, or `disclaim` to release early. Submitting a review completes
+   the claim and clears the label.
+4. **A missed claim is announced.** If the deadline passes with no review, you are removed
+   as reviewer and assignee, and a message goes to the `PR reviews` topic on Zulip.

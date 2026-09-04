@@ -1,0 +1,44 @@
+# Lake cache configuration for Physlib.
+#
+# Point Lake at this file with LAKE_CONFIG, e.g.
+#
+#   LAKE_CONFIG=$PWD/lake-cache.toml lake cache get
+#
+# `lake exe get_cache` (scripts/get_cache.lean) does that for you. Bucket
+# endpoints are public information, which is why this file is committed; the
+# credential that authorises uploads is NOT here. It is supplied via the
+# LAKE_CACHE_KEY environment variable, held as an encrypted GitHub Actions
+# secret.
+#
+# Two services are defined because reads and writes need different access:
+#
+#   physlib-r2         anonymous, public read endpoint. What contributors and
+#                      `lake cache get` use. No credential required. The contents
+#                      of the bucket are public info
+#   physlib-r2-upload  authenticated S3 endpoint, used only by CI to publish.
+#                      Requires LAKE_CACHE_KEY.
+#
+# Keeping them separate means a contributor can never accidentally write to
+# the cache, and mirrors how Mathlib separates its read and write paths.
+#
+# ---------------------------------------------------------------------------
+# Both endpoints point at the physlib-cache bucket. Reads go through its
+# Public Development URL.
+
+
+cache.defaultService = "physlib-r2"
+cache.defaultUploadService = "physlib-r2-upload"
+
+# Anonymous read path used by contributors.
+[[cache.service]]
+name = "physlib-r2"
+kind = "s3"
+artifactEndpoint = "https://lake-cache.physlib.io/artifacts"
+revisionEndpoint = "https://lake-cache.physlib.io/revisions"
+
+# Authenticated write path used by CI only. Same bucket, S3 API endpoint.
+[[cache.service]]
+name = "physlib-r2-upload"
+kind = "s3"
+artifactEndpoint = "https://305f4708d1749d8e1873f7a629768540.r2.cloudflarestorage.com/physlib-cache/artifacts"
+revisionEndpoint = "https://305f4708d1749d8e1873f7a629768540.r2.cloudflarestorage.com/physlib-cache/revisions"

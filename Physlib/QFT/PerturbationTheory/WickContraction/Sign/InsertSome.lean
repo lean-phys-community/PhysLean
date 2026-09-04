@@ -32,6 +32,7 @@ open FieldStatistic
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma stat_ofFinset_eq_one_of_gradingCompliant (φs : List 𝓕.FieldOp)
     (a : Finset (Fin φs.length)) (φsΛ : WickContraction φs.length) (hg : GradingCompliant φs φsΛ)
     (hnon : ∀ i, φsΛ.getDual? i = none → i ∉ a)

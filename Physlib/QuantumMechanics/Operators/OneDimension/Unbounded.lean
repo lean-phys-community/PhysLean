@@ -23,7 +23,7 @@ namespace QuantumMechanics
 
 namespace OneDimension
 noncomputable section
-open HilbertSpace
+open _root_.QuantumMechanics.OneDimension.HilbertSpace
 
 /-- An unbounded operator on the one-dimensional Hilbert space,
   corresponds to a subobject `ι : S →L[ℂ] HilbertSpace` of the Hilbert

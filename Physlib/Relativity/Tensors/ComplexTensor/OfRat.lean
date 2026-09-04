@@ -67,6 +67,7 @@ lemma basis_eq_ofRat {n : ℕ} {c : Fin n → complexLorentzTensor.Color}
   simp only [Rat.cast_one, Rat.cast_zero, zero_mul, add_zero]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contr_basis_ratComplexNum {c : complexLorentzTensor.Color}
     (i : Fin (complexLorentzTensor.repDim c))
     (j : Fin (complexLorentzTensor.repDim (complexLorentzTensor.τ c))) :

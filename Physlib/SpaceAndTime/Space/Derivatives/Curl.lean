@@ -9,6 +9,7 @@ public import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
 public import Mathlib.MeasureTheory.Integral.CurveIntegral.Poincare
 public import Physlib.SpaceAndTime.Space.CrossProduct
 public import Mathlib.Analysis.Calculus.ParametricIntervalIntegral
+public import Physlib.Mathematics.LeviCivita.Basic
 
 /-!
 
@@ -27,6 +28,8 @@ We also prove some basic vector-identities involving of the curl operator.
 - `distCurl` : The curl operator on distributions from `Space 3` to `EuclideanSpace ℝ (Fin 3)`.
 - `div_of_curl_eq_zero` : The divergence of the curl of a function is zero.
 - `distCurl_distGrad_eq_zero` : The curl of the gradient of a distribution is zero.
+- `curl_eq_sum_leviCivitaSymbol` : The components of the curl as a contraction with the
+  Levi-Civita symbol.
 
 ## iii. Table of contents
 
@@ -41,6 +44,7 @@ We also prove some basic vector-identities involving of the curl operator.
   - A.8. The curl of a curl
   - A.9. A divergence-free field is a curl
   - A.10. A curl-free field is a gradient
+  - A.11. The curl in terms of the Levi-Civita symbol
 - B. The curl on distributions
   - B.1. The components of the curl
   - B.2. Basic equalities
@@ -651,6 +655,27 @@ lemma eq_grad_integral_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (
 
 TODO "Generalize the statement that a curl-free field is a gradient
   to time-dependent fields."
+
+/-!
+
+### A.11. The curl in terms of the Levi-Civita symbol
+
+-/
+
+open KroneckerDelta in
+set_option backward.isDefEq.respectTransparency false in
+/-- The components of the curl as a contraction with the Levi-Civita symbol,
+`(∇ ⨯ f) x i = ∑ j k, ε_{ijk} ∂[j] fₖ x`. -/
+lemma curl_eq_sum_leviCivitaSymbol (f : Space → EuclideanSpace ℝ (Fin 3))
+    (x : Space) (i : Fin 3) :
+    (∇ ⨯ f) x i = ∑ j, ∑ k, (leviCivitaSymbol ![i, j, k] : ℝ) * ∂[j] (fun y => f y k) x := by
+  fin_cases i <;>
+    simp only [curl, Fin.isValue, Fin.zero_eta, Fin.mk_one, Fin.reduceFinMk, Fin.reduceAdd,
+      Fin.sum_univ_three, leviCivitaSymbol_eq_det, Matrix.det_fin_three, kroneckerDelta,
+      Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons,
+      Matrix.tail_cons] <;>
+    norm_num <;>
+    ring
 
 /-!
 

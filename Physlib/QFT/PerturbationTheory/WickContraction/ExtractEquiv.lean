@@ -71,7 +71,7 @@ lemma extractEquiv_apply_congr_symm_apply {n m : ℕ} (k : ℕ)
 
 /-- The fintype instance of `WickContraction 0` defined through its single
   element `empty`. -/
-instance fintype_zero : Fintype (WickContraction 0) where
+instance fintypeZero : Fintype (WickContraction 0) where
   elems := {empty}
   complete := by
     intro c
@@ -97,10 +97,10 @@ lemma sum_WickContraction_nil (f : WickContraction 0 → M) [AddCommMonoid M] :
 
 /-- The fintype instance of `WickContraction n`, for `n.succ` this is defined
   through the equivalence `extractEquiv`. -/
-instance fintype_succ : (n : ℕ) → Fintype (WickContraction n)
-  | 0 => fintype_zero
+instance fintypeSucc : (n : ℕ) → Fintype (WickContraction n)
+  | 0 => fintypeZero
   | Nat.succ n => by
-    letI := fintype_succ n
+    letI := fintypeSucc n
     exact Fintype.ofEquiv _ (extractEquiv 0).symm
 
 lemma sum_extractEquiv_congr [AddCommMonoid M] {n m : ℕ} (i : Fin n) (f : WickContraction n → M)

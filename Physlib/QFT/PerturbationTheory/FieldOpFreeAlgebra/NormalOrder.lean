@@ -509,6 +509,7 @@ lemma ofCrAnOpF_mul_normalOrderF_ofFieldOpListF_eq_superCommuteF (φ : 𝓕.CrAn
     + [ofCrAnOpF φ, 𝓝ᶠ(ofFieldOpListF φs')]ₛF := by
   simp [← ofCrAnListF_singleton, ofCrAnListF_mul_normalOrderF_ofFieldOpListF_eq_superCommuteF]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma anPartF_mul_normalOrderF_ofFieldOpListF_eq_superCommuteF (φ : 𝓕.FieldOp)
     (φs' : List 𝓕.FieldOp) :
     anPartF φ * 𝓝ᶠ(ofFieldOpListF φs') =

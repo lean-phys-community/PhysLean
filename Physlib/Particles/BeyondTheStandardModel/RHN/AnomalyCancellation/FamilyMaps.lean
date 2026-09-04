@@ -19,6 +19,7 @@ open SMνCharges
 open SMνACCs
 open BigOperators
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Given a map of for a generic species, the corresponding map for charges. -/
 @[simps!]
 def chargesMapOfSpeciesMap {n m : ℕ} (f : (SMνSpecies n).Charges →ₗ[ℚ] (SMνSpecies m).Charges) :
@@ -53,6 +54,7 @@ def speciesFamilyProj {m n : ℕ} (h : n ≤ m) :
 def familyProjection {m n : ℕ} (h : n ≤ m) : (SMνCharges m).Charges →ₗ[ℚ] (SMνCharges n).Charges :=
   chargesMapOfSpeciesMap (speciesFamilyProj h)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For species, the embedding of the `m`-family charges onto the `n`-family charges, with all
 other charges zero. -/
 @[simps!]
@@ -117,6 +119,7 @@ lemma sum_familyUniversal {n : ℕ} (m : ℕ) (S : (SMνCharges 1).Charges) (j :
   refine Finset.sum_congr rfl (fun i _ => ?_)
   erw [toSpecies_familyUniversal]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma sum_familyUniversal_one {n : ℕ} (S : (SMνCharges 1).Charges) (j : Fin 6) :
     ∑ i, toSpecies j (familyUniversal n S) i = n * (toSpecies j S ⟨0, by simp⟩) := by
   simpa using @sum_familyUniversal n 1 S j
@@ -148,6 +151,7 @@ lemma sum_familyUniversal_three {n : ℕ} (S : (SMνCharges 1).Charges)
     simp only [toSpecies_apply, toSpeciesEquiv_apply, Fin.zero_eta, Fin.isValue, Nat.reduceMul]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma familyUniversal_accGrav (S : (SMνCharges 1).Charges) :
     accGrav (familyUniversal n S) = n * (accGrav S) := by
   rw [accGrav_decomp, accGrav_decomp]
@@ -156,6 +160,7 @@ lemma familyUniversal_accGrav (S : (SMνCharges 1).Charges) :
     Equiv.arrowCongr_symm, Equiv.refl_symm, Equiv.symm_symm, sum_one]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma familyUniversal_accSU2 (S : (SMνCharges 1).Charges) :
     accSU2 (familyUniversal n S) = n * (accSU2 S) := by
   rw [accSU2_decomp, accSU2_decomp]
@@ -163,6 +168,7 @@ lemma familyUniversal_accSU2 (S : (SMνCharges 1).Charges) :
   simp only [Fin.isValue, toSpecies_apply, sum_one]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma familyUniversal_accSU3 (S : (SMνCharges 1).Charges) :
     accSU3 (familyUniversal n S) = n * (accSU3 S) := by
   rw [accSU3_decomp, accSU3_decomp]
@@ -170,6 +176,7 @@ lemma familyUniversal_accSU3 (S : (SMνCharges 1).Charges) :
   simp only [Fin.isValue, toSpecies_apply, sum_one]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma familyUniversal_accYY (S : (SMνCharges 1).Charges) :
     accYY (familyUniversal n S) = n * (accYY S) := by
   rw [accYY_decomp, accYY_decomp]

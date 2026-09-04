@@ -87,10 +87,15 @@ lemma potentialFunction_eq :
     Q.potentialFunction = fun x ↦ (Icc Q.lower Q.upper).indicator (fun _ ↦ Q.V₀) (x 0) := rfl
 
 /-- The piecewise-constant potential of the rectangular barrier is a.e. strongly measurable. -/
-informal_lemma potentialFunction_aestronglyMeasurable where
-  deps := [``RectangularBarrier]
-  tag := "QM-RB-aesm"
-  -- This relies on `Space.val` being measure-preserving.
+-- This relies on `Space.val` being measure-preserving.
+lemma potentialFunction_aestronglyMeasurable: AEStronglyMeasurable Q.potentialFunction volume := by
+  unfold potentialFunction
+  apply AEStronglyMeasurable.indicator
+  · fun_prop
+  · change (MeasurableSet ((Icc Q.lower Q.upper) ∘ (fun (x: Space 1) => x.val 0)))
+    have hi : MeasurableSet (Icc Q.lower Q.upper) := by measurability
+    have hf : Measurable ((fun x => x.val 0) : Space 1 → ℝ) := by measurability
+    exact MeasurableSet.preimage hi hf
 
 /-!
 ## C. Hilbert space
@@ -119,9 +124,16 @@ def kineticOperator : Q.HS →ₗ.[ℂ] Q.HS := (2 * Q.m)⁻¹ • momentumSqOpe
 def potentialOperator : Q.HS →ₗ.[ℂ] Q.HS := 𝓜 volume (Complex.ofReal ∘ Q.potentialFunction)
 
 /-- The potential operator for the rectangular barrier is self-adjoint. -/
-informal_lemma potentialOperator_isSelfAdjoint where
-  deps := [``RectangularBarrier]
-  tag := "QM-RB-sa"
+lemma potentialOperator_isSelfAdjoint (Q : RectangularBarrier) :
+    IsSelfAdjoint Q.potentialOperator := by
+  unfold IsSelfAdjoint
+  unfold potentialOperator
+  rw [mulOperator_isSelfAdjoint_ofReal]
+  swap
+  ext x
+  simp only [Function.comp_apply, Complex.conj_ofReal]
+  have hQ := potentialFunction_aestronglyMeasurable
+  fun_prop
 
 /-!
 ### D.3. Hamiltonian

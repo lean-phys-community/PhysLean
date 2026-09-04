@@ -144,15 +144,15 @@ lemma radialAngularMeasure_closedBall (r : ℝ) :
     rw [abs_of_nonneg (le_of_lt x.2.2)]
   simp [h1]
   rw [MeasureTheory.lintegral_indicator <|
-    MeasurableSet.prod MeasurableSet.univ (measurableSet_setOf.mpr (by fun_prop))]
+    MeasurableSet.prod MeasurableSet.univ (measurableSet_setOfPred.mpr (by fun_prop))]
   simp [MeasureTheory.Measure.prod_prod, Measure.volumeIoiPow]
   rw [MeasureTheory.Measure.comap_apply _ Subtype.val_injective
     (fun s hs => MeasurableSet.subtype_image measurableSet_Ioi hs)
-    _ (measurableSet_setOf.mpr (by fun_prop))]
+    _ (measurableSet_setOfPred.mpr (by fun_prop))]
   trans 3 * ENNReal.ofReal (4 / 3 * π) * volume (α := ℝ) (Set.Ioc 0 r)
   · congr
     ext x
-    simp only [Set.mem_image, Set.mem_setOf_eq, Subtype.exists, Set.mem_Ioi, exists_and_left,
+    simp only [Set.mem_image, Set.mem_ofPred_eq, Subtype.exists, Set.mem_Ioi, exists_and_left,
       exists_prop, exists_eq_right_right, Set.mem_Ioc]
     grind
   simp only [volume_Ioc, sub_zero]

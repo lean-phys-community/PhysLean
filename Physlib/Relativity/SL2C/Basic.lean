@@ -203,6 +203,23 @@ lemma toSelfAdjointMap_pauliBasis (i : Fin 1 ⊕ Fin 3) :
   apply congrArg
   exact Eq.symm (minkowskiMatrix.dual_apply_minkowskiMatrix ((toLorentzGroup M).1) i j)
 
+/-- The matrix elements of the covering map through the trace pairing:
+  `L(M)_{i j} = ½ tr (σ'_i · M σ'_j M†)`. -/
+lemma toLorentzGroup_eq_trace (M : SL(2,ℂ)) (i j : Fin 1 ⊕ Fin 3) :
+    (((toLorentzGroup M).1 i j : ℝ) : ℂ) =
+      Matrix.trace ((PauliMatrix.pauliSelfAdjoint' i).1 *
+        (M.1 * (PauliMatrix.pauliSelfAdjoint' j).1 * M.1ᴴ)) / 2 := by
+  have h := congrArg (fun A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ) =>
+    Matrix.trace ((PauliMatrix.pauliSelfAdjoint' i).1 * A.1))
+    (toSelfAdjointMap_basis (M := M) j)
+  simp only [toSelfAdjointMap_apply_coe, PauliMatrix.pauliBasis',
+    Module.Basis.coe_mk, AddSubmonoidClass.coe_finsetSum, selfAdjoint.val_smul,
+    Matrix.mul_sum, Matrix.trace_sum, Matrix.mul_smul, Matrix.trace_smul,
+    PauliMatrix.trace_pauliSelfAdjoint'_mul, smul_ite, smul_zero, Finset.sum_ite_eq,
+    Finset.mem_univ, if_true] at h
+  rw [h, real_smul]
+  ring
+
 /-- The first column of the Lorentz matrix formed from an element of `SL(2, ℂ)`. -/
 lemma toLorentzGroup_fst_col (M : SL(2, ℂ)) :
     (fun μ => (toLorentzGroup M).1 μ (Sum.inl 0)) = fun μ =>
