@@ -166,7 +166,7 @@ lemma electricField_eq_toFieldStrength_eval {c : SpeedOfLight}
       rw [Space.deriv_eq_fderiv_basis, fderiv_const_mul]
       simp [← Space.deriv_eq_fderiv_basis]
       · fun_prop
-      · exact differentiable_component A hA _
+      · fun_prop
   · exact 2
   · rw [SpaceTime.deriv_sum_inl c]
     simp only [ContinuousLinearEquiv.apply_symm_apply]

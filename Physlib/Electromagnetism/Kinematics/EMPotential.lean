@@ -286,17 +286,12 @@ noncomputable instance {d} :
 
 ### A.4. Differentiability
 
-We show that the components of the potential, and of its derivatives, are differentiable
-(or smooth) if the potential is.
+We show that the potential and its derivatives are differentiable (or smooth) if the potential
+is, in the forms `fun_prop` cannot derive on its own. Differentiability of a component
+`fun x => A x μ` of a differentiable potential is found by `fun_prop` directly.
 -/
 
 open ContDiff
-
-@[fun_prop]
-lemma differentiable_component {d : ℕ}
-    (A : ElectromagneticPotential d) (hA : Differentiable ℝ A) (μ : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => A x μ) := by
-  exact (SpaceTime.differentiable_vector _).mpr hA μ
 
 @[fun_prop]
 lemma differentiable_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
