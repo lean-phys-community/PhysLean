@@ -25,9 +25,9 @@ spacetime to contravariant Lorentz vectors.
 
 - `ElectromagneticPotential` : is the type of electromagnetic potentials.
 - `ElectromagneticPotential.deriv` : the derivative tensor `∂_μ A^ν`.
-- `ElectromagneticPotential.contDiff_deriv_deriv` : the second derivatives `∂_μ ∂_ν A^ρ` are
+- `ElectromagneticPotential.contDiff_deriv_deriv_component` : the second derivatives `∂_μ ∂_ν A^ρ` are
   `C^n` if the potential is `C^{n+2}`.
-- `ElectromagneticPotential.deriv_contDiff` : the derivative tensor is `C^n` if the potential
+- `ElectromagneticPotential.contDiff_deriv` : the derivative tensor is `C^n` if the potential
   is `C^{n+1}`.
 
 ## iii. Table of contents
@@ -312,7 +312,7 @@ lemma contDiff_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
     (hA.comp (ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ⁻¹)))
 
 @[fun_prop]
-lemma differentiable_deriv {d} {A : ElectromagneticPotential d}
+lemma differentiable_deriv_component {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ 2 A) (μ ν : Fin 1 ⊕ Fin d) :
     Differentiable ℝ (fun x => ∂_ μ A x ν) := by
   have h : ∀ ν, Differentiable ℝ fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
@@ -321,13 +321,13 @@ lemma differentiable_deriv {d} {A : ElectromagneticPotential d}
   exact h ν
 
 @[fun_prop]
-lemma differentiable_deriv_of_smooth {d} {A : ElectromagneticPotential d}
+lemma differentiable_deriv_component_of_smooth {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μ ν : Fin 1 ⊕ Fin d) :
     Differentiable ℝ (fun x => ∂_ μ A x ν) := by
-  apply differentiable_deriv (hA.of_le (ENat.LEInfty.out)) μ ν
+  apply differentiable_deriv_component (hA.of_le (ENat.LEInfty.out)) μ ν
 
 @[fun_prop]
-lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d}
+lemma contDiff_deriv_component {n} {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ (n + 1) A) (μ ν : Fin 1 ⊕ Fin d) :
     ContDiff ℝ n (fun x => ∂_ μ A x ν) := by
   have h : ∀ ν, ContDiff ℝ n fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
@@ -336,10 +336,10 @@ lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d}
   exact h ν
 
 @[fun_prop]
-lemma contDiff_deriv_of_smooth {n : ℕ} {d} {A : ElectromagneticPotential d}
+lemma contDiff_deriv_component_of_smooth {n : ℕ} {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μ ν : Fin 1 ⊕ Fin d) :
     ContDiff ℝ n (fun x => ∂_ μ A x ν) :=
-  contDiff_deriv (hA.of_le (mod_cast le_top)) μ ν
+  contDiff_deriv_component (hA.of_le (mod_cast le_top)) μ ν
 
 /-!
 
@@ -354,24 +354,24 @@ in Maxwell's equations.
 
 /-- The second derivatives `∂_ μ ∂_ ν A^ρ` of a `C^{n+2}` potential are `C^n`. -/
 @[fun_prop]
-lemma contDiff_deriv_deriv {n} {d} {A : ElectromagneticPotential d}
+lemma contDiff_deriv_deriv_component {n} {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ (n + 2) A) (μ ν ρ : Fin 1 ⊕ Fin d) :
     ContDiff ℝ n (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) :=
-  SpaceTime.contDiff_deriv μ _ (contDiff_deriv (n := n + 1)
+  SpaceTime.contDiff_deriv μ _ (contDiff_deriv_component (n := n + 1)
     (by rw [add_assoc, one_add_one_eq_two]; exact hA) ν ρ)
 
 /-- The second derivatives `∂_ μ ∂_ ν A^ρ` of a `C^3` potential are differentiable. -/
 @[fun_prop]
-lemma differentiable_deriv_deriv {d} {A : ElectromagneticPotential d}
+lemma differentiable_deriv_deriv_component {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ 3 A) (μ ν ρ : Fin 1 ⊕ Fin d) :
     Differentiable ℝ (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) :=
-  SpaceTime.differentiable_deriv μ _ (contDiff_deriv (n := 2) (by norm_cast) ν ρ)
+  SpaceTime.differentiable_deriv μ _ (contDiff_deriv_component (n := 2) (by norm_cast) ν ρ)
 
 @[fun_prop]
-lemma differentiable_deriv_deriv_of_smooth {d} {A : ElectromagneticPotential d}
+lemma differentiable_deriv_deriv_component_of_smooth {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μ ν ρ : Fin 1 ⊕ Fin d) :
     Differentiable ℝ (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) :=
-  differentiable_deriv_deriv (hA.of_le ENat.LEInfty.out) μ ν ρ
+  differentiable_deriv_deriv_component (hA.of_le ENat.LEInfty.out) μ ν ρ
 
 /-!
 
@@ -686,19 +686,19 @@ We show that the derivative tensor `∂_μ A^ν`, as a function on spacetime, is
 
 /-- The derivative tensor of a `C^2` potential is differentiable. -/
 @[fun_prop]
-lemma deriv_differentiable {d} {A : ElectromagneticPotential d} (hA : ContDiff ℝ 2 A) :
+lemma differentiable_deriv {d} {A : ElectromagneticPotential d} (hA : ContDiff ℝ 2 A) :
     Differentiable ℝ A.deriv := by
   unfold deriv
   fun_prop
 
 @[fun_prop]
-lemma deriv_differentiable_of_smooth {d} {A : ElectromagneticPotential d}
+lemma differentiable_deriv_of_smooth {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) : Differentiable ℝ A.deriv :=
-  deriv_differentiable (hA.of_le ENat.LEInfty.out)
+  differentiable_deriv (hA.of_le ENat.LEInfty.out)
 
 /-- The derivative tensor of a `C^{n+1}` potential is `C^n`. -/
 @[fun_prop]
-lemma deriv_contDiff {n} {d} {A : ElectromagneticPotential d} (hA : ContDiff ℝ (n + 1) A) :
+lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d} (hA : ContDiff ℝ (n + 1) A) :
     ContDiff ℝ n A.deriv := by
   unfold deriv
   fun_prop
