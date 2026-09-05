@@ -311,47 +311,35 @@ lemma contDiff_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
     (hA.comp (ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ⁻¹)))
 
 @[fun_prop]
-lemma differentiable_deriv_component {d} {A : ElectromagneticPotential d}
-    (hA : ContDiff ℝ 2 A) (μ ν : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => ∂_ μ A x ν) := by
-  have h : ∀ ν, Differentiable ℝ fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [SpaceTime.differentiable_vector]
-    fun_prop
-  exact h ν
-
-@[fun_prop]
 lemma differentiable_deriv_component_of_smooth {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μ ν : Fin 1 ⊕ Fin d) :
     Differentiable ℝ (fun x => ∂_ μ A x ν) := by
-  apply differentiable_deriv_component (hA.of_le (ENat.LEInfty.out)) μ ν
-
-@[fun_prop]
-lemma contDiff_deriv_component {n} {d} {A : ElectromagneticPotential d}
-    (hA : ContDiff ℝ (n + 1) A) (μ ν : Fin 1 ⊕ Fin d) :
-    ContDiff ℝ n (fun x => ∂_ μ A x ν) := by
-  have h : ∀ ν, ContDiff ℝ n fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [SpaceTime.contDiff_vector]
-    fun_prop
-  exact h ν
+  have h : ContDiff ℝ 2 A := hA.of_le ENat.LEInfty.out
+  fun_prop
 
 @[fun_prop]
 lemma contDiff_deriv_component_of_smooth {n : ℕ} {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μ ν : Fin 1 ⊕ Fin d) :
-    ContDiff ℝ n (fun x => ∂_ μ A x ν) :=
-  contDiff_deriv_component (hA.of_le (mod_cast le_top)) μ ν
+    ContDiff ℝ n (fun x => ∂_ μ A x ν) := by
+  have h : ContDiff ℝ (n + 1) A := hA.of_le (mod_cast le_top)
+  fun_prop
 
 /-!
 
 #### A.4.1. Differentiability of the derivative of the potential
 
-The derivatives `∂_ μ A x ν` of the potential are themselves differentiable if the
-potential is `C^3`, and `C^n` if the potential is `C^{n+2}`. This is what is needed to
-make sense of second derivatives of the potential, as appear for example in Maxwell's equations.
+The derivatives `∂_ μ A x ν` of the potential are `C^n` if the potential is `C^{n+2}`.
+This is what is needed to make sense of second derivatives of the potential, as appear for
+example in Maxwell's equations. Differentiability for a `C^3` potential follows by `fun_prop`
+from these lemmas and `SpaceTime.differentiable_deriv`, so is not stated separately.
 
 A second derivative of a component can be written in two ways: as `∂_ μ (fun x => ∂_ ν A x ρ) x`,
 the derivative of the real-valued component `∂_ ν A x ρ` (the `_component` lemmas), or as
 `∂_ μ (∂_ ν A) x ρ`, the component of the derivative of the vector-valued `∂_ ν A`
 (the `_apply` lemmas). The two agree for a `C^2` potential by `SpaceTime.deriv_apply_eq`.
+
+The differentiability of the first-derivative components `∂_ μ A x ν` for a `C^2` (or
+`C^{n+1}`) potential is found by `fun_prop` directly, so only the smooth variants are stated.
 
 -/
 
@@ -359,48 +347,27 @@ the derivative of the real-valued component `∂_ ν A x ρ` (the `_component` l
 @[fun_prop]
 lemma contDiff_deriv_deriv_component {n} {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ (n + 2) A) (μ ν ρ : Fin 1 ⊕ Fin d) :
-    ContDiff ℝ n (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) :=
-  SpaceTime.contDiff_deriv μ _ (contDiff_deriv_component (n := n + 1)
-    (by rw [add_assoc, one_add_one_eq_two]; exact hA) ν ρ)
-
-/-- The second derivatives `∂_ μ ∂_ ν A^ρ` of a `C^3` potential are differentiable. -/
-@[fun_prop]
-lemma differentiable_deriv_deriv_component {d} {A : ElectromagneticPotential d}
-    (hA : ContDiff ℝ 3 A) (μ ν ρ : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) :=
-  SpaceTime.differentiable_deriv μ _ (contDiff_deriv_component (n := 2) (by norm_cast) ν ρ)
-
-@[fun_prop]
-lemma differentiable_deriv_deriv_component_of_smooth {d} {A : ElectromagneticPotential d}
-    (hA : ContDiff ℝ ∞ A) (μ ν ρ : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) :=
-  differentiable_deriv_deriv_component (hA.of_le ENat.LEInfty.out) μ ν ρ
+    ContDiff ℝ n (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) := by
+  have h : ContDiff ℝ (n + 1 + 1) A := by rw [add_assoc, one_add_one_eq_two]; exact hA
+  fun_prop
 
 /-- The `ρ` component of `∂_ μ (∂_ ν A)` is `C^n` for a `C^{n+2}` potential. -/
 @[fun_prop]
 lemma contDiff_deriv_deriv_apply {n} {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ (n + 2) A) (μ ν ρ : Fin 1 ⊕ Fin d) :
     ContDiff ℝ n (fun x => ∂_ μ (∂_ ν A) x ρ) := by
+  have h : ContDiff ℝ (n + 1 + 1) A := by rw [add_assoc, one_add_one_eq_two]; exact hA
   have hd : Differentiable ℝ (∂_ ν A) :=
     SpaceTime.differentiable_deriv ν A (hA.of_le le_add_self)
   conv => enter [3, x]; rw [SpaceTime.deriv_apply_eq μ ρ _ hd, ← SpaceTime.deriv_eq]
   fun_prop
 
-/-- The `ρ` component of `∂_ μ (∂_ ν A)` is differentiable for a `C^3` potential. -/
-@[fun_prop]
-lemma differentiable_deriv_deriv_apply {d} {A : ElectromagneticPotential d}
-    (hA : ContDiff ℝ 3 A) (μ ν ρ : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => ∂_ μ (∂_ ν A) x ρ) := by
-  have hd : Differentiable ℝ (∂_ ν A) :=
-    SpaceTime.differentiable_deriv ν A (hA.of_le (by norm_num))
-  conv => enter [2, x]; rw [SpaceTime.deriv_apply_eq μ ρ _ hd, ← SpaceTime.deriv_eq]
-  fun_prop
-
 @[fun_prop]
 lemma differentiable_deriv_deriv_apply_of_smooth {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μ ν ρ : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => ∂_ μ (∂_ ν A) x ρ) :=
-  differentiable_deriv_deriv_apply (hA.of_le ENat.LEInfty.out) μ ν ρ
+    Differentiable ℝ (fun x => ∂_ μ (∂_ ν A) x ρ) := by
+  have h : ContDiff ℝ 3 A := hA.of_le ENat.LEInfty.out
+  fun_prop
 
 /-!
 
