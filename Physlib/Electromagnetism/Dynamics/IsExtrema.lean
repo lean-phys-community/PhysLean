@@ -81,16 +81,18 @@ lemma isExtrema_iff_gradLagrangian {𝓕 : FreeSpace} (A : ElectromagneticPotent
 
 /-!
 
-### A.1. Extrema condition in terms of the field strength matrix
+### A.1. Extrema condition in terms of the field strength tensor
 
 -/
 
-lemma isExtrema_iff_fieldStrengthMatrix {𝓕 : FreeSpace}
+lemma isExtrema_iff_toFieldStrength_eval {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJ : ContDiff ℝ ∞ J) :
     IsExtrema 𝓕 A J ↔
-    ∀ x, ∀ ν, ∑ μ, ∂_ μ (A.fieldStrengthMatrix · (μ, ν)) x = 𝓕.μ₀ * J x ν := by
-  rw [isExtrema_iff_gradLagrangian, gradLagrangian_eq_sum_fieldStrengthMatrix A hA J hJ, funext_iff]
+    ∀ x, ∀ ν, ∑ μ, ∂_ μ (fun x => toField {A.toFieldStrength x | [μ] [ν]}ᵀ) x =
+      𝓕.μ₀ * J x ν := by
+  rw [isExtrema_iff_gradLagrangian, gradLagrangian_eq_sum_toFieldStrength_eval A hA J hJ,
+    funext_iff]
   conv_lhs =>
     enter [x, 1, 2, ν]
     rw [smul_smul]
