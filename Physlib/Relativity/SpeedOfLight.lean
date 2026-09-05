@@ -29,6 +29,7 @@ and should be thought of as the speed of light in some chosen but arbitrary syst
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

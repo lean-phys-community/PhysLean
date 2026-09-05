@@ -49,6 +49,7 @@ their being dense in `SpaceDHilbertSpace 0 ≅ ℂ`).
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

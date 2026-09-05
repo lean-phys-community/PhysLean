@@ -45,6 +45,7 @@ Commutator lemmas come in three flavors:
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

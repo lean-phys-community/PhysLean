@@ -42,8 +42,7 @@ In this file we define the minimal super set and prove some basic properties of 
 
 ## iv. References
 
-There are no known references for the material in this file.
-
+* None.
 -/
 
 @[expose] public section

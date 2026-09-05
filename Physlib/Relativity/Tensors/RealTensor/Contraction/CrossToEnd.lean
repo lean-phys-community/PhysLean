@@ -27,6 +27,7 @@ component expansion to one finite sum.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

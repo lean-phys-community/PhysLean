@@ -23,6 +23,10 @@ To define specific mass units, we first state the existence of a
 a given mass unit, and then construct all other mass units from it. We choose to state the
 existence of the mass unit of kilograms, and construct all other mass units from that.
 
+## References
+
+* The numerical value used for the nominal solar mass. [ref: nominal_solar_mass_article]
+
 -/
 
 @[expose] public section
@@ -181,7 +185,7 @@ noncomputable def metricTons : MassUnit := scale (1000) kilograms
 noncomputable def longTons : MassUnit := scale (2240) pounds
 
 /-- The mass unit of nominal solar masses (1.988416 × 10 ^ 30 kilograms).
-  See: https://iopscience.iop.org/article/10.3847/0004-6256/152/2/41 -/
+  See: https://iopscience.iop.org/article/10.3847/0004-6256/152/2/41 [ref: nominal_solar_mass_article] -/
 noncomputable def nominalSolarMasses : MassUnit := scale (1.988416e30) kilograms
 
 /-!

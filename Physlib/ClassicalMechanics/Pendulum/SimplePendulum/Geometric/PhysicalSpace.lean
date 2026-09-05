@@ -45,12 +45,12 @@ the trajectory module.
 
 ## iv. References
 
-- `Physlib.ClassicalMechanics.Pendulum.SimplePendulum.Basic` (the lifted dynamics: the
-  energies and the Lagrangian on the Euclidean lift of the angle).
-- `Physlib.ClassicalMechanics.Pendulum.SimplePendulum.Geometric.Trajectory` (trajectories on
-  the configuration circle and the position of the bob along them).
-- Landau & Lifshitz, Mechanics, 3rd ed., §5, Problems 1–3 (pendulum configurations).
-
+* `Physlib.ClassicalMechanics.Pendulum.SimplePendulum.Basic` (the lifted dynamics: the energies and
+  the Lagrangian on the Euclidean lift of the angle).
+* `Physlib.ClassicalMechanics.Pendulum.SimplePendulum.Geometric.Trajectory` (trajectories on the
+  configuration circle and the position of the bob along them).
+* Landau & Lifshitz, Mechanics, 3rd ed., §5, Problems 1–3 (pendulum configurations).
+  [ref: landau_mechanics]
 -/
 
 @[expose] public section

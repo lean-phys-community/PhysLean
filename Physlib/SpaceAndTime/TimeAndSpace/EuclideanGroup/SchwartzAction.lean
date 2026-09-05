@@ -30,6 +30,7 @@ In this file we define the pullback action of the Euclidean group on Schwartz ma
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

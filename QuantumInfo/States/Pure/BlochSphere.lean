@@ -28,10 +28,11 @@ then builds the solid angle and dot product API on sphere points.
  * `dot_blochPoint`: dot product of Bloch vectors in terms of angle differences
 
 ## References
- * [S. Pancharatnam, *Generalized theory of interference, and its
-   applications*, Proc. Indian Acad. Sci. A 44, 247–262 (1956)][pancharatnam1956]
- * [M. V. Berry, *Quantal phase factors accompanying adiabatic changes*,
-   Proc. R. Soc. London A 392, 45–57 (1984)][berry1984]
+
+* S. Pancharatnam, *Generalized theory of interference, and its applications*, Proc. Indian Acad.
+  Sci. A 44, 247–262 (1956). [ref: pancharatnam1956]
+* M. V. Berry, *Quantal phase factors accompanying adiabatic changes*, Proc. R. Soc. London A 392,
+  45–57 (1984). [ref: berry1984]
 -/
 
 open Complex Matrix

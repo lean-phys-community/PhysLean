@@ -19,9 +19,8 @@ doublet.
 
 ## References
 
-- https://arxiv.org/abs/hep-ph/0605184
-- https://arxiv.org/abs/1605.03237
-
+* https://arxiv.org/abs/hep-ph/0605184. [ref: arxiv_hep_ph_0605184]
+* https://arxiv.org/abs/1605.03237. [ref: arxiv_1605_03237]
 -/
 
 @[expose] public section

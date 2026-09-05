@@ -21,9 +21,9 @@ applied to `(p, q)`.
 
 ## References
 
-- G. J. Sussman and J. Wisdom, "Structure and Interpretation of Classical Mechanics", Section 3.1.2.
-<https://groups.csail.mit.edu/mac/users/gjs/6946/sicm-html/book-Z-H-36.html#%_sec_3.1.2>
-
+* G. J. Sussman and J. Wisdom, "Structure and Interpretation of Classical Mechanics", Section 3.1.2.
+  <https://groups.csail.mit.edu/mac/users/gjs/6946/sicm-html/book-Z-H-36.html#%_sec_3.1.2>.
+  [ref: sussman_wisdom_sicm]
 -/
 
 @[expose] public section

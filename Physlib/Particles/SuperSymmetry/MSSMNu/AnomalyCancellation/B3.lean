@@ -14,10 +14,7 @@ We define `B₃` and show that it is a double point of the cubic.
 
 # References
 
-The main reference for the material in this file is:
-
-[Allanach, Madigan and Tooby-Smith][Allanach:2021yjy]
-
+* The main reference for the material in this file. [ref: Allanach:2021yjy]
 -/
 
 @[expose] public section

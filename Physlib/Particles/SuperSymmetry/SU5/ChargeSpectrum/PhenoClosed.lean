@@ -61,8 +61,7 @@ which include three which are defined in this file: `IsPhenoClosedQ5`, `IsPhenoC
 
 ## iv. References
 
-There are no known references for the material in this module.
-
+* None.
 -/
 
 @[expose] public section

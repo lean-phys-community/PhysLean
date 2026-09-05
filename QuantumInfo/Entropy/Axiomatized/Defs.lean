@@ -35,13 +35,12 @@ function, and then derive much of `Entropy` from it.
 
 ## References:
 
- - [Khinchin’s Fourth Axiom of Entropy Revisited](https://www.mdpi.com/2571-905X/6/3/49)
- - [α-z Relative Entropies](https://warwick.ac.uk/fac/sci/maths/research/events/2013-2014/statmech/su/Nilanjana-slides.pdf)
- - Watrous's notes, [Max-relative entropy and conditional min-entropy](https://cs.uwaterloo.ca/~watrous/QIT-notes/QIT-notes.02.pdf)
- - [Quantum Relative Entropy - An Axiomatic Approach](https://www.marcotom.info/files/entropy-masterclass2022.pdf)
-by Marco Tomamichel
- - [StackExchange](https://quantumcomputing.stackexchange.com/a/12953/10115)
-
+* Khinchin’s Fourth Axiom of Entropy Revisited. [ref: mdpi_khinchin_fourth_axiom]
+* α-z Relative Entropies. [ref: warwick_alpha_z_relative_entropies]
+* Watrous's notes, Max-relative entropy and conditional min-entropy. [ref: watrous_qit_notes_02]
+* Quantum Relative Entropy - An Axiomatic Approach by Marco Tomamichel.
+  [ref: tomamichel_relative_entropy_masterclass]
+* StackExchange. [ref: stackexchange_qc_12953]
 -/
 
 @[expose] public section

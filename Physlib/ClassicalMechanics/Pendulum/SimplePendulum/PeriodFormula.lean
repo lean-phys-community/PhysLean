@@ -82,15 +82,14 @@ integral.
 
 ## iv. References
 
-- Landau & Lifshitz, Mechanics, 3rd ed., §11, Problem 1: `T = 4 √(l/g) K(sin ½φ₀)`, in the
-  modulus convention `K(k) = ∫ φ in 0..π/2, (1 - k² sin² φ)^(-1/2)`.
-- M. Abramowitz, I. A. Stegun, Handbook of Mathematical Functions, 17.3.1 (the parameter
-  convention `K(m)`, `m = k²`, used by `Real.completeEllipticK`).
-- The module `Physlib.Mathematics.SpecialFunctions.EllipticIntegral`, for `completeEllipticK`
-  and its theory on the domain `m < 1`.
-- The module `Physlib.ClassicalMechanics.Pendulum.SimplePendulum.SmallAngle`, for the
-  small-angle period `smallAnglePeriod = 2π √(ℓ/g)`.
-
+* Landau & Lifshitz, Mechanics, 3rd ed., §11, Problem 1: `T = 4 √(l/g) K(sin ½φ₀)`, in the modulus
+  convention `K(k) = ∫ φ in 0..π/2, (1 - k² sin² φ)^(-1/2)`. [ref: landau_mechanics]
+* M. Abramowitz, I. A. Stegun, Handbook of Mathematical Functions, 17.3.1 (the parameter convention
+  `K(m)`, `m = k²`, used by `Real.completeEllipticK`). [ref: abramowitz_stegun_1964]
+* The module `Physlib.Mathematics.SpecialFunctions.EllipticIntegral`, for `completeEllipticK` and
+  its theory on the domain `m < 1`.
+* The module `Physlib.ClassicalMechanics.Pendulum.SimplePendulum.SmallAngle`, for the small-angle
+  period `smallAnglePeriod = 2π √(ℓ/g)`.
 -/
 
 @[expose] public section

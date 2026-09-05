@@ -24,8 +24,7 @@ defines the expectation value and the centered vector `Tψ - ⟨T⟩_ψ ψ`.
 
 ## References
 
-- [B. C. Hall, *Quantum Theory for Mathematicians*, Chapter 12][hall2013quantum].
-
+* B. C. Hall, *Quantum Theory for Mathematicians*, Chapter 12. [ref: hall2013quantum]
 -/
 
 @[expose] public section

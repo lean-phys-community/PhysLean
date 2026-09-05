@@ -19,8 +19,7 @@ That is a LeftHandedWeyl and a DualRightHandedWeyl.
 
 ## References
 
-- arXiv:0812.1594 page 197.
-
+* arXiv:0812.1594 page 197. [ref: Dreiner:2008tw]
 -/
 
 @[expose] public section

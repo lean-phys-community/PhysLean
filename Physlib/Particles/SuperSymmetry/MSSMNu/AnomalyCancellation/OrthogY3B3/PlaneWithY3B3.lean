@@ -13,8 +13,7 @@ The plane spanned by Y₃, B₃ and third orthogonal point.
 
 # References
 
-- https://arxiv.org/pdf/2107.07926.pdf
-
+* https://arxiv.org/pdf/2107.07926.pdf. [ref: Allanach:2021yjy]
 -/
 
 @[expose] public section

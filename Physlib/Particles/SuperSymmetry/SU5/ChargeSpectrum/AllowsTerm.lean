@@ -70,8 +70,7 @@ charge spectrum `x`, leads to a zero charge in the charges of potential term `T`
 
 ## iv. References
 
-There are no known references for the results in this file.
-
+* None.
 -/
 
 @[expose] public section

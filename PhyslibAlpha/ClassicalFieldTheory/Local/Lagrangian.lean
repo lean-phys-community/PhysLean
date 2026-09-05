@@ -38,9 +38,8 @@ structure on local jet-point data has been made explicit enough to support it na
 
 ## iv. References
 
-- J. Cortés and A. Haupt, *Lecture Notes on Mathematical Methods of Classical Physics*,
-  Chapter 5.
-
+* J. Cortés and A. Haupt, *Lecture Notes on Mathematical Methods of Classical Physics*, Chapter 5.
+  [ref: cortes_haupt_2016]
 -/
 
 @[expose] public section

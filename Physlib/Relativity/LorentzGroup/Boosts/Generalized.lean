@@ -21,9 +21,9 @@ A boost is the special case of a generalised boost when `u = basis 0`.
 
 ## References
 
-- The main argument follows: Guillem Cobos, The Lorentz Group, 2015:
-  https://diposit.ub.edu/dspace/bitstream/2445/68763/2/memoria.pdf
-
+* The main argument follows: Guillem Cobos, The Lorentz Group, 2015:
+  https://diposit.ub.edu/dspace/bitstream/2445/68763/2/memoria.pdf. [ref: cobos_2015_lorentz_group]
+* A Zulip proof of the time component of a generalised boost, used below.
 -/
 
 @[expose] public section

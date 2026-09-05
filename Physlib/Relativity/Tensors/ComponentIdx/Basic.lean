@@ -33,8 +33,7 @@ component indices induced by tensor products and contractions live in sibling fi
 
 ## iv. References
 
-There are no known references for the material in this module.
-
+* None.
 -/
 
 @[expose] public section

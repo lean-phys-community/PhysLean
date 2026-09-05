@@ -54,7 +54,5 @@ This is detailed in the paper `arxiv:1504.05593`. In implemented here using
 
 ## References
 
-This theory is looked at in the following paper:
-- arXiv:1507.05961.
-
+* This theory is looked at in the following paper: arXiv:1507.05961. [ref: arxiv_1507_05961]
 -/@[expose] public section

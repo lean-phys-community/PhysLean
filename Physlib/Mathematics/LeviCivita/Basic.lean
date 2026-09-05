@@ -42,8 +42,7 @@ permutation via `Matrix.det_permutation`.
 
 ## iv. References
 
-- https://en.wikipedia.org/wiki/Levi-Civita_symbol
-
+* https://en.wikipedia.org/wiki/Levi-Civita_symbol. [ref: wiki_levi_civita_symbol]
 -/
 
 @[expose] public section

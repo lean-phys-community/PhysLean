@@ -38,8 +38,7 @@ terms in the potential.
 
 ## iv. References
 
-There are no known references for the results in this file.
-
+* None.
 -/
 
 @[expose] public section

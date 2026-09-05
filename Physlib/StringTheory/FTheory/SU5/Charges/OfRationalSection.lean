@@ -45,14 +45,10 @@ work.
 
 ## iv. References
 
-The main reference for the material in this section is the paper:
-
-Lawrie, Schafer-Nameki and Wong.
-F-theory and All Things Rational: Surveying U(1) Symmetries with Rational Sections
-<https://arxiv.org/pdf/1504.05593>. Page 6.
-
-- See also footnote 4 of 1507.05961
-
+* The main reference for the material in this section: Lawrie, Schafer-Nameki and Wong, F-theory
+  and All Things Rational: Surveying U(1) Symmetries with Rational Sections, page 6.
+  [ref: lawrie_schafer_nameki_wong_2015]
+* See also footnote 4 of 1507.05961. [ref: arxiv_1507_05961]
 -/
 
 @[expose] public section

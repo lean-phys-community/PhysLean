@@ -66,6 +66,7 @@ We use properties of this power series to prove various results about distributi
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

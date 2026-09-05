@@ -63,8 +63,7 @@ with periodic boundary conditions.
 
 ## iv. References
 
-- https://www.damtp.cam.ac.uk/user/tong/aqm/aqmtwo.pdf
-
+* https://www.damtp.cam.ac.uk/user/tong/aqm/aqmtwo.pdf. [ref: tong_statistical_physics]
 -/
 
 @[expose] public section

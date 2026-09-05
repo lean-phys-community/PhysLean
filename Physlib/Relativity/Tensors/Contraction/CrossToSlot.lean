@@ -41,6 +41,7 @@ operation live with the unit-tensor collapse theory in
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

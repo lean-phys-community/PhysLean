@@ -47,6 +47,7 @@ For some relevant Gaussian integrals see
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

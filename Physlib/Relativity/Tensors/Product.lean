@@ -67,8 +67,7 @@ The following results exist for both `prodP` and `prodT` :
 
 ## iv. References
 
-- arXiv:2411.07667
-
+* arXiv:2411.07667. [ref: arxiv_2411_07667]
 -/
 
 @[expose] public section

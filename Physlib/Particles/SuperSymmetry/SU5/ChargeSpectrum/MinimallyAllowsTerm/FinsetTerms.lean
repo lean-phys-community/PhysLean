@@ -43,8 +43,7 @@ We have special focus on those charge spectra which minimally allow a top and bo
 
 ## iv. References
 
-There are no references for this module.
-
+* None.
 -/
 
 @[expose] public section

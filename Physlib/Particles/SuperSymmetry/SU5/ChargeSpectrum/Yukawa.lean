@@ -44,8 +44,7 @@ this module.
 
 ## iv. References
 
-There are no known references for this module.
-
+* None.
 -/
 
 @[expose] public section

@@ -45,10 +45,9 @@ to `Bψ` and `B` to `Aψ`.
 
 ## iv. References
 
-- [H. P. Robertson, *The Uncertainty Principle* (1929)][robertson1929uncertainty].
-- [E. Schrodinger, *Zum Heisenbergschen Unscharfeprinzip* (1930)][schrodinger1930heisenberg].
-- [B. C. Hall, *Quantum Theory for Mathematicians*, Chapter 12][hall2013quantum].
-
+* H. P. Robertson, *The Uncertainty Principle* (1929). [ref: robertson1929uncertainty]
+* E. Schrodinger, *Zum Heisenbergschen Unscharfeprinzip* (1930). [ref: schrodinger1930heisenberg]
+* B. C. Hall, *Quantum Theory for Mathematicians*, Chapter 12. [ref: hall2013quantum]
 -/
 
 @[expose] public section

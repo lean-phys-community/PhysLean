@@ -49,6 +49,7 @@ The complementary convention keeps the replacement index in place. Contracting s
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

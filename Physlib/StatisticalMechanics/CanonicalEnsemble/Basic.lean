@@ -87,10 +87,10 @@ mean energies and integrability.
 
 ## 8. References
 
-* L. D. Landau & E. M. Lifshitz, *Statistical Physics, Part 1*.
+* L. D. Landau & E. M. Lifshitz, *Statistical Physics, Part 1*. [ref: landau_statphys1]
 * D. Tong, Cambridge Lecture Notes (sections on canonical ensemble).
-  - https://www.damtp.cam.ac.uk/user/tong/statphys/one.pdf
-  - https://www.damtp.cam.ac.uk/user/tong/statphys/two.pdf
+  - https://www.damtp.cam.ac.uk/user/tong/statphys/one.pdf [ref: tong_statphys_notes_one]
+  - https://www.damtp.cam.ac.uk/user/tong/statphys/two.pdf [ref: tong_statphys_notes_two]
 
 ## 9. Roadmap
 

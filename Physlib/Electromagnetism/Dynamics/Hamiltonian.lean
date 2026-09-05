@@ -38,8 +38,8 @@ in the case of three spatial dimensions.
 
 ## iv. References
 
-- https://quantummechanics.ucsd.edu/ph130a/130_notes/node452.html
-- https://ph.qmul.ac.uk/sites/default/files/EMT10new.pdf
+* https://quantummechanics.ucsd.edu/ph130a/130_notes/node452.html. [ref: ucsd_ph130a_node452]
+* https://ph.qmul.ac.uk/sites/default/files/EMT10new.pdf. [ref: qmul_emt10_notes]
 -/
 
 @[expose] public section

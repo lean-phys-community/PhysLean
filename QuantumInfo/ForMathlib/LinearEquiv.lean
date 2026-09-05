@@ -31,6 +31,7 @@ together with lemmas relating them to `Matrix.reindex`.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

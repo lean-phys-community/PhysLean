@@ -34,9 +34,8 @@ for every libration amplitude `|θ₀| < π`.
 
 ## iv. References
 
-- Landau & Lifshitz, Mechanics, 3rd ed., §11, Problem 1 (the pendulum period, whose parameter is
-  `sin² (θ₀ / 2)`).
-
+* Landau & Lifshitz, Mechanics, 3rd ed., §11, Problem 1 (the pendulum period, whose parameter is
+  `sin² (θ₀ / 2)`). [ref: landau_mechanics]
 -/
 
 @[expose] public section

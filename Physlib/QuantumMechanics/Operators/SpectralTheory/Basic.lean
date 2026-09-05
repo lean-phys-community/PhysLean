@@ -81,8 +81,7 @@ Main results
 
 ## iv. References
 
-- [Konrad Schmüdgen, *Unbounded Self-Adjoint Operators on Hilbert Space*][Schmudgen2012]
-
+* Konrad Schmüdgen, *Unbounded Self-Adjoint Operators on Hilbert Space*. [ref: Schmudgen2012]
 -/
 
 TODO "Move spectral theory definitions and lemmas over to Mathlib equivalents if/when available."

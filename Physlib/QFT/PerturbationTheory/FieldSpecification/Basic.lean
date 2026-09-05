@@ -23,9 +23,10 @@ From each field we can create three different types of `FieldOp`.
 
 These states carry the same field statistic as the field they are derived from.
 
-## Some references
+## References
 
-- https://particle.physics.ucdavis.edu/modernsusy/slides/slideimages/spinorfeynrules.pdf
+* https://particle.physics.ucdavis.edu/modernsusy/slides/slideimages/spinorfeynrules.pdf.
+  [ref: ucdavis_spinorfeynrules]
 
 -/
 

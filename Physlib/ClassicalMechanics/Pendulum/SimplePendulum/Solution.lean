@@ -75,15 +75,15 @@ the time since release.
 
 References for the motion of the pendulum, its phase plane, and the existence and uniqueness
 theorem for ordinary differential equations include:
-- Landau & Lifshitz, Mechanics, 3rd ed., §11, for motion in one dimension.
-- Arnold, Mathematical Methods of Classical Mechanics, 2nd ed., §4, for the phase plane of the
-  pendulum.
-- Arnold, Ordinary Differential Equations, Chapter 4 (Proofs of the main theorems), for the
-  existence and uniqueness theorem by Picard iteration.
+
+* Landau & Lifshitz, Mechanics, 3rd ed., §11, for motion in one dimension. [ref: landau_mechanics]
+* Arnold, Mathematical Methods of Classical Mechanics, 2nd ed., §4, for the phase plane of the
+  pendulum. [ref: arnold_mechanics]
+* Arnold, Ordinary Differential Equations, Chapter 4 (Proofs of the main theorems), for the
+  existence and uniqueness theorem by Picard iteration. [ref: arnold_ode]
 
 The reduction to a first-order system on the phase space follows
 `DampedHarmonicOscillator.equationOfMotion_unique`.
-
 -/
 
 @[expose] public section

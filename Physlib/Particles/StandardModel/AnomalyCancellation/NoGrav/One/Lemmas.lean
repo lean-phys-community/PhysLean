@@ -10,9 +10,13 @@ public import Physlib.Particles.StandardModel.AnomalyCancellation.NoGrav.One.Lin
 # Lemmas for 1 family SM Accs
 
 The main result of this file is the conclusion of this paper:
-  [Lohitsiri and Tong][Lohitsiri:2019fuu]
+  [Lohitsiri and Tong][Lohitsiri:2019fuu] [ref: Lohitsiri:2019fuu]
 
 That every solution to the ACCs without gravity satisfies for free the gravitational anomaly.
+
+## References
+
+* The main result of this file is the conclusion of this paper. [ref: Lohitsiri:2019fuu]
 -/
 
 @[expose] public section

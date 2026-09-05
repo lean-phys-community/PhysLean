@@ -36,6 +36,7 @@ The integrability of `x ↦ ‖x‖ᵖ` on `ball 0 b` and `(ball 0 b)ᶜ` follow
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

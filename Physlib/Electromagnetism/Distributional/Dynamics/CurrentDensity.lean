@@ -32,6 +32,7 @@ The current density is given in terms of the charge density `ρ` and the current
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

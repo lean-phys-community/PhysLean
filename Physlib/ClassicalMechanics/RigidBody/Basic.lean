@@ -26,7 +26,8 @@ reference frame. The parallel-axis theorem expresses it in terms of the inertia 
 centre of mass.
 
 ## References
-- Landau and Lifshitz, Mechanics, page 100, Section 32
+
+* Landau and Lifshitz, Mechanics, page 100, Section 32. [ref: landau_mechanics]
 -/
 
 @[expose] public section

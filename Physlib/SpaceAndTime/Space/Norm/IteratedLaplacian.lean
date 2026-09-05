@@ -27,6 +27,7 @@ gives a nonzero constant multiple of the Dirac delta at the origin.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

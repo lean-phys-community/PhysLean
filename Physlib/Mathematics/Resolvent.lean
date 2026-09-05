@@ -43,6 +43,7 @@ affine reciprocal `t ↦ (z + a·t)⁻¹ = resolvent (-z) (a·t)` follow at call
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

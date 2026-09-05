@@ -55,8 +55,8 @@ the field strength of a bare-gradient potential. The invariance theorem
 
 ## iv. References
 
-- https://en.wikipedia.org/wiki/Mathematical_descriptions_of_the_electromagnetic_field#Gauge_freedom
-
+* https://en.wikipedia.org/wiki/Mathematical_descriptions_of_the_electromagnetic_field#Gauge_freedom.
+  [ref: wiki_em_field_gauge_freedom]
 -/
 
 @[expose] public section

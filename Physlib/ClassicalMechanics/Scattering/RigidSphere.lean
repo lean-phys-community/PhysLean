@@ -12,7 +12,7 @@ public import Physlib.Meta.TODO.Basic
 
 ## References
 
-- Landau and Lifshitz, Mechanics, page 50, Section 18, Problem 1
+* Landau and Lifshitz, Mechanics, page 50, Section 18, Problem 1. [ref: landau_mechanics]
 -/
 
 @[expose] public section

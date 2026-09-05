@@ -47,6 +47,7 @@ from the `CommRing` `crossToEnd`/`crossToSlot` algebra.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

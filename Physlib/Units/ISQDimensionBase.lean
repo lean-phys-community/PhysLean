@@ -27,10 +27,9 @@ PhysLib's default `LTMCTDimensionBase` in two ways:
 
 ## References
 
-* ISO/IEC 80000-1:2009, *Quantities and units — Part 1: General*.
-* JCGM 200:2012, *International vocabulary of metrology — Basic and general concepts
-  and associated terms (VIM, 3rd edition)*.
-
+* ISO/IEC 80000-1:2009, *Quantities and units — Part 1: General*. [ref: iso_80000_1_2009]
+* JCGM 200:2012, *International vocabulary of metrology — Basic and general concepts and associated
+  terms (VIM, 3rd edition)*. [ref: jcgm_200_2012]
 -/
 
 @[expose] public section

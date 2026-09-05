@@ -40,6 +40,7 @@ sitting at the origin in 3d space.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

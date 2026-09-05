@@ -14,10 +14,8 @@ We define $Y_3$ and show that it is a double point of the cubic.
 
 # References
 
-The main reference for the material in this file is:
-
-- https://arxiv.org/pdf/2107.07926.pdf
-
+* The main reference for the material in this file is https://arxiv.org/pdf/2107.07926.pdf.
+  [ref: Allanach:2021yjy]
 -/
 
 @[expose] public section

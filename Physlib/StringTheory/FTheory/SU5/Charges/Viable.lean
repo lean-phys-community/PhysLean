@@ -90,8 +90,7 @@ will be very welcome. In particular working out a way to restrict by anomaly can
 
 ## iv. References
 
-There are no known references for the material in this section.
-
+* None.
 -/
 
 @[expose] public section

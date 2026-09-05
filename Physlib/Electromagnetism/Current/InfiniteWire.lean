@@ -37,6 +37,7 @@ carrying a steady current along the x-axis.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

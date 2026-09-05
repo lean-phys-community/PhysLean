@@ -29,8 +29,7 @@ In this module we define the covariance of two partial linear maps `A` and `B` i
 
 ## iv. References
 
-- [B. C. Hall, *Quantum Theory for Mathematicians*, Chapter 12][hall2013quantum].
-
+* B. C. Hall, *Quantum Theory for Mathematicians*, Chapter 12. [ref: hall2013quantum]
 -/
 
 @[expose] public section

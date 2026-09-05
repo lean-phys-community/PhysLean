@@ -36,6 +36,7 @@ In this module we define the electric field, and prove lemmas about it.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

@@ -38,6 +38,7 @@ follows by differentiating two exponential representations at zero.
 
 ## iii. References
 
+* None.
 -/
 
 @[expose] public section

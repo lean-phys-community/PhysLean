@@ -52,6 +52,7 @@ Newton’s law → zero acceleration → constant velocity → constant momentum
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

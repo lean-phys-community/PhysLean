@@ -111,11 +111,11 @@ cubically small in the angle.
 ## iv. References
 
 References for the small-angle motion of the simple pendulum include:
-- Huygens, Horologium Oscillatorium (1673).
-- Landau & Lifshitz, Mechanics, 3rd ed., §21.
-- The module `Physlib.ClassicalMechanics.Pendulum.SimplePendulum.Basic`, whose equation of
-  motion this module linearizes.
 
+* Huygens, Horologium Oscillatorium (1673). [ref: huygens_1673]
+* Landau & Lifshitz, Mechanics, 3rd ed., §21. [ref: landau_mechanics]
+* The module `Physlib.ClassicalMechanics.Pendulum.SimplePendulum.Basic`, whose equation of motion
+  this module linearizes.
 -/
 
 @[expose] public section

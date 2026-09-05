@@ -30,6 +30,7 @@ trigonometric functions satisfying appropriate boundary conditions.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

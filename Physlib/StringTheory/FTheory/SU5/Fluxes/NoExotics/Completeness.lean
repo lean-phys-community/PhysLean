@@ -59,8 +59,7 @@ are only constrained by `2` SM representations `D` and `L`.
 
 ## iv. References
 
-There are no known references for the material in this module.
-
+* None.
 -/
 
 @[expose] public section

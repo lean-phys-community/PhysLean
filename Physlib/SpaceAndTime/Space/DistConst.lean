@@ -28,6 +28,7 @@ We show that the derivatives of this constant distribution are zero.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

@@ -38,6 +38,7 @@ Notation:
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

@@ -64,9 +64,8 @@ In this module we define the Higgs field and prove some basic properties.
 
 ## iv. References
 
-- The particle data group has properties of the Higgs boson
-  [Review of Particle Physics, PDG][ParticleDataGroup:2018ovx]
-
+* The particle data group has properties of the Higgs boson Review of Particle Physics, PDG.
+  [ref: ParticleDataGroup:2018ovx]
 -/
 
 @[expose] public section

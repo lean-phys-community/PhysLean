@@ -31,7 +31,8 @@ smooth for any motion; for differentiable motions it agrees with the honest poin
 `∂ₜ (displacement · y)`, recovering `T = ½ ∫ ⟪v, v⟫ dm` (`kineticEnergy_eq_integral_velocity`).
 
 ## References
-- Landau and Lifshitz, Mechanics, Section 32.
+
+* Landau and Lifshitz, Mechanics, Section 32. [ref: landau_mechanics]
 -/
 
 @[expose] public section

@@ -47,8 +47,7 @@ We will show that these two multisets have the same elements.
 
 ## iv. References
 
-There are no known references for this material.
-
+* None.
 -/
 
 @[expose] public section

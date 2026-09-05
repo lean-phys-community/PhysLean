@@ -70,12 +70,10 @@ Related to these are the different types of spaces of charges:
 
 ## iv. References
 
-Some references on anomaly cancellation conditions are:
-- Alvarez-Gaume, L. and Ginsparg, P. H. (1985). The Structure of Gauge and
-Gravitational Anomalies.
-- Bilal, A. (2008). Lectures on Anomalies. arXiv preprint.
-- Nash, C. (1991). Differential topology and quantum field theory. Elsevier.
-
+* Alvarez-Gaume, L. and Ginsparg, P. H. (1985). The Structure of Gauge and Gravitational Anomalies.
+  [ref: alvarez_gaume_ginsparg_1985]
+* Bilal, A. (2008). Lectures on Anomalies. arXiv preprint. [ref: bilal_2008_anomalies]
+* Nash, C. (1991). Differential topology and quantum field theory. Elsevier. [ref: nash_1991_dtqft]
 -/
 
 @[expose] public section

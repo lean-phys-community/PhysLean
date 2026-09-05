@@ -18,9 +18,9 @@ We define the Lorentz group.
 
 ## References
 
-- *Lorentz Transformations, Rotations, and Boosts*, Jaffe.
-<https://cdn.ku.edu.tr/cdn/files/amostafazadeh/phys517_518/phys517_2016f/Handouts/A_Jaffi_Lorentz_Group.pdf>
-
+* *Lorentz Transformations, Rotations, and Boosts*, Jaffe.
+  <https://cdn.ku.edu.tr/cdn/files/amostafazadeh/phys517_518/phys517_2016f/Handouts/A_Jaffi_Lorentz_Group.pdf>.
+  [ref: jaffe_lorentz_notes]
 -/
 
 @[expose] public section

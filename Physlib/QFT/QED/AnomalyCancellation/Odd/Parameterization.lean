@@ -12,9 +12,9 @@ public import Physlib.QFT.QED.AnomalyCancellation.Odd.LineInCubic
 Given maps `g : Fin n → ℚ`, `f : Fin n → ℚ` and `a : ℚ` we form a solution to the anomaly
 equations. We show that every solution can be got in this way, up to permutation, unless it is zero.
 
-The main reference is:
+## References
 
-- https://arxiv.org/pdf/1912.04804.pdf
+* The main reference is https://arxiv.org/pdf/1912.04804.pdf. [ref: arxiv_1912_04804]
 
 -/
 

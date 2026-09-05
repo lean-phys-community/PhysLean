@@ -32,6 +32,7 @@ homogeneous Dirichlet boundary conditions on `Ω`.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

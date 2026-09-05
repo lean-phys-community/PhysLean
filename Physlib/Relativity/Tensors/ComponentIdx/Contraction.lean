@@ -36,8 +36,7 @@ component choices at the contracted positions.
 
 ## iv. References
 
-There are no known references for the material in this module.
-
+* None.
 -/
 
 @[expose] public section

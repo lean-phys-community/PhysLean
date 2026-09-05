@@ -16,7 +16,7 @@ We say a `LinSol` satisfies the `line in plane` condition if for all distinct `i
 We look at various consequences of this.
 The main reference for this material is
 
-- https://arxiv.org/pdf/1912.04804.pdf
+- https://arxiv.org/pdf/1912.04804.pdf [ref: arxiv_1912_04804]
 
 We will show that `n ≥ 4` the `line in plane` condition on solutions implies the
 `constAbs` condition.

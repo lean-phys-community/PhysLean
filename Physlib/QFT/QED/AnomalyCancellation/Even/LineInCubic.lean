@@ -18,9 +18,9 @@ if the line through that point and through the two different planes formed by th
 We show that for a solution all its permutations satisfy this property, then there exists
 a permutation for which it lies in the unshifted plane.
 
-The main reference for this file is:
+## References
 
-- https://arxiv.org/pdf/1912.04804.pdf
+* The main reference for this file is https://arxiv.org/pdf/1912.04804.pdf. [ref: arxiv_1912_04804]
 -/
 
 @[expose] public section

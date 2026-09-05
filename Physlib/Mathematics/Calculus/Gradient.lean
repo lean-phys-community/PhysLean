@@ -48,8 +48,7 @@ product space. The file is deliberately real: two of its rules (`gradient_const_
 
 ## iv. References
 
-- Mathlib, `Mathlib.Analysis.Calculus.Gradient.Basic`.
-
+* Mathlib, `Mathlib.Analysis.Calculus.Gradient.Basic`.
 -/
 
 @[expose] public section

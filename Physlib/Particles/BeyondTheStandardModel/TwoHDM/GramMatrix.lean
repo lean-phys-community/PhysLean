@@ -10,10 +10,12 @@ public import Physlib.Particles.BeyondTheStandardModel.TwoHDM.Basic
 
 # The gram matrix for the two Higgs doublet model
 
-The main reference for material in this section is https://arxiv.org/pdf/hep-ph/0605184.
-
 We will show that the gram matrix of the two Higgs doublet model
 describes the gauge orbits of the configuration space.
+
+## References
+
+* The main reference for material in this section is https://arxiv.org/pdf/hep-ph/0605184. [ref: arxiv_hep_ph_0605184]
 
 -/
 
@@ -30,7 +32,7 @@ open StandardModel
 -/
 
 /-- The Gram matrix of the two Higgs doublet.
-  This matrix is used in https://arxiv.org/abs/hep-ph/0605184. -/
+  This matrix is used in https://arxiv.org/abs/hep-ph/0605184. [ref: arxiv_hep_ph_0605184] -/
 noncomputable def gramMatrix (H : TwoHiggsDoublet) : Matrix (Fin 2) (Fin 2) ℂ :=
   !![⟪H.Φ1, H.Φ1⟫_ℂ, ⟪H.Φ2, H.Φ1⟫_ℂ; ⟪H.Φ1, H.Φ2⟫_ℂ, ⟪H.Φ2, H.Φ2⟫_ℂ]
 

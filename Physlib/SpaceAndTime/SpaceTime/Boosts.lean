@@ -28,9 +28,7 @@ Note that the material here currently assumes that the speed of light `c = 1`.
 
 ## iv. References
 
-See e.g.
-- https://en.wikipedia.org/wiki/Lorentz_transformation
-
+* https://en.wikipedia.org/wiki/Lorentz_transformation. [ref: wiki_lorentz_transformation]
 -/
 
 @[expose] public section

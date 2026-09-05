@@ -1,124 +1,649 @@
-
 # To normalize:
 # bibtool --preserve.key.case=on --preserve.keys=on --pass.comments=on --print.use.tab=off -s -i docs/references.bib -o docs/references.bib
 
 # When possible, please use the reference obtained from InspireHep.
 
-# To link to an entry in `references.bib`, use the following formats:
-#   [Author, *Title* (optional location)][bibkey]
-@Article{         Allanach:2021yjy,
-  author        = "Allanach, B. C. and Madigan, Maeve and Tooby-Smith,
-                  Joseph",
-  title         = "{A nu supersymmetric anomaly-free atlas}",
-  eprint        = "2107.07926",
-  archiveprefix = "arXiv",
-  primaryclass  = "hep-ph",
-  doi           = "10.1007/JHEP02(2022)144",
-  journal       = "JHEP",
-  volume        = "02",
-  pages         = "144",
-  year          = "2022"
+# To cite an entry in `references.bib` from a module's docstring, append
+# "[ref: <bibkey>]" to the end of the bullet describing it, e.g.:
+#   * Landau & Lifshitz, Mechanics, 3rd ed., section 25. [ref: landau_mechanics]
+
+# Do not add Zulip links to the .bib file, keep them as plain URLs within the Lean files
+
+
+@article{Allanach:2021yjy,
+  author        = {Allanach, B. C. and Madigan, Maeve and Tooby-Smith, Joseph},
+  title         = {A nu supersymmetric anomaly-free atlas},
+  volume        = {02},
+  eprint        = {2107.07926},
+  archiveprefix = {arXiv},
+  primaryclass  = {hep-ph},
+  doi           = {10.1007/JHEP02(2022)144},
+  journal       = {JHEP},
+  pages         = {144},
+  year          = {2022}
 }
 
-@Article{         Dreiner:2008tw,
-  author        = "Dreiner, Herbi K. and Haber, Howard E. and Martin, Stephen
-                  P.",
-  title         = "{Two-component spinor techniques and Feynman rules for
-                  quantum field theory and supersymmetry}",
-  eprint        = "0812.1594",
-  archiveprefix = "arXiv",
-  primaryclass  = "hep-ph",
-  reportnumber  = "BN-TH-2008-12, SCIPP-08-08, FERMILAB-PUB-09-855-T,
-                  BN-TH-2008-12 and SCIPP-08/08",
-  doi           = "10.1016/j.physrep.2010.05.002",
-  journal       = "Phys. Rept.",
-  volume        = "494",
-  pages         = "1--196",
-  year          = "2010"
+@article{Dreiner:2008tw,
+  author        = {Dreiner, Herbi K. and Haber, Howard E. and Martin, Stephen P.},
+  title         = {Two-component spinor techniques and Feynman rules for quantum field theory and supersymmetry},
+  volume        = {494},
+  eprint        = {0812.1594},
+  archiveprefix = {arXiv},
+  primaryclass  = {hep-ph},
+  doi           = {10.1016/j.physrep.2010.05.002},
+  journal       = {Phys. Rept.},
+  pages         = {1-196},
+  year          = {2010},
+  note          = {not currently cited by any module; kept for future use}
 }
 
-@Book{            hall2013quantum,
-  author        = "Hall, Brian C.",
-  title         = "{Quantum Theory for Mathematicians}",
-  publisher     = "Springer",
-  year          = "2013"
+@article{Lohitsiri:2019fuu,
+  author        = {Lohitsiri, Nakarin and Tong, David},
+  title         = {Hypercharge Quantisation and Fermat's Last Theorem},
+  volume        = {8},
+  number        = {1},
+  eprint        = {1907.00514},
+  archiveprefix = {arXiv},
+  primaryclass  = {hep-th},
+  doi           = {10.21468/SciPostPhys.8.1.009},
+  journal       = {SciPost Phys.},
+  pages         = {009},
+  year          = {2020}
 }
 
-@Article{         robertson1929uncertainty,
-  author        = "Robertson, H. P.",
-  title         = "{The Uncertainty Principle}",
-  doi           = "10.1103/PhysRev.34.163",
-  journal       = "Phys. Rev.",
-  volume        = "34",
-  pages         = "163--164",
-  year          = "1929"
+@article{ParticleDataGroup:2018ovx,
+  author        = {Tanabashi, M. and others},
+  collaboration = {Particle Data Group},
+  title         = {Review of Particle Physics},
+  volume        = {98},
+  number        = {3},
+  doi           = {10.1103/PhysRevD.98.030001},
+  journal       = {Phys. Rev. D},
+  pages         = {030001},
+  year          = {2018}
 }
 
-@Article{         schrodinger1930heisenberg,
-  author        = "Schr{\"o}dinger, Erwin",
-  title         = "{Zum Heisenbergschen Unscharfeprinzip}",
-  journal       = "Sitzungsberichte der Preussischen Akademie der Wissenschaften,
-                  Physikalisch-mathematische Klasse",
-  pages         = "296--303",
-  year          = "1930"
-}
-
-@Article{         Lohitsiri:2019fuu,
-  author        = "Lohitsiri, Nakarin and Tong, David",
-  title         = "{Hypercharge Quantisation and Fermat's Last Theorem}",
-  eprint        = "1907.00514",
-  archiveprefix = "arXiv",
-  primaryclass  = "hep-th",
-  doi           = "10.21468/SciPostPhys.8.1.009",
-  journal       = "SciPost Phys.",
-  volume        = "8",
-  number        = "1",
-  pages         = "009",
-  year          = "2020"
-}
-
-@Article{         ParticleDataGroup:2018ovx,
-  author        = "Tanabashi, M. and others",
-  collaboration = "Particle Data Group",
-  title         = "{Review of Particle Physics}",
-  doi           = "10.1103/PhysRevD.98.030001",
-  journal       = "Phys. Rev. D",
-  volume        = "98",
-  number        = "3",
-  pages         = "030001",
-  year          = "2018"
-}
-
-@Article{         raynor2021graphical,
-  title         = {Graphical combinatorics and a distributive law for modular
-                  operads},
-  author        = {Raynor, Sophie},
-  journal       = {Advances in Mathematics},
-  volume        = {392},
-  pages         = {108011},
-  year          = {2021},
-  publisher     = {Elsevier}
-}
-
-@Book{        Reed1972,
+@book{Reed1972,
   author    = {Reed, Michael and Simon, Barry},
   title     = {Functional Analysis},
   series    = {Methods of Modern Mathematical Physics},
   volume    = {1},
-  year      = {1972},
+  doi       = {10.1016/B978-0-12-585001-8.X5001-6},
   publisher = {Academic Press},
-  isbn      = {978-0-12-585001-8},
-  doi       = {10.1016/B978-0-12-585001-8.X5001-6}
+  year      = {1972},
+  isbn      = {978-0-12-585001-8}
 }
 
-@Book{        Schmudgen2012,
-  author    = {Konrad Schm{\"u}dgen},
+@book{Schmudgen2012,
+  author    = {Schmudgen, Konrad},
   title     = {Unbounded Self-Adjoint Operators on Hilbert Space},
   series    = {Graduate Texts in Mathematics},
   volume    = {265},
-  year      = {2012},
+  doi       = {10.1007/978-94-007-4753-1},
   publisher = {Springer},
   address   = {Dordrecht},
-  isbn      = {978-94-007-4753-1},
-  doi       = {10.1007/978-94-007-4753-1}
+  year      = {2012},
+  isbn      = {978-94-007-4753-1}
+}
+
+@book{abramowitz_stegun_1964,
+  author    = {Abramowitz, Milton and Stegun, Irene A.},
+  title     = {Handbook of Mathematical Functions},
+  publisher = {National Bureau of Standards},
+  year      = {1964}
+}
+
+@article{alvarez_gaume_ginsparg_1985,
+  author = {Alvarez-Gaume, L. and Ginsparg, P. H.},
+  title  = {The Structure of Gauge and Gravitational Anomalies},
+  year   = {1985}
+}
+
+@book{arnold_mechanics,
+  author  = {Arnold, V. I.},
+  title   = {Mathematical Methods of Classical Mechanics},
+  edition = {2nd},
+  note    = {year/publisher not stated in any citing module; commonly Springer 1989}
+}
+
+@book{arnold_ode,
+  author = {Arnold, V. I.},
+  title  = {Ordinary Differential Equations},
+  note   = {edition/year/publisher not stated in the citing module}
+}
+
+@misc{arxiv_0912_0853,
+  eprint        = {0912.0853},
+  archiveprefix = {arXiv},
+  note          = {title not stated in the citing module(s)}
+}
+
+@misc{arxiv_1401_5084,
+  eprint        = {1401.5084},
+  archiveprefix = {arXiv},
+  note          = {title not stated in the citing module(s)}
+}
+
+@misc{arxiv_1507_05961,
+  eprint        = {1507.05961},
+  archiveprefix = {arXiv},
+  note          = {title not stated in the citing module(s)}
+}
+
+@misc{arxiv_1605_03237,
+  eprint        = {1605.03237},
+  archiveprefix = {arXiv},
+  note          = {title not stated in the citing module(s)}
+}
+
+@misc{arxiv_1912_04804,
+  eprint        = {1912.04804},
+  archiveprefix = {arXiv},
+  note          = {title not stated in the citing module(s)}
+}
+
+@misc{arxiv_2006_03588,
+  eprint        = {2006.03588},
+  archiveprefix = {arXiv},
+  note          = {title not stated in the citing module(s)}
+}
+
+@misc{arxiv_2201_07245,
+  eprint        = {2201.07245},
+  archiveprefix = {arXiv},
+  note          = {title not stated in the citing module(s)}
+}
+
+@misc{arxiv_2411_07667,
+  eprint        = {2411.07667},
+  archiveprefix = {arXiv},
+  note          = {title not stated in the citing module(s)}
+}
+
+@misc{arxiv_2411_14941,
+  eprint        = {2411.14941},
+  archiveprefix = {arXiv},
+  note          = {title not stated in the citing module(s)}
+}
+
+@misc{arxiv_hep_ph_0605184,
+  eprint        = {hep-ph/0605184},
+  archiveprefix = {arXiv},
+  note          = {title not stated in the citing modules; one citing module notes that a step of this paper's argument is not valid}
+}
+
+@misc{baez_guts_notes,
+  author       = {Baez, John},
+  title        = {Grand Unified Theories notes},
+  howpublished = {},
+  url          = {https://math.ucr.edu/home/baez/guts.pdf},
+  note         = {author inferred from the URL path (~baez); title not stated in the citing modules}
+}
+
+@book{barenblatt_1996_scaling,
+  author    = {Barenblatt, G. I.},
+  title     = {Scaling, Self-similarity, and Intermediate Asymptotics},
+  publisher = {Cambridge University Press},
+  year      = {1996}
+}
+
+@article{bargmann1964,
+  author  = {Bargmann, V.},
+  title   = {Note on Wigner's theorem on symmetry operations},
+  volume  = {5},
+  journal = {J. Math. Phys.},
+  pages   = {862-868},
+  year    = {1964}
+}
+
+@article{berry1984,
+  author  = {Berry, M. V.},
+  title   = {Quantal phase factors accompanying adiabatic changes},
+  volume  = {392},
+  journal = {Proc. R. Soc. London A},
+  pages   = {45-57},
+  year    = {1984}
+}
+
+@article{bilal_2008_anomalies,
+  author = {Bilal, A.},
+  title  = {Lectures on Anomalies},
+  year   = {2008},
+  note   = {arXiv preprint; id not stated in the citing module}
+}
+
+@misc{bipm_si_brochure_2019,
+  title        = {International Bureau of Weights and Measures (BIPM), The International System of Units (SI Brochure)},
+  edition      = {9th},
+  year         = {2019},
+  howpublished = {},
+  url          = {https://www.bipm.org/documents/d/guest/si-brochure-9-en-pdf}
+}
+
+@article{caldirola_1941,
+  author  = {Caldirola, P.},
+  volume  = {18},
+  journal = {Nuovo Cimento},
+  pages   = {393},
+  year    = {1941}
+}
+
+@misc{cobos_2015_lorentz_group,
+  author       = {Cobos, Guillem},
+  title        = {The Lorentz Group},
+  year         = {2015},
+  howpublished = {},
+  url          = {https://diposit.ub.edu/dspace/bitstream/2445/68763/2/memoria.pdf}
+}
+
+@article{cortes_haupt_2016,
+  author        = {Cortes, J. and Haupt, A.},
+  title         = {Lecture Notes on Mathematical Methods of Classical Physics},
+  eprint        = {1612.03100},
+  archiveprefix = {arXiv},
+  year          = {2016},
+  note          = {year inferred from the arXiv identifier (1612.*)}
+}
+
+@misc{doi_1063_1_3290740,
+  howpublished = {},
+  url          = {https://doi.org/10.1063/1.3290740},
+  note         = {title/author not stated in the citing module}
+}
+
+@misc{doi_physreva_80_032507,
+  howpublished = {},
+  url          = {https://doi.org/10.1103/PhysRevA.80.032507},
+  note         = {title/author not stated in the citing module}
+}
+
+@misc{github_leandojo_extractdata,
+  howpublished = {},
+  url          = {https://github.com/lean-dojo/LeanDojo/blob/main/src/lean_dojo/data_extraction/ExtractData.lean}
+}
+
+@misc{github_tryateachstep,
+  howpublished = {},
+  url          = {https://github.com/dwrensha/tryAtEachStep/blob/main/tryAtEachStep.lean}
+}
+
+@book{goldstein_classicalmechanics,
+  author = {Goldstein, Herbert},
+  title  = {Classical Mechanics},
+  note   = {edition/year/publisher not stated in the citing module}
+}
+
+@book{hall2013quantum,
+  author    = {Hall, Brian C.},
+  title     = {Quantum Theory for Mathematicians},
+  publisher = {Springer},
+  year      = {2013}
+}
+
+@book{huygens_1673,
+  author = {Huygens, Christiaan},
+  title  = {Horologium Oscillatorium},
+  year   = {1673}
+}
+
+@misc{iau_2012_resolution_b2,
+  title        = {IAU 2012 Resolution B2 (the astronomical unit)},
+  howpublished = {},
+  url          = {https://iauarchive.eso.org/static/resolutions/IAU2012_English.pdf}
+}
+
+@misc{iau_2015_resolution_b2,
+  title        = {IAU 2015 Resolution B2 (the exact parsec convention)},
+  howpublished = {},
+  url          = {https://iauarchive.eso.org/static/resolutions/IAU2015_English.pdf}
+}
+
+@misc{iau_style_manual_units,
+  title        = {IAU Style Manual recommendations (the Julian year convention used in the light-year)},
+  howpublished = {},
+  url          = {https://iauarchive.eso.org/publications/proceedings_rules/units/}
+}
+
+@book{ioffe_1957,
+  author    = {Ioffe, A. F.},
+  title     = {Semiconductor Thermoelements and Thermoelectric Cooling},
+  publisher = {Infosearch},
+  year      = {1957}
+}
+
+@misc{iso_80000_1_2009,
+  title = {ISO/IEC 80000-1:2009, Quantities and units - Part 1: General}
+}
+
+@misc{jaffe_lorentz_notes,
+  author       = {Jaffe, A.},
+  title        = {Lorentz Transformations, Rotations, and Boosts},
+  howpublished = {},
+  url          = {https://cdn.ku.edu.tr/cdn/files/amostafazadeh/phys517_518/phys517_2016f/Handouts/A_Jaffi_Lorentz_Group.pdf}
+}
+
+@misc{jcgm_200_2012,
+  title = {JCGM 200:2012, International vocabulary of metrology - Basic and general concepts and associated terms (VIM, 3rd edition)}
+}
+
+@article{kanai_1948,
+  author  = {Kanai, E.},
+  volume  = {3},
+  journal = {Progress of Theoretical Physics},
+  pages   = {440},
+  year    = {1948}
+}
+
+@article{koor_et_al_2023_wirtinger,
+  author        = {Koor, B. and Qiu, Y. and Kwek, L. and Rebentrost, P.},
+  title         = {A short tutorial on Wirtinger Calculus with applications in quantum information},
+  eprint        = {2312.04858},
+  archiveprefix = {arXiv}
+}
+
+@article{kreutz_delgado_cr_calculus,
+  author        = {Kreutz-Delgado, K.},
+  title         = {The Complex Gradient Operator and the CR-Calculus},
+  eprint        = {0906.4835},
+  archiveprefix = {arXiv}
+}
+
+@book{landau_fluidmechanics,
+  author  = {Landau, L. D. and Lifshitz, E. M.},
+  title   = {Fluid Mechanics},
+  series  = {Course of Theoretical Physics},
+  volume  = {6},
+  edition = {2nd},
+  note    = {year/publisher not stated in any citing module}
+}
+
+@book{landau_mechanics,
+  author  = {Landau, L. D. and Lifshitz, E. M.},
+  title   = {Mechanics},
+  series  = {Course of Theoretical Physics},
+  volume  = {1},
+  edition = {3rd},
+  note    = {year/publisher not stated in any citing module; commonly Pergamon 1976}
+}
+
+@book{landau_statphys1,
+  author = {Landau, L. D. and Lifshitz, E. M.},
+  title  = {Statistical Physics, Part 1},
+  series = {Course of Theoretical Physics},
+  volume = {5},
+  note   = {edition/year/publisher not stated in any citing module}
+}
+
+@article{lawrie_schafer_nameki_wong_2015,
+  author        = {Lawrie and Schafer-Nameki and Wong},
+  title         = {F-theory and All Things Rational: Surveying U(1) Symmetries with Rational Sections},
+  eprint        = {1504.05593},
+  archiveprefix = {arXiv},
+  note          = {full first names not stated in the citing module; page 6 is cited there}
+}
+
+@misc{mdpi_khinchin_fourth_axiom,
+  title        = {Khinchin's Fourth Axiom of Entropy Revisited},
+  howpublished = {},
+  url          = {https://www.mdpi.com/2571-905X/6/3/49}
+}
+
+@article{mortini_rupp_2022,
+  author  = {Mortini, R. and Rupp, R.},
+  title   = {The Clairaut-Schwarz Theorem for Mixed Wirtinger Derivatives},
+  volume  = {48},
+  journal = {Bull. Iranian Math. Soc.},
+  pages   = {2643-2647},
+  year    = {2022}
+}
+
+@misc{nasa_ntrs_20140002333,
+  howpublished = {},
+  url          = {https://ntrs.nasa.gov/api/citations/20140002333/downloads/20140002333.pdf}
+}
+
+@book{nash_1991_dtqft,
+  author    = {Nash, C.},
+  title     = {Differential topology and quantum field theory},
+  publisher = {Elsevier},
+  year      = {1991}
+}
+
+@book{nielsen_chuang_qci,
+  author = {Nielsen, M. A. and Chuang, I. L.},
+  title  = {Quantum Computation and Quantum Information},
+  note   = {edition/year/publisher not stated in the citing module; commonly 10th anniversary ed., Cambridge University Press, 2010}
+}
+
+@misc{nist_dlmf,
+  title = {NIST Digital Library of Mathematical Functions},
+  note  = {URL not stated in the citing module (dlmf.nist.gov); section 19.7(ii) is cited}
+}
+
+@misc{nist_hb44_2023,
+  title = {NIST Handbook 44, Appendix C (international foot-based units and the international nautical mile)},
+  doi   = {10.6028/NIST.HB.44-2023}
+}
+
+@misc{nominal_solar_mass_article,
+  howpublished = {},
+  url          = {https://iopscience.iop.org/article/10.3847/0004-6256/152/2/41},
+  note         = {title/author not stated in the citing module}
+}
+
+@book{oneill_1983_semi_riemannian,
+  author    = {O'Neill, Barrett},
+  title     = {Semi-Riemannian Geometry With Applications to Relativity},
+  publisher = {Academic Press},
+  year      = {1983}
+}
+
+@article{pancharatnam1956,
+  author  = {Pancharatnam, S.},
+  title   = {Generalized theory of interference, and its applications},
+  volume  = {44},
+  journal = {Proc. Indian Acad. Sci. A},
+  pages   = {247-262},
+  year    = {1956}
+}
+
+@book{peskin_schroeder_qft,
+  author = {Peskin, Michael E. and Schroeder, Daniel V.},
+  title  = {An Introduction to Quantum Field Theory},
+  note   = {year/publisher not stated in the citing module; commonly Westview Press 1995}
+}
+
+@misc{qmul_emt10_notes,
+  howpublished = {},
+  url          = {https://ph.qmul.ac.uk/sites/default/files/EMT10new.pdf}
+}
+
+@article{raynor2021graphical,
+  author    = {Raynor, Sophie},
+  title     = {Graphical combinatorics and a distributive law for modular operads},
+  volume    = {392},
+  journal   = {Advances in Mathematics},
+  pages     = {108011},
+  publisher = {Elsevier},
+  year      = {2021},
+  note      = {not currently cited by any module; kept for future use}
+}
+
+@article{robertson1929uncertainty,
+  author  = {Robertson, H. P.},
+  title   = {The Uncertainty Principle},
+  volume  = {34},
+  doi     = {10.1103/PhysRev.34.163},
+  journal = {Phys. Rev.},
+  pages   = {163-164},
+  year    = {1929}
+}
+
+@article{schrodinger1930heisenberg,
+  author  = {Schrodinger, Erwin},
+  title   = {Zum Heisenbergschen Unscharfeprinzip},
+  journal = {Sitzungsberichte der Preussischen Akademie der Wissenschaften, Physikalisch-mathematische Klasse},
+  pages   = {296-303},
+  year    = {1930}
+}
+
+@article{snyder_toberer_2008,
+  author  = {Snyder, G. J. and Toberer, E. S.},
+  title   = {Complex thermoelectric materials},
+  volume  = {7},
+  journal = {Nature Materials},
+  pages   = {105-114},
+  year    = {2008}
+}
+
+@misc{stackexchange_qc_12953,
+  title        = {Quantum Computing Stack Exchange answer 12953},
+  howpublished = {},
+  url          = {https://quantumcomputing.stackexchange.com/a/12953/10115}
+}
+
+@article{stone_1932,
+  author  = {Stone, M. H.},
+  title   = {Linear Transformations in Hilbert Space III. Operational Methods and Group Theory},
+  volume  = {18},
+  journal = {Proc. Natl. Acad. Sci.},
+  pages   = {172-175},
+  year    = {1932}
+}
+
+@book{sussman_wisdom_sicm,
+  author = {Sussman, Gerald Jay and Wisdom, Jack},
+  title  = {Structure and Interpretation of Classical Mechanics},
+  url    = {https://groups.csail.mit.edu/mac/users/gjs/6946/sicm-html/book-Z-H-36.html#%_sec_3.1.2},
+  note   = {edition/year not stated in the citing module}
+}
+
+@misc{terek_variational_manifolds,
+  author = {Terek, Ivo},
+  title  = {Introductory Variational Calculus on Manifolds},
+  note   = {lecture notes; year/URL not stated in the citing module}
+}
+
+@misc{tomamichel_relative_entropy_masterclass,
+  title        = {Tomamichel, Quantum Relative Entropy - An Axiomatic Approach},
+  howpublished = {},
+  url          = {https://www.marcotom.info/files/entropy-masterclass2022.pdf}
+}
+
+@article{tong_line_operators_sm,
+  author        = {Tong, D.},
+  title         = {Line Operators in the Standard Model},
+  volume        = {07},
+  eprint        = {1705.01853},
+  archiveprefix = {arXiv},
+  journal       = {JHEP},
+  pages         = {104},
+  year          = {2017}
+}
+
+@misc{tong_statistical_physics,
+  author       = {Tong, David},
+  title        = {Lectures on Statistical Physics},
+  howpublished = {},
+  url          = {https://www.damtp.cam.ac.uk/user/tong/aqm/aqmtwo.pdf}
+}
+
+@misc{tong_statphys_notes_one,
+  author       = {Tong, David},
+  title        = {Cambridge Lecture Notes on Statistical Physics, part one},
+  howpublished = {},
+  url          = {https://www.damtp.cam.ac.uk/user/tong/statphys/one.pdf}
+}
+
+@misc{tong_statphys_notes_two,
+  author       = {Tong, David},
+  title        = {Cambridge Lecture Notes on Statistical Physics, part two},
+  howpublished = {},
+  url          = {https://www.damtp.cam.ac.uk/user/tong/statphys/two.pdf}
+}
+
+@article{tooby_smith_2024_index_notation,
+  author        = {Tooby-Smith, Joseph},
+  title         = {Formalization of physics index notation in Lean 4},
+  eprint        = {2411.07667},
+  archiveprefix = {arXiv}
+}
+
+@misc{ucdavis_spinorfeynrules,
+  howpublished = {},
+  url          = {https://particle.physics.ucdavis.edu/modernsusy/slides/slideimages/spinorfeynrules.pdf},
+  note         = {a different spinor index convention is used there than in Physlib}
+}
+
+@misc{ucsd_ph130a_node452,
+  howpublished = {},
+  url          = {https://quantummechanics.ucsd.edu/ph130a/130_notes/node452.html}
+}
+
+@misc{warwick_alpha_z_relative_entropies,
+  title        = {alpha-z Relative Entropies},
+  howpublished = {},
+  url          = {https://warwick.ac.uk/fac/sci/maths/research/events/2013-2014/statmech/su/Nilanjana-slides.pdf}
+}
+
+@misc{watrous_qit_notes_02,
+  title        = {Watrous, Max-relative entropy and conditional min-entropy},
+  howpublished = {},
+  url          = {https://cs.uwaterloo.ca/~watrous/QIT-notes/QIT-notes.02.pdf},
+  note         = {lecture notes}
+}
+
+@misc{watrous_tqi_ch8,
+  title        = {Watrous, The Theory of Quantum Information, Chapter 8},
+  howpublished = {},
+  url          = {https://cs.uwaterloo.ca/~watrous/TQI/TQI.8.pdf}
+}
+
+@book{weinberg_qft1,
+  author = {Weinberg, Steven},
+  title  = {The Quantum Theory of Fields, Vol. 1},
+  note   = {year/publisher not stated in the citing module; commonly Cambridge University Press 1995}
+}
+
+@misc{wiki_classical_em_and_sr,
+  title        = {Classical electromagnetism and special relativity},
+  howpublished = {},
+  url          = {https://en.wikipedia.org/wiki/Classical_electromagnetism_and_special_relativity}
+}
+
+@misc{wiki_complex_differential_form,
+  title        = {Complex differential form (Dolbeault operators)},
+  howpublished = {},
+  url          = {https://en.wikipedia.org/wiki/Complex_differential_form}
+}
+
+@misc{wiki_em_field_gauge_freedom,
+  title        = {Mathematical descriptions of the electromagnetic field (gauge freedom)},
+  howpublished = {},
+  url          = {https://en.wikipedia.org/wiki/Mathematical_descriptions_of_the_electromagnetic_field#Gauge_freedom}
+}
+
+@misc{wiki_levi_civita_symbol,
+  title        = {Levi-Civita symbol},
+  howpublished = {},
+  url          = {https://en.wikipedia.org/wiki/Levi-Civita_symbol}
+}
+
+@misc{wiki_lorentz_transformation,
+  title        = {Lorentz transformation},
+  howpublished = {},
+  url          = {https://en.wikipedia.org/wiki/Lorentz_transformation}
+}
+
+@misc{wiki_rigged_hilbert_space,
+  title        = {Rigged Hilbert space},
+  howpublished = {},
+  url          = {https://en.wikipedia.org/wiki/Rigged_Hilbert_space}
+}
+
+@misc{williams_variational_noether_notes,
+  title        = {Variational calculus and Noether's theorem (lecture notes)},
+  howpublished = {},
+  url          = {https://web.williams.edu/Mathematics/it3/texts/var_noether.pdf},
+  note         = {author not stated in the citing module}
 }

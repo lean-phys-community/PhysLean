@@ -22,7 +22,8 @@ momentum. The reference point is taken to be the centre of mass, following the d
 a rigid motion into a translation of the centre of mass plus a rotation about it.
 
 ## References
-- Landau and Lifshitz, Mechanics, Section 32.
+
+* Landau and Lifshitz, Mechanics, Section 32. [ref: landau_mechanics]
 -/
 
 @[expose] public section

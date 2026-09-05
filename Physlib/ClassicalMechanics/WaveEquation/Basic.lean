@@ -39,6 +39,7 @@ By a plne wave we mean a function of the form `f(t, x) = f₀(⟪x, s⟫_ℝ - c
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

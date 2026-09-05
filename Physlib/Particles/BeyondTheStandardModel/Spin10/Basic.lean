@@ -14,6 +14,10 @@ public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 Note: By physicists this is usually called SO(10). However, the true gauge group involved
 is Spin(10).
 
+## References
+
+* Baez's Grand Unified Theories notes, cited throughout below. [ref: baez_guts_notes]
+
 -/
 
 @[expose] public section
@@ -30,7 +34,7 @@ informal_definition GaugeGroupI where
 Precomposed with the isomorphism, `PatiSalam.gaugeGroupISpinEquiv`, between `SU(4) × SU(2) × SU(2)`
 and `Spin(6) × Spin(4)`.
 
-See page 56 of https://math.ucr.edu/home/baez/guts.pdf
+See page 56 of https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 informal_definition inclPatiSalam where
   deps := [``GaugeGroupI, ``PatiSalam.GaugeGroupI, ``PatiSalam.gaugeGroupISpinEquiv]
@@ -39,7 +43,7 @@ informal_definition inclPatiSalam where
 /-- The inclusion of the Standard Model gauge group into Spin(10), i.e., the composition of
 `embedPatiSalam` and `PatiSalam.inclSM`.
 
-See page 56 of https://math.ucr.edu/home/baez/guts.pdf
+See page 56 of https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 informal_definition inclSM where
   deps := [``inclPatiSalam, ``PatiSalam.inclSM]
@@ -47,6 +51,7 @@ informal_definition inclSM where
 
 /-- The inclusion of the Georgi-Glashow gauge group into Spin(10), i.e., the Lie group homomorphism
 from `SU(n) → Spin(2n)` discussed on page 46 of https://math.ucr.edu/home/baez/guts.pdf for `n = 5`.
+[ref: baez_guts_notes]
 -/
 informal_definition inclGeorgiGlashow where
   deps := [``GaugeGroupI, ``GeorgiGlashow.GaugeGroupI]

@@ -12,10 +12,11 @@ public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.P
 We give a series of properties held by solutions to the quadratic equation.
 
 In particular given a quad solution we define a map from linear solutions to quadratic solutions
-and show that it is a surjection. The main reference for this is:
+and show that it is a surjection.
 
-- https://arxiv.org/abs/2006.03588
+## References
 
+* The main reference for this is https://arxiv.org/abs/2006.03588. [ref: arxiv_2006_03588]
 -/
 
 @[expose] public section

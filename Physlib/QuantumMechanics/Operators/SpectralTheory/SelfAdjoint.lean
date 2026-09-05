@@ -33,6 +33,7 @@ In this module we develop the spectral theory for self-adjoint operators.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

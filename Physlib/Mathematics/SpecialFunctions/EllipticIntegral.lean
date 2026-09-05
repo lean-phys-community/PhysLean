@@ -65,12 +65,11 @@ here. Every lemma of this file about a general parameter therefore carries its d
 
 ## iv. References
 
-- M. Abramowitz, I. A. Stegun, Handbook of Mathematical Functions, §17.3 (the parameter
-  convention, 17.3.1).
-- NIST DLMF §19.7(ii) (the reciprocal-modulus transformation).
-- Landau & Lifshitz, Mechanics, 3rd ed., §11, Problem 1 (the pendulum period as `K(k)`, modulus
-  convention).
-
+* M. Abramowitz, I. A. Stegun, Handbook of Mathematical Functions, §17.3 (the parameter convention,
+  17.3.1). [ref: abramowitz_stegun_1964]
+* NIST DLMF §19.7(ii) (the reciprocal-modulus transformation). [ref: nist_dlmf]
+* Landau & Lifshitz, Mechanics, 3rd ed., §11, Problem 1 (the pendulum period as `K(k)`, modulus
+  convention). [ref: landau_mechanics]
 -/
 
 @[expose] public section

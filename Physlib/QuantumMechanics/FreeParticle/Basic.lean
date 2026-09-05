@@ -29,6 +29,7 @@ to the Hamiltonian `p²/2m` with no potential.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

@@ -61,11 +61,10 @@ and runs the following physical pipeline:
 
 ## iv. References
 
-* The bilinear formalism: https://arxiv.org/abs/hep-ph/0605184.
+* The bilinear formalism: https://arxiv.org/abs/hep-ph/0605184. [ref: arxiv_hep_ph_0605184]
 
-Mathematically the result is the first fundamental theorem of invariant theory for `SU(2)` acting on
-two doublets in `ℂ²`.
-
+Mathematically the result is the first fundamental theorem of invariant theory for `SU(2)`
+acting on two doublets in `ℂ²`.
 -/
 
 @[expose] public section

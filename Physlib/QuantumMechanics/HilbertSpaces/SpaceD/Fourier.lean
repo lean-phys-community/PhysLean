@@ -35,6 +35,7 @@ equivalence of `Lp ℂ 2 volume`, hence of `SpaceDHilbertSpace d`, onto itself; 
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

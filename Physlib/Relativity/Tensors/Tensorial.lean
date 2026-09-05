@@ -51,8 +51,7 @@ We define the class `Tensorial` here, and provide an API around its use.
 
 ## iv. References
 
-There are no known references for this material.
-
+* None.
 -/
 
 @[expose] public section

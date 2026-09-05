@@ -34,6 +34,7 @@ on a closed interval and zero elsewhere.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

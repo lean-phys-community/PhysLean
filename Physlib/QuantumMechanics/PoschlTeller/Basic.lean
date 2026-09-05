@@ -37,8 +37,7 @@ the parameter controlling its depth is a positive integer.
 
 ## iv. References
 
-- https://arxiv.org/pdf/2411.14941
-
+* https://arxiv.org/pdf/2411.14941. [ref: arxiv_2411_14941]
 -/
 @[expose] public section
 

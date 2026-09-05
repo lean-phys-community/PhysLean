@@ -51,8 +51,7 @@ We define some variations of this result.
 
 ## iv. References
 
-There are no known references for the material in this file.
-
+* None.
 -/
 
 @[expose] public section

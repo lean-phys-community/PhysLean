@@ -41,6 +41,7 @@ and, up to numerical factors, satisfy all of the same properties.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

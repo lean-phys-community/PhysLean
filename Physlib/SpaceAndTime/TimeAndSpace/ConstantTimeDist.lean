@@ -54,6 +54,7 @@ to get a Schwartz Map on `Space d`.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

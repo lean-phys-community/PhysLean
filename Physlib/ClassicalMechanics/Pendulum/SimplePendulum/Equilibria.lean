@@ -62,11 +62,11 @@ this module.
 ## iv. References
 
 References for the equilibria and the energy regimes of the simple pendulum include:
-- Landau & Lifshitz, Mechanics, 3rd ed., §11 (motion in one dimension: the turning points, and
-  finite and infinite motion according to the energy).
-- Arnold, Mathematical Methods of Classical Mechanics, 2nd ed., §4 (the phase portrait of the
-  pendulum).
 
+* Landau & Lifshitz, Mechanics, 3rd ed., §11 (motion in one dimension: the turning points, and
+  finite and infinite motion according to the energy). [ref: landau_mechanics]
+* Arnold, Mathematical Methods of Classical Mechanics, 2nd ed., §4 (the phase portrait of the
+  pendulum). [ref: arnold_mechanics]
 -/
 
 @[expose] public section

@@ -51,6 +51,7 @@ The core library — physics digitalizations reviewed and curated to a high stan
 <td width="33%" valign="top">
 
 ###  [**PhyslibAlpha**](./PhyslibAlpha)
+### [**PhyslibAlpha**](./PhyslibAlpha)
 
 PhyslibAlpha exists for the rapid development of physics digitalizations, enabled by a lighter review process built to handle large-scale, human- or AI-generated contributions.
 
@@ -77,6 +78,7 @@ Quantum information theory. Currently a distinct codebase with its own conventio
 
 🎯 The project shall contain results (definitions, theorems, lemmas and calculations) from **physics**,
   including quantum information, formalized (or **digitalized**) into the interactive theorem prover **Lean 4**.
+including quantum information, formalized (or **digitalized**) into the interactive theorem prover **Lean 4**.
 
 🎯 The project shall be **organized** by **physics**.
 
@@ -87,6 +89,7 @@ Quantum information theory. Currently a distinct codebase with its own conventio
 🎯 The project shall contain Physics Lean **tactics**, **notation** and **syntax** for physicists.
 
 🎯 The project shall *not* be tied to physics axiomizations (e.g. axiomatic QFT), but rather flexiable enough to accommodate different approaches and starting points.
+🎯 The project shall _not_ be tied to physics axiomizations (e.g. axiomatic QFT), but rather flexiable enough to accommodate different approaches and starting points.
 
 🎯 The content of the project shall be carefully **reviewed** and curated, to ensure reusability, readability and fit.
 
@@ -108,7 +111,8 @@ Because of the lower-review bar for PhyslibAlpha we cannot promise to maintain c
 Physlib is open-source and community run, and we welcome contributions from anyone.
 All you need to do is open a pull-request with your changes
 and our team of maintainers will review it and iterate with you on feedback until it
-can be merged.
+can be merged. Please add references to the `## References` section at the top of the file
+and add them to the .bib file.
 
 If you unsure where you would like to contribute, you may find ideas on:
 - our [open issues](https://github.com/leanprover-community/physlib/issues).

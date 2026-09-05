@@ -31,6 +31,7 @@ In this module we define the field strength tensor in terms of the electromagnet
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

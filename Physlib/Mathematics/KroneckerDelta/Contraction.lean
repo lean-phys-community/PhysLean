@@ -46,6 +46,7 @@ matrix determinant lemma when `det A` is a unit and Kronecker-delta matrices are
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

@@ -36,6 +36,7 @@ determinant of a matrix of Kronecker deltas.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

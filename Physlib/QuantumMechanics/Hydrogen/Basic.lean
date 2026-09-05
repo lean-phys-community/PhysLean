@@ -20,7 +20,11 @@ The standard hydrogen atom has `d=3`, `m = mₑmₚ/(mₑ + mₚ) ≈ mₑ` and 
 The potential `V = -k/r` is singular at the origin. To address this we define a regularized
 Hamiltonian in which the potential is replaced by `-k·r(ε)⁻¹`, where `r(ε)² = ‖x‖² + ε²`.
 This goes by several names including "soft-core" and "truncated" Coulomb potential.
-e.g. see https://doi.org/10.1103/PhysRevA.80.032507 and https://doi.org/10.1063/1.3290740.
+
+## References
+
+* https://doi.org/10.1103/PhysRevA.80.032507. [ref: doi_physreva_80_032507]
+* https://doi.org/10.1063/1.3290740. [ref: doi_1063_1_3290740]
 
 -/
 

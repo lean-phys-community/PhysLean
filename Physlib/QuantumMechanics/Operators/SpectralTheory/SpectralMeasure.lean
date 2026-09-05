@@ -34,6 +34,7 @@ For each `x : H` there is an associated measure `μₓ` given by `μₓ A = ‖�
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

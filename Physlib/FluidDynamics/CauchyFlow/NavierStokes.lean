@@ -36,6 +36,7 @@ stress law. The Cauchy momentum equation supplies the balance-law layer, while
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

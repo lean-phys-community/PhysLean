@@ -42,9 +42,8 @@ symbolic calculus for coordinate derivatives of total derivatives.
 
 ## iv. References
 
-- J. Cortés and A. Haupt, *Lecture Notes on Mathematical Methods of Classical Physics*,
-  arXiv:1612.03100v2, Chapter 5.
-
+* J. Cortés and A. Haupt, *Lecture Notes on Mathematical Methods of Classical Physics*,
+  arXiv:1612.03100v2, Chapter 5. [ref: cortes_haupt_2016]
 -/
 
 @[expose] public section

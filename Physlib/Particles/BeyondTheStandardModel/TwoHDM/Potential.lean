@@ -43,13 +43,11 @@ give stability properties of the potential.
 
 ## iv. References
 
-For the parameterization of the potential we follow the convention of
-- https://arxiv.org/pdf/1605.03237
-
-Stability arguments of the potential follow, in part, those from
-- https://arxiv.org/abs/hep-ph/0605184
-Although we note that we explicitly prove that one of the steps in this paper is not valid.
-
+* For the parameterization of the potential we follow the convention of
+  https://arxiv.org/pdf/1605.03237. [ref: arxiv_1605_03237]
+* Stability arguments of the potential follow, in part, those from
+  https://arxiv.org/abs/hep-ph/0605184, although we note that we explicitly prove that one of
+  the steps in this paper is not valid. [ref: arxiv_hep_ph_0605184]
 -/
 
 @[expose] public section

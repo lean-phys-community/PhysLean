@@ -48,9 +48,9 @@ calculus identities for the canonical ensemble.
 
 ## References
 
-Same references as `Basic.lean` (Landau–Lifshitz; Tong), especially the identities
-`F = U - T S` and `U = -∂_β log Z`.
-
+* Same references as `Basic.lean`. [ref: landau_statphys1]
+* Same references as `Basic.lean`, especially the identities `F = U - T S` and
+  `U = -∂_β log Z`. [ref: tong_statistical_physics]
 -/
 
 @[expose] public section

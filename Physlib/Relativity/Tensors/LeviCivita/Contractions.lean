@@ -55,6 +55,7 @@ and the Euclidean contraction theorems evaluate those sums.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

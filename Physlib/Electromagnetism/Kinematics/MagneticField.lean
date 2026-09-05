@@ -46,6 +46,7 @@ field strength matrix. This is an antisymmetric matrix.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

@@ -29,10 +29,11 @@ geodesic triangle in projective Hilbert space.
  * `norm_bargmannInvariantThree_le_one`: `‖Δ₃‖ ≤ 1` (via `Braket.norm_dot_le_one`)
 
 ## References
- * [V. Bargmann, *Note on Wigner's theorem on symmetry operations*,
-   J. Math. Phys. 5, 862–868 (1964)][bargmann1964]
- * [S. Pancharatnam, *Generalized theory of interference, and its
-   applications*, Proc. Indian Acad. Sci. A 44, 247–262 (1956)][pancharatnam1956]
+
+* V. Bargmann, *Note on Wigner's theorem on symmetry operations*, J. Math. Phys. 5, 862–868 (1964).
+  [ref: bargmann1964]
+* S. Pancharatnam, *Generalized theory of interference, and its applications*, Proc. Indian Acad.
+  Sci. A 44, 247–262 (1956). [ref: pancharatnam1956]
 -/
 
 open Braket Complex

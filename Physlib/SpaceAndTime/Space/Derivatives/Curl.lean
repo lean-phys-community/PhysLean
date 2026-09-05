@@ -52,6 +52,7 @@ We also prove some basic vector-identities involving of the curl operator.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

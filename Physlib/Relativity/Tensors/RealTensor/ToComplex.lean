@@ -53,10 +53,9 @@ The main definitions and statements are:
 
 ## iv. References
 
-The general formalism of Lorentz tensors and their operations is developed in
-other parts of the library; here we only specialise to the passage from real to
-complex Lorentz tensors.
-
+* None — the general formalism of Lorentz tensors and their operations is
+  developed in other parts of the library; here we only specialise to the
+  passage from real to complex Lorentz tensors.
 -/
 
 @[expose] public section

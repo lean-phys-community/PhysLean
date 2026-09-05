@@ -45,7 +45,8 @@ dimensions its dual is the *body-frame angular velocity vector* `ω_body = Ω_bo
 velocity `ω` resolved along the body-fixed axes, `ω_body = Rᵀ ω`.
 
 ## References
-- Landau and Lifshitz, Mechanics, Sections 31 and 32.
+
+* Landau and Lifshitz, Mechanics, Sections 31 and 32. [ref: landau_mechanics]
 -/
 
 @[expose] public section

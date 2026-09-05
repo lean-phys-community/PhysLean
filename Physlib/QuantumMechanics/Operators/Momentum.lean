@@ -36,6 +36,7 @@ Notation:
 
 ## iv. References
 
+* None.
 -/
 
 TODO "Extend the domain of the momentum operator to the Sobolev space `H¹`."

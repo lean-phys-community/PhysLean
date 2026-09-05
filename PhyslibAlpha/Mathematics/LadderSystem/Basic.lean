@@ -60,6 +60,7 @@ Theorems:
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

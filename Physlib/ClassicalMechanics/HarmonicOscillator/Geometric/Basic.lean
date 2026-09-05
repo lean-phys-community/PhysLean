@@ -57,8 +57,8 @@ tangent-coordinate infrastructure is used by later geometric constructions on th
 
 ## iv. References
 
-- Ivo Terek, Introductory Variational Calculus on Manifolds, page 1 (Section 1, Basic
-  definitions and examples).
+* Ivo Terek, Introductory Variational Calculus on Manifolds, page 1 (Section 1, Basic definitions
+  and examples). [ref: terek_variational_manifolds]
 -/
 
 @[expose] public section

@@ -42,6 +42,7 @@ through index evaluation, `toField {A.toFieldStrength x | [μ] [ν]}ᵀ`.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

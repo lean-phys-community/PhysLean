@@ -33,9 +33,8 @@ block, while rotation generators are antisymmetric matrices acting only on spati
 
 ## References
 
-- Weinberg, *The Quantum Theory of Fields*, Vol 1, Section 2.7
-- Peskin & Schroeder, *An Introduction to QFT*, Appendix A
-
+* Weinberg, *The Quantum Theory of Fields*, Vol 1, Section 2.7. [ref: weinberg_qft1]
+* Peskin & Schroeder, *An Introduction to QFT*, Appendix A. [ref: peskin_schroeder_qft]
 ## Future Work
 
 TODO can be completed by proving linear independence and spanning of these

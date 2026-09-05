@@ -132,19 +132,18 @@ of §G.
 
 ## iv. References
 
-- Kreutz-Delgado, *The Complex Gradient Operator and the CR-Calculus*,
-  arXiv:0906.4835 — directional/multivariable formulation and two-term chain
-  rule (§D); second-order theory behind §G–I.
-- Mortini & Rupp, *The Clairaut–Schwarz Theorem for Mixed Wirtinger
-  Derivatives*, Bull. Iranian Math. Soc. 48 (2022), 2643–2647 — the mixed
-  holomorphic/anti-holomorphic symmetry of §I under the same `C²` hypothesis,
-  with the same reduction to real Schwarz used here.
-- Koor, Qiu, Kwek & Rebentrost, *A short tutorial on Wirtinger Calculus with
-  applications in quantum information*, arXiv:2312.04858 — companion
-  exposition of the scalar single/multivariable calculus and sign conventions.
-- *Complex differential form*, Wikipedia (section "The Dolbeault operators") — the
-  `d = ∂ + ∂̄` splitting and the `∂`/`∂̄` notation this module's operators are named after.
-
+* Kreutz-Delgado, *The Complex Gradient Operator and the CR-Calculus*, arXiv:0906.4835 —
+  directional/multivariable formulation and two-term chain rule (§D); second-order theory behind
+  §G–I. [ref: kreutz_delgado_cr_calculus]
+* Mortini & Rupp, *The Clairaut–Schwarz Theorem for Mixed Wirtinger Derivatives*, Bull. Iranian
+  Math. Soc. 48 (2022), 2643–2647 — the mixed holomorphic/anti-holomorphic symmetry of §I under the
+  same `C²` hypothesis, with the same reduction to real Schwarz used here. [ref: mortini_rupp_2022]
+* Koor, Qiu, Kwek & Rebentrost, *A short tutorial on Wirtinger Calculus with applications in quantum
+  information*, arXiv:2312.04858 — companion exposition of the scalar single/multivariable calculus
+  and sign conventions. [ref: koor_et_al_2023_wirtinger]
+* *Complex differential form*, Wikipedia (section "The Dolbeault operators") — the `d = ∂ + ∂̄`
+  splitting and the `∂`/`∂̄` notation this module's operators are named after.
+  [ref: wiki_complex_differential_form]
 -/
 
 @[expose] public section

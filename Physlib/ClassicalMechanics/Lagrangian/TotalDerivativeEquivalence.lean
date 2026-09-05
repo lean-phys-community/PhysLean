@@ -54,9 +54,8 @@ This is because:
 
 ## iv. References
 
-- Landau & Lifshitz, "Mechanics", §2 (The principle of least action)
-- Landau & Lifshitz, "Mechanics", §4 (The Lagrangian for a free particle)
-
+* Landau & Lifshitz, "Mechanics", §2 (The principle of least action). [ref: landau_mechanics]
+* Landau & Lifshitz, "Mechanics", §4 (The Lagrangian for a free particle). [ref: landau_mechanics]
 -/
 
 @[expose] public section

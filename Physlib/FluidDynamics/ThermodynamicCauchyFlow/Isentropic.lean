@@ -26,6 +26,7 @@ This module defines the isentropic predicate for thermodynamic Cauchy flows.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

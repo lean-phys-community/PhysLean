@@ -25,6 +25,7 @@ This module defines the Newtonian constitutive stress law for `CauchyFlow`.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

@@ -49,8 +49,7 @@ are complete, and have their charges in the given subsets.
 
 ## iv. References
 
-There are no known references for the material in this module.
-
+* None.
 -/
 
 @[expose] public section

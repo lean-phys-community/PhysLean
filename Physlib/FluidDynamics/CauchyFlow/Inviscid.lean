@@ -28,6 +28,7 @@ matrix-divergence identity for pressure stress.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

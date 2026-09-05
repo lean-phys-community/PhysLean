@@ -36,9 +36,8 @@ are correctly attributed `sorryful` and `pseudo` respectively.
 
 ## iv. References
 
-Some of the code here is adapted from from the file: `Lean.Util.CollectAxioms`
-copyright (c) 2020 Microsoft Corporation. Authored by Leonardo de Moura.
-
+* Adapted from `Lean.Util.CollectAxioms`, copyright (c) 2020 Microsoft
+  Corporation, authored by Leonardo de Moura.
 -/
 
 @[expose] public meta section

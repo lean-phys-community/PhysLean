@@ -50,6 +50,7 @@ and prove that `⊗ₕ` is commutative and associative (up to linear isometric e
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

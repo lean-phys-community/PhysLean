@@ -15,6 +15,11 @@ The Pati-Salam model is a petite unified theory that unifies the Standard Model 
 
 This file currently contains informal-results about the Pati-Salam group.
 
+## References
+
+* Baez's Grand Unified Theories notes, cited throughout below. [ref: baez_guts_notes]
+* A reference for the kernel of `inclSM`, cited below. [ref: arxiv_2201_07245]
+
 -/
 
 @[expose] public section
@@ -35,7 +40,7 @@ informal_definition GaugeGroupI where
 group homomorphism `SU(3) × SU(2) × U(1) → SU(4) × SU(2) × SU(2)` taking `(h, g, α)` to
 `(blockdiag (α h, α ^ (-3)), g, diag (α ^ 3, α ^(-3))`.
 
-See page 54 of https://math.ucr.edu/home/baez/guts.pdf
+See page 54 of https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 informal_definition inclSM where
   deps := [``GaugeGroupI, ``StandardModel.GaugeGroupI]
@@ -43,7 +48,7 @@ informal_definition inclSM where
 
 /-- The kernel of the map `inclSM` is equal to the subgroup `StandardModel.gaugeGroupℤ₃SubGroup`.
 
-See footnote 10 of https://arxiv.org/pdf/2201.07245
+See footnote 10 of https://arxiv.org/pdf/2201.07245 [ref: arxiv_2201_07245]
 -/
 informal_lemma inclSM_ker where
   deps := [``inclSM, ``StandardModel.gaugeGroupℤ₃SubGroup]
@@ -64,7 +69,7 @@ informal_definition gaugeGroupISpinEquiv where
 /-- The ℤ₂-subgroup of the un-quotiented gauge group which acts trivially on all particles in the
 standard model, i.e., the ℤ₂-subgroup of `GaugeGroupI` with the non-trivial element `(-1, -1, -1)`.
 
-See https://math.ucr.edu/home/baez/guts.pdf
+See https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 informal_definition gaugeGroupℤ₂SubGroup where
   deps := [``GaugeGroupI]
@@ -73,7 +78,7 @@ informal_definition gaugeGroupℤ₂SubGroup where
 /-- The gauge group of the Pati-Salam model with a ℤ₂ quotient, i.e., the quotient of `GaugeGroupI`
 by the ℤ₂-subgroup `gaugeGroupℤ₂SubGroup`.
 
-See https://math.ucr.edu/home/baez/guts.pdf
+See https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 informal_definition GaugeGroupℤ₂ where
   deps := [``GaugeGroupI, ``gaugeGroupℤ₂SubGroup]

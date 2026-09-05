@@ -18,7 +18,8 @@ position `r` moves with velocity `ω × r`, so the body's angular momentum about
 `L = I ω`.
 
 ## References
-- Landau and Lifshitz, Mechanics, Section 32.
+
+* Landau and Lifshitz, Mechanics, Section 32. [ref: landau_mechanics]
 -/
 
 @[expose] public section

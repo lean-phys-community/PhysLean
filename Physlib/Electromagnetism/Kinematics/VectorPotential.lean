@@ -35,6 +35,7 @@ the vector potential is non-relativistic and is therefore a function of `Time` a
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

@@ -15,6 +15,10 @@ The Georgi-Glashow model is a grand unified theory that unifies the Standard Mod
 
 This file currently contains informal-results about the Georgi-Glashow group.
 
+## References
+
+* Baez's Grand Unified Theories notes, cited throughout below. [ref: baez_guts_notes]
+
 -/
 
 @[expose] public section
@@ -30,7 +34,7 @@ informal_definition GaugeGroupI where
 the group homomorphism `SU(3) × SU(2) × U(1) → SU(5)` taking `(h, g, α)` to
 `blockdiag (α ^ 3 g, α ^ (-2) h)`.
 
-See page 34 of https://math.ucr.edu/home/baez/guts.pdf
+See page 34 of https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 informal_definition inclSM where
   deps := [``GaugeGroupI, ``StandardModel.GaugeGroupI]
@@ -38,7 +42,7 @@ informal_definition inclSM where
 
 /-- The kernel of the map `inclSM` is equal to the subgroup `StandardModel.gaugeGroupℤ₆SubGroup`.
 
-See page 34 of https://math.ucr.edu/home/baez/guts.pdf
+See page 34 of https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 informal_lemma inclSM_ker where
   deps := [``inclSM]

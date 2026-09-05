@@ -24,8 +24,7 @@ of the dual of `𝓢(Space d, ℂ)` defined by evaluation of the Fourier transfo
 
 ## iv. References
 
-- https://en.wikipedia.org/wiki/Rigged_Hilbert_space
-
+* https://en.wikipedia.org/wiki/Rigged_Hilbert_space. [ref: wiki_rigged_hilbert_space]
 -/
 
 @[expose] public section

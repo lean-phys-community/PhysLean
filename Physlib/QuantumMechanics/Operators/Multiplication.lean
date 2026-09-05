@@ -57,9 +57,8 @@ through multiplication in the Fourier domain: see `Operators/Derivative.lean`.
 
 ## iv. References
 
-See examples 1.3 and 3.8 in
-- [Konrad Schmüdgen, *Unbounded Self-Adjoint Operators on Hilbert Space*][Schmudgen2012]
-
+* Konrad Schmüdgen, *Unbounded Self-Adjoint Operators on Hilbert Space*, examples 1.3 and 3.8.
+  [ref: Schmudgen2012]
 -/
 
 @[expose] public section

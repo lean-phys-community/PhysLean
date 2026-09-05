@@ -41,9 +41,8 @@ systems (addition, `nsmul`, and `congr`).
 
 ## References
 
-- L. D. Landau & E. M. Lifshitz, *Statistical Physics, Part 1*, §31.
-- D. Tong, *Lectures on Statistical Physics*, §1.3.
-
+* L. D. Landau & E. M. Lifshitz, *Statistical Physics, Part 1*, §31. [ref: landau_statphys1]
+* D. Tong, *Lectures on Statistical Physics*, §1.3. [ref: tong_statistical_physics]
 -/
 
 @[expose] public section

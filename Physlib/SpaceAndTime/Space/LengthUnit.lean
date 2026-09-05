@@ -22,6 +22,17 @@ To define specific length units, we first state the existence of a
 a given length unit, and then construct all other length units from it. We choose to state the
 existence of the length unit of meters, and construct all other length units from that.
 
+## References
+
+* The BIPM SI Brochure, for the meter, the speed of light, and SI prefixes.
+  [ref: bipm_si_brochure_2019]
+* NIST Handbook 44, Appendix C, for the international foot-based units and the international
+  nautical mile. [ref: nist_hb44_2023]
+* IAU 2012 Resolution B2, for the astronomical unit. [ref: iau_2012_resolution_b2]
+* The IAU Style Manual recommendations, for the Julian year convention used in the light-year.
+  [ref: iau_style_manual_units]
+* IAU 2015 Resolution B2, for the exact parsec convention. [ref: iau_2015_resolution_b2]
+
 -/
 
 @[expose] public section
@@ -143,17 +154,17 @@ From this choice of meters, we can define other length units by scaling meters.
 
 The references for the numerical definitions used below are:
 * the BIPM SI Brochure for the meter, the speed of light, and SI prefixes:
-  https://www.bipm.org/documents/d/guest/si-brochure-9-en-pdf
+  https://www.bipm.org/documents/d/guest/si-brochure-9-en-pdf [ref: bipm_si_brochure_2019]
 * NIST Handbook 44, Appendix C, for the international foot-based units and
   the international nautical mile:
-  https://doi.org/10.6028/NIST.HB.44-2023
+  https://doi.org/10.6028/NIST.HB.44-2023 [ref: nist_hb44_2023]
 * IAU 2012 Resolution B2 for the astronomical unit:
-  https://iauarchive.eso.org/static/resolutions/IAU2012_English.pdf
+  https://iauarchive.eso.org/static/resolutions/IAU2012_English.pdf [ref: iau_2012_resolution_b2]
 * the IAU Style Manual recommendations for the Julian year convention used in
   the light-year:
-  https://iauarchive.eso.org/publications/proceedings_rules/units/
+  https://iauarchive.eso.org/publications/proceedings_rules/units/ [ref: iau_style_manual_units]
 * IAU 2015 Resolution B2 for the exact parsec convention:
-  https://iauarchive.eso.org/static/resolutions/IAU2015_English.pdf
+  https://iauarchive.eso.org/static/resolutions/IAU2015_English.pdf [ref: iau_2015_resolution_b2]
 
 -/
 

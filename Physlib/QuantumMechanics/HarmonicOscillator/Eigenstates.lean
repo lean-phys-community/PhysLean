@@ -41,6 +41,7 @@ hyperspherical harmonics. In such cases the energies only depend on the radial q
 
 ## iv. References
 
+* None.
 -/
 @[expose] public section
 

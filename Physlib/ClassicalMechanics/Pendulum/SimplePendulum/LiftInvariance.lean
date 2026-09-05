@@ -49,9 +49,9 @@ level of configuration-space trajectories comes with the geometric bridge in a l
 ## iv. References
 
 References for the simple gravity pendulum include:
-- Landau & Lifshitz, Mechanics, 3rd ed., §5 and §21.
-- Arnold, Mathematical Methods of Classical Mechanics, 2nd ed., §4.
 
+* Landau & Lifshitz, Mechanics, 3rd ed., §5 and §21. [ref: landau_mechanics]
+* Arnold, Mathematical Methods of Classical Mechanics, 2nd ed., §4. [ref: arnold_mechanics]
 -/
 
 @[expose] public section

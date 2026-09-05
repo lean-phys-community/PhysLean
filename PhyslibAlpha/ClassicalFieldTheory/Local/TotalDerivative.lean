@@ -31,6 +31,7 @@ formula, without yet introducing a separate coordinate-level derivative calculus
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

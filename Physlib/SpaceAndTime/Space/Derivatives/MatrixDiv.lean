@@ -35,6 +35,7 @@ the vector field whose `i`th component is
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

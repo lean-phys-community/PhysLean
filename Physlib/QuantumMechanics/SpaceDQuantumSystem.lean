@@ -30,6 +30,7 @@ namely the number of spatial dimensions, the particle's mass and the potential f
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

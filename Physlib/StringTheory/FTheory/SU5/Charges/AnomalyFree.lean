@@ -39,8 +39,7 @@ which do not have exotics.
 
 ## iv. References
 
-There are no known references for the material in this section.
-
+* None.
 -/
 
 @[expose] public section

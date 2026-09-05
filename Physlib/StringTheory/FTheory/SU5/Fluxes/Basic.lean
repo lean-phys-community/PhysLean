@@ -118,9 +118,8 @@ they can be derived from other data structures.
 
 ## iv. References
 
-- [1] arXiv:1401.5084
-- For an old version of the material in this module see PR #569.
-
+* [1] arXiv:1401.5084. [ref: arxiv_1401_5084]
+* For an old version of the material in this module see PR #569.
 -/
 
 @[expose] public section

@@ -46,8 +46,7 @@ properties thereof.
 
 ## iv. References
 
-A reference for the anomaly cancellation conditions is arXiv:1401.5084 equation 22.
-
+* Anomaly cancellation conditions, equation 22. [ref: arxiv_1401_5084]
 -/
 
 @[expose] public section

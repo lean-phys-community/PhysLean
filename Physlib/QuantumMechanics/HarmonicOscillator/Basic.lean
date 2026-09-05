@@ -47,6 +47,7 @@ in `d` dimensions.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

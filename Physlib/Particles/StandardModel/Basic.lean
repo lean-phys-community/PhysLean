@@ -13,6 +13,10 @@ public import Mathlib.RingTheory.RootsOfUnity.Complex
 
 This file defines the basic properties of the standard model in particle physics.
 
+## References
+
+* Baez's Grand Unified Theories notes, cited throughout below. [ref: baez_guts_notes]
+
 -/
 
 @[expose] public section
@@ -281,7 +285,7 @@ lemma gaugeGroupℤ₆Hom_toU1 (α : rootsOfUnity 6 ℂ) :
 standard model, i.e., the ℤ₆-subgroup of `GaugeGroupI` with elements `(α^2 * I₃, α^(-3) * I₂, α)`,
 where `α` is a sixth complex root of unity.
 
-See https://math.ucr.edu/home/baez/guts.pdf
+See https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 noncomputable def gaugeGroupℤ₆SubGroup : Subgroup GaugeGroupI :=
   gaugeGroupℤ₆Hom.range
@@ -307,7 +311,7 @@ instance gaugeGroupℤ₆SubGroup_normal : gaugeGroupℤ₆SubGroup.Normal where
 /-- The smallest possible gauge group of the Standard Model, i.e., the quotient of `GaugeGroupI` by
 the ℤ₆-subgroup `gaugeGroupℤ₆SubGroup`.
 
-See https://math.ucr.edu/home/baez/guts.pdf
+See https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 def GaugeGroupℤ₆ : Type :=
   GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup
@@ -388,7 +392,7 @@ lemma gaugeGroupℤ₂Hom_toU1 (α : rootsOfUnity 2 ℂ) :
 standard model, i.e., the ℤ₂-subgroup of `GaugeGroupI` derived from the ℤ₂ subgroup of
 `gaugeGroupℤ₆SubGroup`.
 
-See https://math.ucr.edu/home/baez/guts.pdf
+See https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 noncomputable def gaugeGroupℤ₂SubGroup : Subgroup GaugeGroupI :=
   gaugeGroupℤ₂Hom.range
@@ -418,7 +422,7 @@ instance gaugeGroupℤ₂SubGroup_normal : gaugeGroupℤ₂SubGroup.Normal where
 /-- The gauge group of the Standard Model with a ℤ₂ quotient, i.e., the quotient of `GaugeGroupI` by
 the ℤ₂-subgroup `gaugeGroupℤ₂SubGroup`.
 
-See https://math.ucr.edu/home/baez/guts.pdf
+See https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 def GaugeGroupℤ₂ : Type :=
   GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup
@@ -499,7 +503,7 @@ lemma gaugeGroupℤ₃Hom_toU1 (α : rootsOfUnity 3 ℂ) :
 standard model, i.e., the ℤ₃-subgroup of `GaugeGroupI` derived from the ℤ₃ subgroup of
 `gaugeGroupℤ₆SubGroup`.
 
-See https://math.ucr.edu/home/baez/guts.pdf
+See https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 noncomputable def gaugeGroupℤ₃SubGroup : Subgroup GaugeGroupI :=
   gaugeGroupℤ₃Hom.range
@@ -529,7 +533,7 @@ instance gaugeGroupℤ₃SubGroup_normal : gaugeGroupℤ₃SubGroup.Normal where
 /-- The gauge group of the Standard Model with a ℤ₃-quotient, i.e., the quotient of `GaugeGroupI` by
 the ℤ₃-subgroup `gaugeGroupℤ₃SubGroup`.
 
-See https://math.ucr.edu/home/baez/guts.pdf
+See https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 def GaugeGroupℤ₃ : Type :=
   GaugeGroupI ⧸ gaugeGroupℤ₃SubGroup
@@ -577,7 +581,7 @@ deriving Fintype, DecidableEq
 `GaugeGroupQuot` to `Type` which gives the gauge group of the Standard Model for a given choice of
 quotient.
 
-See https://math.ucr.edu/home/baez/guts.pdf
+See https://math.ucr.edu/home/baez/guts.pdf [ref: baez_guts_notes]
 -/
 def GaugeGroup : GaugeGroupQuot → Type
   | .ℤ₆ => GaugeGroupℤ₆

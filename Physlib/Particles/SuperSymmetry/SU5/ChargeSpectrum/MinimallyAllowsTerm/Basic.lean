@@ -49,7 +49,7 @@ We show that every charge spectrum which minimally allows `T` is of the form
 
 ## iv. References
 
-There are no known references for this material.
+* None.
 -/
 
 @[expose] public section

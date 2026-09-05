@@ -48,7 +48,8 @@ In coordinates this gives the standard expression
 
 ## iv. References
 
-- Ivo Terek, Introductory Variational Calculus on Manifolds, pages 1-2.
+* Ivo Terek, Introductory Variational Calculus on Manifolds, pages 1-2.
+  [ref: terek_variational_manifolds]
 -/
 
 @[expose] public section

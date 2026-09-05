@@ -38,6 +38,7 @@ sitting at the origin in 1d space.
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

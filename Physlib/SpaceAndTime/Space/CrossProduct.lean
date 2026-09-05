@@ -33,6 +33,7 @@ and prove various properties about it related to time derivatives and inner prod
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

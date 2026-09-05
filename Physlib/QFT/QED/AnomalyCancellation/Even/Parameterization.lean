@@ -13,9 +13,9 @@ Given maps `g : Fin n.succ → ℚ`, `f : Fin n → ℚ` and `a : ℚ` we form a
 equations. We show that every solution can be got in this way, up to permutation, unless it, up to
 permutation, lives in the unshifted plane.
 
-The main reference is:
+## References
 
-- https://arxiv.org/pdf/1912.04804.pdf
+* The main reference is https://arxiv.org/pdf/1912.04804.pdf. [ref: arxiv_1912_04804]
 
 -/
 

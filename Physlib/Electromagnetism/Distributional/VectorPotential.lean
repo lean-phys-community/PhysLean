@@ -33,6 +33,7 @@ the vector potential is non-relativistic and is therefore a distribution of `Tim
 
 ## iv. References
 
+* None.
 -/
 
 @[expose] public section

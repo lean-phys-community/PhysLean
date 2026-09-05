@@ -71,8 +71,7 @@ conditions.
 
 ## iv. References
 
-- https://arxiv.org/pdf/1912.04804.pdf
-
+* https://arxiv.org/pdf/1912.04804.pdf. [ref: arxiv_1912_04804]
 -/
 
 @[expose] public section

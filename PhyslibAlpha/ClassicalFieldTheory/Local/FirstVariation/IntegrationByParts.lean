@@ -28,9 +28,8 @@ Euler-Lagrange criterion.
 
 ## iv. References
 
-- J. Cortés and A. Haupt, *Lecture Notes on Mathematical Methods of Classical Physics*,
-  Chapter 5, Theorem 5.2.
-
+* J. Cortés and A. Haupt, *Lecture Notes on Mathematical Methods of Classical Physics*, Chapter 5,
+  Theorem 5.2. [ref: cortes_haupt_2016]
 -/
 
 @[expose] public section

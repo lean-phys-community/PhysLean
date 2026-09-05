@@ -35,8 +35,7 @@ In this implementation we have set `μ₀ = 1`. It is a TODO to introduce this c
 
 ## iv. References
 
-- https://quantummechanics.ucsd.edu/ph130a/130_notes/node452.html
-
+* https://quantummechanics.ucsd.edu/ph130a/130_notes/node452.html. [ref: ucsd_ph130a_node452]
 -/
 
 @[expose] public section

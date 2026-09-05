@@ -23,8 +23,8 @@ electromagnetic potentials and fields around a circular coil.
 
 ## iv. References
 
-- https://ntrs.nasa.gov/api/citations/20140002333/downloads/20140002333.pdf
-
+* https://ntrs.nasa.gov/api/citations/20140002333/downloads/20140002333.pdf.
+  [ref: nasa_ntrs_20140002333]
 -/
 
 @[expose] public section

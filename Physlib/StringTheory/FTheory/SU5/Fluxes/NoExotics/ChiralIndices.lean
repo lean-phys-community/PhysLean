@@ -40,8 +40,7 @@ we state them for the representation `D = (bar 3,1)_{1/3}` only:
 
 ## iv. References
 
-There are no known references for the material in this module.
-
+* None.
 -/
 
 @[expose] public section
