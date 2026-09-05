@@ -25,8 +25,8 @@ spacetime to contravariant Lorentz vectors.
 
 - `ElectromagneticPotential` : is the type of electromagnetic potentials.
 - `ElectromagneticPotential.deriv` : the derivative tensor `∂_μ A^ν`.
-- `ElectromagneticPotential.contDiff_deriv_deriv_component` : the second derivatives `∂_μ ∂_ν A^ρ` are
-  `C^n` if the potential is `C^{n+2}`.
+- `ElectromagneticPotential.contDiff_deriv_deriv_component` : the second derivatives
+  `∂_μ ∂_ν A^ρ` are `C^n` if the potential is `C^{n+2}`.
 - `ElectromagneticPotential.contDiff_deriv` : the derivative tensor is `C^n` if the potential
   is `C^{n+1}`.
 
@@ -347,8 +347,12 @@ lemma contDiff_deriv_component_of_smooth {n : ℕ} {d} {A : ElectromagneticPoten
 
 The derivatives `∂_ μ A x ν` of the potential are themselves differentiable if the
 potential is `C^3`, and `C^n` if the potential is `C^{n+2}`. This is what is needed to
-make sense of second derivatives `∂_ μ (∂_ ν A) x ρ` of the potential, as appear for example
-in Maxwell's equations.
+make sense of second derivatives of the potential, as appear for example in Maxwell's equations.
+
+A second derivative of a component can be written in two ways: as `∂_ μ (fun x => ∂_ ν A x ρ) x`,
+the derivative of the real-valued component `∂_ ν A x ρ` (the `_component` lemmas), or as
+`∂_ μ (∂_ ν A) x ρ`, the component of the derivative of the vector-valued `∂_ ν A`
+(the `_apply` lemmas). The two agree for a `C^2` potential by `SpaceTime.deriv_apply_eq`.
 
 -/
 
@@ -372,6 +376,32 @@ lemma differentiable_deriv_deriv_component_of_smooth {d} {A : ElectromagneticPot
     (hA : ContDiff ℝ ∞ A) (μ ν ρ : Fin 1 ⊕ Fin d) :
     Differentiable ℝ (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) :=
   differentiable_deriv_deriv_component (hA.of_le ENat.LEInfty.out) μ ν ρ
+
+/-- The `ρ` component of `∂_ μ (∂_ ν A)` is `C^n` for a `C^{n+2}` potential. -/
+@[fun_prop]
+lemma contDiff_deriv_deriv_apply {n} {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ (n + 2) A) (μ ν ρ : Fin 1 ⊕ Fin d) :
+    ContDiff ℝ n (fun x => ∂_ μ (∂_ ν A) x ρ) := by
+  have hd : Differentiable ℝ (∂_ ν A) :=
+    SpaceTime.differentiable_deriv ν A (hA.of_le le_add_self)
+  conv => enter [3, x]; rw [SpaceTime.deriv_apply_eq μ ρ _ hd, ← SpaceTime.deriv_eq]
+  fun_prop
+
+/-- The `ρ` component of `∂_ μ (∂_ ν A)` is differentiable for a `C^3` potential. -/
+@[fun_prop]
+lemma differentiable_deriv_deriv_apply {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ 3 A) (μ ν ρ : Fin 1 ⊕ Fin d) :
+    Differentiable ℝ (fun x => ∂_ μ (∂_ ν A) x ρ) := by
+  have hd : Differentiable ℝ (∂_ ν A) :=
+    SpaceTime.differentiable_deriv ν A (hA.of_le (by norm_num))
+  conv => enter [2, x]; rw [SpaceTime.deriv_apply_eq μ ρ _ hd, ← SpaceTime.deriv_eq]
+  fun_prop
+
+@[fun_prop]
+lemma differentiable_deriv_deriv_apply_of_smooth {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ ∞ A) (μ ν ρ : Fin 1 ⊕ Fin d) :
+    Differentiable ℝ (fun x => ∂_ μ (∂_ ν A) x ρ) :=
+  differentiable_deriv_deriv_apply (hA.of_le ENat.LEInfty.out) μ ν ρ
 
 /-!
 
