@@ -481,23 +481,23 @@ lemma space_deriv_electricField_eq_magneticFieldMatrix {d : ℕ}
   simp [← Time.deriv_eq]
   field_simp
   any_goals apply Differentiable.differentiableAt
-  · exact fieldStrengthMatrix_differentiable_space hA2 t
+  · exact toFieldStrength_eval_differentiable_space hA2 t
   · apply Differentiable.mul_const
-    exact fieldStrengthMatrix_differentiable_space hA2 t
-  · exact fieldStrengthMatrix_differentiable_time hA2 x
+    exact toFieldStrength_eval_differentiable_space hA2 t
+  · exact toFieldStrength_eval_differentiable_time hA2 x
   · intro i _
     apply Differentiable.differentiableAt
     apply Differentiable.const_mul
     apply Differentiable.mul_const
-    exact fieldStrengthMatrix_differentiable_space hA2 t
+    exact toFieldStrength_eval_differentiable_space hA2 t
   · intro i _
     apply Differentiable.differentiableAt
     apply Differentiable.mul_const
-    exact fieldStrengthMatrix_differentiable_time hA2 x
+    exact toFieldStrength_eval_differentiable_time hA2 x
   · apply Differentiable.fun_sum
     intro i _
     apply Differentiable.mul_const
-    exact fieldStrengthMatrix_differentiable_time hA2 x
+    exact toFieldStrength_eval_differentiable_time hA2 x
 
 /-!
 

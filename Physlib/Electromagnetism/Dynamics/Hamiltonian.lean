@@ -58,6 +58,8 @@ open TensorProduct
 open minkowskiMatrix
 open InnerProductSpace
 open Lorentz.Vector
+
+attribute [-simp] Fin.succAbove_zero
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
 
@@ -124,16 +126,17 @@ lemma canonicalMomentum_eq_gradient_kineticTerm {d}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma canonicalMomentum_eq {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ 2 A) (J : LorentzCurrentDensity d) :
     A.canonicalMomentum 𝓕 J = fun x => fun μ =>
-      (1/𝓕.μ₀) * η μ μ • A.fieldStrengthMatrix x (μ, Sum.inl 0) := by
+      (1/𝓕.μ₀) * η μ μ • toField {A.toFieldStrength x | [μ] [Sum.inl 0]}ᵀ := by
   rw [canonicalMomentum_eq_gradient_kineticTerm A hA J]
   funext x
   apply ext_inner_right (𝕜 := ℝ)
   intro v
   simp [gradient]
+  conv_rhs => rw [Lorentz.Vector.inner_eq_sum]
+  simp only [toFieldStrength_eval_apply_eq_single]
   conv_lhs =>
     enter [1, 2, v]
     rw [kineticTerm_add_time_mul_const _ (hA.differentiable (by simp))]
@@ -144,11 +147,8 @@ lemma canonicalMomentum_eq {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
   rw [← Finset.sum_sub_distrib, Finset.mul_sum]
   congr
   ext μ
-  simp only [Fin.isValue, RCLike.inner_apply, conj_trivial, equivEuclid_apply]
-  rw [fieldStrengthMatrix, toFieldStrength_basis_repr_apply_eq_single]
-  simp only [Fin.isValue, inl_0_inl_0, one_mul]
-  ring_nf
-  simp
+  linear_combination (-(v μ * 𝓕.μ₀⁻¹ * ∂_ μ A x (Sum.inl 0))) *
+    minkowskiMatrix.η_apply_mul_η_apply_diag μ
 
 /-!
 
@@ -165,14 +165,14 @@ lemma canonicalMomentum_eq_electricField {d} {𝓕 : FreeSpace} (A : Electromagn
   rw [canonicalMomentum_eq A hA J]
   funext x μ
   match μ with
-  | Sum.inl 0 => simp
+  | Sum.inl 0 => simp [toFieldStrength_eval_diag_eq_zero]
   | Sum.inr i =>
   simp only [one_div, inr_i_inr_i, Fin.isValue, smul_eq_mul, neg_mul, one_mul, mul_neg, mul_inv_rev,
     neg_inj]
-  rw [electricField_eq_fieldStrengthMatrix (hA := hA.differentiable (by simp))]
+  rw [electricField_eq_toFieldStrength_eval (hA := hA.differentiable (by simp))]
   simp only [Fin.isValue, toTimeAndSpace_symm_apply_time_space, neg_mul, mul_neg]
   field_simp
-  exact fieldStrengthMatrix_antisymm A x (Sum.inr i) (Sum.inl 0)
+  exact toFieldStrength_eval_antisymm A x (Sum.inr i) (Sum.inl 0)
 /-!
 
 ## B. The Hamiltonian
