@@ -11,7 +11,27 @@ public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 # Point particles
 
-This module defines point particles relative to a reference frame.
+This module defines point particles together with their motion relative to a
+reference frame. A `Particle` has a constant positive mass and a position over
+time. Velocity and acceleration are derived from that position rather than stored
+as independent data.
+
+The trajectory is part of the particle's description, but need not be given by an
+explicit solution formula. Particle values can be considered subject to conditions
+on their positions and on the forces acting on them. A particular mechanical model
+can therefore be specified by constraints on particles, with the existence of
+particles satisfying those constraints established separately.
+
+A particle by itself carries no equation of motion or assumption about which
+forces act on it. It is a constituent from which systems can be assembled, rather
+than a specification of an isolated or unconstrained one-particle system. Newton's
+laws are imposed when particles and forces are assembled in
+`ClassicalMechanics.PointParticle.System`.
+
+Position and its first time derivative are required to be differentiable when the
+frame is inertial. This ensures that the velocity and acceleration used in
+Newtonian systems are genuine derivatives. The trajectories in this definition
+are defined for all `Time`.
 -/
 
 @[expose] public noncomputable section

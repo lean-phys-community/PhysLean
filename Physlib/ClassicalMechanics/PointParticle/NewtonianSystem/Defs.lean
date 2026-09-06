@@ -10,7 +10,29 @@ public import Physlib.ClassicalMechanics.PointParticle.Defs
 /-!
 # Newtonian point-particle systems
 
-This module defines finite systems of point particles and forces satisfying Newton's laws.
+This module defines `System`, consisting of an inertial reference frame, a finite
+collection of point particles, and the internal and external forces acting on
+them. Particles carry masses and positions over time; forces carry vector values
+over time and identify the particles they act on.
+
+Newton's second law requires the net force on each particle to equal its mass
+times its acceleration. Newton's third law requires the multiset of internal
+forces to be invariant under equal-and-opposite reversal.
+
+Particles and forces are stored in multisets. For example, if two identical springs
+connect the same pair of particles, the net force on either particle must count
+both spring forces, even though they are equal.
+
+Many classical systems are specified by constraints rather than explicit position
+and force functions. Such models can be formalized as conditions on `System`
+values: which particles and forces are present, geometric constraints such as
+fixed distances, and restrictions on the forces such as centrality.
+
+Results can be proved for arbitrary systems satisfying these conditions. An
+existence proof establishes that a satisfying system exists for given parameters
+and initial conditions; choice can then be used to select one. Explicit formulas
+for the positions and forces are not required to state the conditions or to
+reason about systems satisfying them.
 -/
 
 @[expose] public noncomputable section
