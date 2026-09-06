@@ -25,6 +25,10 @@ spacetime to contravariant Lorentz vectors.
 
 - `ElectromagneticPotential` : is the type of electromagnetic potentials.
 - `ElectromagneticPotential.deriv` : the derivative tensor `∂_μ A^ν`.
+- `ElectromagneticPotential.contDiff_deriv_deriv_component` : the second derivatives
+  `∂_μ ∂_ν A^ρ` are `C^n` if the potential is `C^{n+2}`.
+- `ElectromagneticPotential.contDiff_deriv` : the derivative tensor is `C^n` if the potential
+  is `C^{n+1}`.
 
 ## iii. Table of contents
 
@@ -33,12 +37,15 @@ spacetime to contravariant Lorentz vectors.
   - A.2. Basic constructors of the electromagnetic potential
   - A.3. The group action on the ElectromagneticPotential
   - A.4. Differentiability
-  - A.5. The action on the space-time derivatives
-  - A.6. Variational adjoint derivative of component
-  - A.7. Variational adjoint derivative of derivatives of the potential
+    - A.4.1. Differentiability of the derivative of the potential
+  - A.5. Differentiability in terms of constructors
+  - A.6. The action on the space-time derivatives
+  - A.7. Variational adjoint derivative of component
+  - A.8. Variational adjoint derivative of derivatives of the potential
 - B. The derivative tensor of the electromagnetic potential
   - B.1. Equivariance of the derivative tensor
   - B.2. The elements of the derivative tensor in terms of the basis
+  - B.3. Differentiability of the derivative tensor
 
 ## iv. References
 
@@ -208,7 +215,6 @@ noncomputable def ofPotentials {d} (c : SpeedOfLight) (ϕ : Time → Space d →
     | Sum.inl 0 => ((timeSlice c).symm ϕ x) / c
     | Sum.inr i => (timeSlice c).symm A x i
 
-set_option backward.isDefEq.respectTransparency false in
 lemma ofPotentials_eq_add {d} (c : SpeedOfLight) (ϕ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
     ofPotentials c ϕ A = ofScalarPotential c ϕ + ofVectorPotential c A := by
@@ -280,16 +286,12 @@ noncomputable instance {d} :
 
 ### A.4. Differentiability
 
-We show that the components of field strength tensor are differentiable if the potential is.
+We show that the potential and its derivatives are differentiable (or smooth) if the potential
+is, in the forms `fun_prop` cannot derive on its own. Differentiability of a component
+`fun x => A x μ` of a differentiable potential is found by `fun_prop` directly.
 -/
 
 open ContDiff
-
-@[fun_prop]
-lemma differentiable_component {d : ℕ}
-    (A : ElectromagneticPotential d) (hA : Differentiable ℝ A) (μ : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => A x μ) := by
-  exact (SpaceTime.differentiable_vector _).mpr hA μ
 
 @[fun_prop]
 lemma differentiable_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
@@ -304,39 +306,70 @@ lemma contDiff_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
     (hA.comp (ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ⁻¹)))
 
 @[fun_prop]
-lemma differentiable_deriv {d} {A : ElectromagneticPotential d}
-    (hA : ContDiff ℝ 2 A) (μ ν : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => ∂_ μ A x ν) := by
-  have h : ∀ ν, Differentiable ℝ fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [SpaceTime.differentiable_vector]
-    fun_prop
-  exact h ν
-
-@[fun_prop]
-lemma differentiable_deriv_of_smooth {d} {A : ElectromagneticPotential d}
+lemma differentiable_deriv_component_of_smooth {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μ ν : Fin 1 ⊕ Fin d) :
     Differentiable ℝ (fun x => ∂_ μ A x ν) := by
-  apply differentiable_deriv (hA.of_le (ENat.LEInfty.out)) μ ν
+  have h : ContDiff ℝ 2 A := hA.of_le ENat.LEInfty.out
+  fun_prop
 
 @[fun_prop]
-lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d}
-    (hA : ContDiff ℝ (n + 1) A) (μ ν : Fin 1 ⊕ Fin d) :
+lemma contDiff_deriv_component_of_smooth {n : ℕ} {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ ∞ A) (μ ν : Fin 1 ⊕ Fin d) :
     ContDiff ℝ n (fun x => ∂_ μ A x ν) := by
-  have h : ∀ ν, ContDiff ℝ n fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [SpaceTime.contDiff_vector]
-    fun_prop
-  exact h ν
-
-TODO "Add results related to the differentiability of the
-  derivative of the Electromagnetic potential."
+  have h : ContDiff ℝ (n + 1) A := hA.of_le (mod_cast le_top)
+  fun_prop
 
 /-!
 
-### A.5. Differentiablity in terms of constructors
+#### A.4.1. Differentiability of the derivative of the potential
+
+The derivatives `∂_ μ A x ν` of the potential are `C^n` if the potential is `C^{n+2}`.
+This is what is needed to make sense of second derivatives of the potential, as appear for
+example in Maxwell's equations. Differentiability for a `C^3` potential follows by `fun_prop`
+from these lemmas and `SpaceTime.differentiable_deriv`, so is not stated separately.
+
+A second derivative of a component can be written in two ways: as `∂_ μ (fun x => ∂_ ν A x ρ) x`,
+the derivative of the real-valued component `∂_ ν A x ρ` (the `_component` lemmas), or as
+`∂_ μ (∂_ ν A) x ρ`, the component of the derivative of the vector-valued `∂_ ν A`
+(the `_apply` lemmas). The two agree for a `C^2` potential by `SpaceTime.deriv_apply_eq`.
+
+The differentiability of the first-derivative components `∂_ μ A x ν` for a `C^2` (or
+`C^{n+1}`) potential is found by `fun_prop` directly, so only the smooth variants are stated.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
+/-- The second derivatives `∂_ μ ∂_ ν A^ρ` of a `C^{n+2}` potential are `C^n`. -/
+@[fun_prop]
+lemma contDiff_deriv_deriv_component {n} {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ (n + 2) A) (μ ν ρ : Fin 1 ⊕ Fin d) :
+    ContDiff ℝ n (fun x => ∂_ μ (fun x => ∂_ ν A x ρ) x) := by
+  have h : ContDiff ℝ (n + 1 + 1) A := by rw [add_assoc, one_add_one_eq_two]; exact hA
+  fun_prop
+
+/-- The `ρ` component of `∂_ μ (∂_ ν A)` is `C^n` for a `C^{n+2}` potential. -/
+@[fun_prop]
+lemma contDiff_deriv_deriv_apply {n} {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ (n + 2) A) (μ ν ρ : Fin 1 ⊕ Fin d) :
+    ContDiff ℝ n (fun x => ∂_ μ (∂_ ν A) x ρ) := by
+  have h : ContDiff ℝ (n + 1 + 1) A := by rw [add_assoc, one_add_one_eq_two]; exact hA
+  have hd : Differentiable ℝ (∂_ ν A) :=
+    SpaceTime.differentiable_deriv ν A (hA.of_le le_add_self)
+  conv => enter [3, x]; rw [SpaceTime.deriv_apply_eq μ ρ _ hd, ← SpaceTime.deriv_eq]
+  fun_prop
+
+@[fun_prop]
+lemma differentiable_deriv_deriv_apply_of_smooth {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ ∞ A) (μ ν ρ : Fin 1 ⊕ Fin d) :
+    Differentiable ℝ (fun x => ∂_ μ (∂_ ν A) x ρ) := by
+  have h : ContDiff ℝ 3 A := hA.of_le ENat.LEInfty.out
+  fun_prop
+
+/-!
+
+### A.5. Differentiability in terms of constructors
+
+-/
+
 lemma differentiable_ofScalarPotential {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (hϕ : Differentiable ℝ ↿φ) : Differentiable ℝ (ofScalarPotential c φ) := by
   simp [ofScalarPotential]
@@ -345,7 +378,6 @@ lemma differentiable_ofScalarPotential {d} (c : SpeedOfLight) (φ : Time → Spa
   match μ with
   | Sum.inl 0 | Sum.inr _ => fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (hϕ : ContDiff ℝ n ↿φ) : ContDiff ℝ n (ofScalarPotential c φ) := by
   simp [ofScalarPotential]
@@ -354,7 +386,6 @@ lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space
   match μ with
   | Sum.inl 0 | Sum.inr _ => fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
     (hA : Differentiable ℝ ↿A) : Differentiable ℝ (ofVectorPotential c A) := by
@@ -364,7 +395,6 @@ lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
   match μ with
   | Sum.inl 0 | Sum.inr _ => fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
     (hA : ContDiff ℝ n ↿A) : ContDiff ℝ n (ofVectorPotential c A) := by
@@ -374,7 +404,6 @@ lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
   match μ with
   | Sum.inl 0 | Sum.inr _ => fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma differentiable_ofPotentials {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : Differentiable ℝ ↿φ)
     (hA : Differentiable ℝ ↿A) : Differentiable ℝ (ofPotentials c φ A) := by
@@ -384,7 +413,6 @@ lemma differentiable_ofPotentials {d} (c : SpeedOfLight) (φ : Time → Space d 
   match μ with
   | Sum.inl 0 | Sum.inr _ => fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contDiff_ofPotentials {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : ContDiff ℝ n ↿φ)
     (hA : ContDiff ℝ n ↿A) : ContDiff ℝ n (ofPotentials c φ A) := by
@@ -434,7 +462,7 @@ lemma contDiff_ofElectromagneticField {n : ℕ} (c : SpeedOfLight)
 
 /-!
 
-### A.5. The action on the space-time derivatives
+### A.6. The action on the space-time derivatives
 
 Given a ElectromagneticPotential `A^μ`, we can consider its derivative `∂_μ A^ν`.
 Under a Lorentz transformation `Λ`, this transforms as
@@ -455,7 +483,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
 
 /-!
 
-### A.6. Variational adjoint derivative of component
+### A.7. Variational adjoint derivative of component
 
 We find the variational adjoint derivative of the components of the potential.
 This will be used to find e.g. the variational derivative of the kinetic term,
@@ -485,7 +513,7 @@ lemma hasVarAdjDerivAt_component {d : ℕ} (μ : Fin 1 ⊕ Fin d) (A : SpaceTime
 
 /-!
 
-### A.7. Variational adjoint derivative of derivatives of the potential
+### A.8. Variational adjoint derivative of derivatives of the potential
 
 We find the variational adjoint derivative of the derivatives of the components of the potential.
 This will again be used to find the variational derivative of the kinetic term,
@@ -571,7 +599,6 @@ are just equal to `∂_ μ A x ν`.
 -/
 
 open Tensorial
-set_option backward.isDefEq.respectTransparency false in
 /-- Evaluation of the tensor components of `∂_ μ A x ν`. -/
 lemma tensorDeriv_eval_eq {d} {A : ElectromagneticPotential d} (hA : Differentiable ℝ A)
     (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
@@ -602,7 +629,6 @@ lemma tensorDeriv_eval_eq {d} {A : ElectromagneticPotential d} (hA : Differentia
   · simp only [map_smul, h, smul_eq_mul, Finsupp.coe_smul, Pi.smul_apply]
   · simp only [map_add, h1, h2, Finsupp.coe_add, Pi.add_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma deriv_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     (A : ElectromagneticPotential d)
@@ -631,6 +657,34 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
     simp
   rw [hb, Module.Basis.repr_reindex_apply, deriv_basis_repr_apply]
   rfl
+
+/-!
+
+### B.3. Differentiability of the derivative tensor
+
+We show that the derivative tensor `∂_μ A^ν`, as a function on spacetime, is differentiable
+(or `C^n`) if the potential is `C^2` (or `C^{n+1}`).
+
+-/
+
+/-- The derivative tensor of a `C^2` potential is differentiable. -/
+@[fun_prop]
+lemma differentiable_deriv {d} {A : ElectromagneticPotential d} (hA : ContDiff ℝ 2 A) :
+    Differentiable ℝ A.deriv := by
+  unfold deriv
+  fun_prop
+
+@[fun_prop]
+lemma differentiable_deriv_of_smooth {d} {A : ElectromagneticPotential d}
+    (hA : ContDiff ℝ ∞ A) : Differentiable ℝ A.deriv :=
+  differentiable_deriv (hA.of_le ENat.LEInfty.out)
+
+/-- The derivative tensor of a `C^{n+1}` potential is `C^n`. -/
+@[fun_prop]
+lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d} (hA : ContDiff ℝ (n + 1) A) :
+    ContDiff ℝ n A.deriv := by
+  unfold deriv
+  fun_prop
 
 end ElectromagneticPotential
 
